@@ -23,6 +23,9 @@ public final class x {
     }
 
     public static Application app() {
+        if (Ext.app == null) {
+            throw new RuntimeException("please invoke x.Ext.init(app) on Application#onCreate()");
+        }
         return Ext.app;
     }
 

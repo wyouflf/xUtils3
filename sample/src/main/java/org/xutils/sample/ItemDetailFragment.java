@@ -1,15 +1,21 @@
 package org.xutils.sample;
 
 import android.app.Activity;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
 import org.xutils.sample.dummy.DummyContent;
+import org.xutils.x;
+
+import java.io.File;
 
 /**
  * A fragment representing a single Item detail screen.
@@ -66,4 +72,32 @@ public class ItemDetailFragment extends Fragment {
 
         return rootView;
     }
+
+    private void testUploadFile() {
+        RequestParams params = new RequestParams("http://192.168.0.12:8080/upload", null, null, null);
+        params.setMultipart(true);
+        params.addBodyParameter("file", new File("/sdcard/test.jpg"));
+        x.http().post(params, new Callback.CommonCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean result) {
+                Toast.makeText(getActivity(), "result: " + result, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
 }

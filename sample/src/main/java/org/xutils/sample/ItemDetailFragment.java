@@ -74,7 +74,7 @@ public class ItemDetailFragment extends Fragment {
     }
 
     private void testUploadFile() {
-        RequestParams params = new RequestParams("http://192.168.0.12:8080/upload", null, null, null);
+        RequestParams params = new RequestParams("http://192.168.0.12:8080/upload");
         params.setMultipart(true);
         params.addBodyParameter("file", new File("/sdcard/test.jpg"));
         x.http().post(params, new Callback.CommonCallback<Boolean>() {

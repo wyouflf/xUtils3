@@ -78,8 +78,15 @@ public class RequestParams {
     }
 
     /**
+     * @param uri 不可为空
+     */
+    public RequestParams(String uri) {
+        this(uri, null, null, null);
+    }
+
+    /**
      * @param uri       不可为空
-     * @param builder   不可为空
+     * @param builder
      * @param signs
      * @param cacheKeys
      */

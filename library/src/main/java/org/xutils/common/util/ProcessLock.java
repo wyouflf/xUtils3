@@ -12,7 +12,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.security.MessageDigest;
 
 /**
  * @author: wyouflf
@@ -28,7 +27,6 @@ public final class ProcessLock implements Closeable {
 
     private final static long MAX_AGE = 1000 * 60; // 1min
     private final static String LOCK_FILE_DIR = "process_lock";
-    private static final char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     static {
         IOUtil.deleteFileOrDir(x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE));
@@ -53,7 +51,7 @@ public final class ProcessLock implements Closeable {
         Closeable stream = null;
         FileChannel channel = null;
         try {
-            File file = new File(x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE), md5(lockName));
+            File file = new File(x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE), MD5.md5(lockName));
             if (file.exists()) {
                 if (file.lastModified() + MAX_AGE < System.currentTimeMillis()) {
                     IOUtil.deleteFileOrDir(file);
@@ -157,25 +155,6 @@ public final class ProcessLock implements Closeable {
             }
         }
         IOUtil.deleteFileOrDir(file);
-    }
-
-    private static String md5(String str) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            return toHexString(digest.digest(str.getBytes()));
-        } catch (Throwable ignored) {
-        }
-        return toHexString(str.getBytes());
-    }
-
-    private static String toHexString(byte[] bytes) {
-        if (bytes == null) return "";
-        StringBuilder hex = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            hex.append(hexDigits[(b >> 4) & 0x0F]);
-            hex.append(hexDigits[b & 0x0F]);
-        }
-        return hex.toString();
     }
 
     @Override

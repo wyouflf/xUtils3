@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 
-import org.xutils.x;
 import org.xutils.cache.LruCache;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.common.Callback;
@@ -23,6 +22,7 @@ import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.ex.CacheFileLockException;
 import org.xutils.http.RequestParams;
+import org.xutils.x;
 
 import java.io.File;
 import java.io.IOException;
@@ -309,44 +309,6 @@ import java.util.concurrent.atomic.AtomicLong;
         return cancelable = x.http().get(params, this);
     }
 
-    private boolean validView() {
-        final ImageView view = viewRef.get();
-        if (view != null) {
-            Drawable otherDrawable = view.getDrawable();
-            if (otherDrawable instanceof AsyncDrawable) {
-                ImageLoader otherLoader = ((AsyncDrawable) otherDrawable).getImageLoader();
-                if (otherLoader != null && otherLoader != this) {
-                    if (this.seq > otherLoader.seq) {
-                        otherLoader.cancel();
-                        return true;
-                    } else {
-                        this.cancel();
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private synchronized void setSuccessDrawableForCallback(final Drawable drawable) {
-        final ImageView view = viewRef.get();
-        if (view != null) {
-            if (drawable instanceof GifDrawable) {
-                view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-            }
-            if (options.getAnimation() != null) {
-                ImageAnimationHelper.animationDisplay(view, drawable, options.getAnimation());
-            } else if (options.isFadeIn()) {
-                ImageAnimationHelper.fadeInDisplay(view, drawable);
-            } else {
-                view.setImageDrawable(drawable);
-            }
-            view.setScaleType(options.getImageScaleType());
-        }
-    }
-
     @Override
     public void cancel() {
         stopped = true;
@@ -369,21 +331,21 @@ import java.util.concurrent.atomic.AtomicLong;
 
     @Override
     public void onStarted() {
-        if (validView() && progressCallback != null) {
+        if (validView4Callback(true) && progressCallback != null) {
             progressCallback.onStarted();
         }
     }
 
     @Override
     public void onLoading(long total, long current, boolean isDownloading) {
-        if (progressCallback != null && validView() /*防止过频繁校验*/) {
+        if (progressCallback != null && validView4Callback(true) /*防止过频繁校验*/) {
             progressCallback.onLoading(total, current, isDownloading);
         }
     }
 
     @Override
     public Drawable prepare(File rawData) {
-        if (!validView()) return null;
+        if (!validView4Callback(true)) return null;
 
         if (prepareCallback != null) {
             return prepareCallback.prepare(rawData);
@@ -405,12 +367,15 @@ import java.util.concurrent.atomic.AtomicLong;
         return null;
     }
 
+    private boolean hasCache = false;
+
     @Override
     public boolean onCache(Drawable result) {
-        if (!validView()) return false;
+        if (!validView4Callback(true)) return false;
 
         if (result != null) {
-            setSuccessDrawableForCallback(result);
+            hasCache = true;
+            setSuccessDrawable4Callback(result);
             if (cacheCallback != null) {
                 return cacheCallback.onCache(result);
             } else if (callback != null) {
@@ -425,10 +390,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
     @Override
     public void onSuccess(Drawable result) {
-        if (!validView()) return;
+        if (!validView4Callback(!hasCache)) return;
 
         if (result != null) {
-            setSuccessDrawableForCallback(result);
+            setSuccessDrawable4Callback(result);
             if (callback != null) {
                 callback.onSuccess(result);
             }
@@ -439,18 +404,14 @@ import java.util.concurrent.atomic.AtomicLong;
     public void onError(Throwable ex, boolean isOnCallback) {
         stopped = true;
         LogUtil.e(key.url, ex);
-        if (!validView()) return;
+        if (!validView4Callback(false)) return;
 
         if (ex instanceof CacheFileLockException) {
             doBind(viewRef.get(), key.url, options, callback);
             return;
         }
 
-        ImageView view = viewRef.get();
-        if (view != null) {
-            view.setImageDrawable(options.getFailureDrawable(view));
-            view.setScaleType(options.getPlaceholderScaleType());
-        }
+        setErrorDrawable4Callback();
         if (callback != null) {
             callback.onError(ex, isOnCallback);
         }
@@ -459,7 +420,7 @@ import java.util.concurrent.atomic.AtomicLong;
     @Override
     public void onCancelled(CancelledException cex) {
         stopped = true;
-        if (!validView()) return;
+        if (!validView4Callback(false)) return;
 
         if (callback != null) {
             callback.onCancelled(cex);
@@ -470,16 +431,66 @@ import java.util.concurrent.atomic.AtomicLong;
     public void onFinished() {
         stopped = true;
         ImageView view = viewRef.get();
-        if (view != null && view instanceof FakeImageView) {
+        if (view instanceof FakeImageView) {
             synchronized (FAKE_IMG_MAP) {
                 FAKE_IMG_MAP.remove(key.url);
             }
         }
 
-        if (!validView()) return;
+        if (!validView4Callback(false)) return;
 
         if (callback != null) {
             callback.onFinished();
+        }
+    }
+
+    private boolean validView4Callback(boolean forceValidAsyncDrawable) {
+        final ImageView view = viewRef.get();
+        if (view != null) {
+            Drawable otherDrawable = view.getDrawable();
+            if (otherDrawable instanceof AsyncDrawable) {
+                ImageLoader otherLoader = ((AsyncDrawable) otherDrawable).getImageLoader();
+                if (otherLoader != null && otherLoader != this) {
+                    if (this.seq > otherLoader.seq) {
+                        otherLoader.cancel();
+                        return true;
+                    } else {
+                        this.cancel();
+                        return false;
+                    }
+                }
+            } else if (forceValidAsyncDrawable) {
+                this.cancel();
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private synchronized void setSuccessDrawable4Callback(final Drawable drawable) {
+        final ImageView view = viewRef.get();
+        if (view != null) {
+            if (drawable instanceof GifDrawable) {
+                view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            }
+            if (options.getAnimation() != null) {
+                ImageAnimationHelper.animationDisplay(view, drawable, options.getAnimation());
+            } else if (options.isFadeIn()) {
+                ImageAnimationHelper.fadeInDisplay(view, drawable);
+            } else {
+                view.setImageDrawable(drawable);
+            }
+            view.setScaleType(options.getImageScaleType());
+        }
+    }
+
+    private synchronized void setErrorDrawable4Callback() {
+        final ImageView view = viewRef.get();
+        if (view != null) {
+            Drawable drawable = options.getFailureDrawable(view);
+            view.setImageDrawable(drawable);
+            view.setScaleType(options.getPlaceholderScaleType());
         }
     }
 

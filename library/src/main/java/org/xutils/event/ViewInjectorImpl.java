@@ -20,17 +20,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.xutils.ViewInjector;
 import org.xutils.common.util.LogUtil;
 import org.xutils.event.annotation.ContentView;
 import org.xutils.event.annotation.Event;
 import org.xutils.event.annotation.ViewInject;
+import org.xutils.x;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 
-public final class ViewInjector {
+public final class ViewInjectorImpl implements ViewInjector {
 
     private static final HashSet<Class<?>> IGNORED = new HashSet<Class<?>>();
 
@@ -39,14 +41,55 @@ public final class ViewInjector {
         IGNORED.add(Activity.class);
     }
 
-    private ViewInjector() {
+    private static final Object lock = new Object();
+    private static ViewInjectorImpl instance;
+
+    private ViewInjectorImpl() {
     }
 
-    public static void inject(View view) {
+    public static void registerInstance() {
+        if (instance == null) {
+            synchronized (lock) {
+                if (instance == null) {
+                    instance = new ViewInjectorImpl();
+                }
+            }
+        }
+        x.Ext.setViewInjector(instance);
+    }
+
+    @Override
+    public void inject(View view) {
         injectObject(view, view.getClass(), new ViewFinder(view));
     }
 
-    public static View inject(Object fragment, LayoutInflater inflater, ViewGroup container) {
+    @Override
+    public void inject(Activity activity) {
+        //获取Activity的ContentView的注解
+        Class<?> handlerType = activity.getClass();
+        try {
+            ContentView contentView = findContentView(handlerType);
+            if (contentView != null) {
+                int viewId = contentView.value();
+                if (viewId > 0) {
+                    Method setContentViewMethod = handlerType.getMethod("setContentView", int.class);
+                    setContentViewMethod.invoke(activity, viewId);
+                }
+            }
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
+        }
+
+        injectObject(activity, handlerType, new ViewFinder(activity));
+    }
+
+    @Override
+    public void inject(Object handler, View view) {
+        injectObject(handler, handler.getClass(), new ViewFinder(view));
+    }
+
+    @Override
+    public View inject(Object fragment, LayoutInflater inflater, ViewGroup container) {
         // inject ContentView
         View view = null;
         Class<?> handlerType = fragment.getClass();
@@ -66,29 +109,6 @@ public final class ViewInjector {
         injectObject(fragment, handlerType, new ViewFinder(view));
 
         return view;
-    }
-
-    public static void inject(Activity activity) {
-        //获取Activity的ContentView的注解
-        Class<?> handlerType = activity.getClass();
-        try {
-            ContentView contentView = findContentView(handlerType);
-            if (contentView != null) {
-                int viewId = contentView.value();
-                if (viewId > 0) {
-                    Method setContentViewMethod = handlerType.getMethod("setContentView", int.class);
-                    setContentViewMethod.invoke(activity, viewId);
-                }
-            }
-        } catch (Throwable ex) {
-            LogUtil.e(ex.getMessage(), ex);
-        }
-
-        injectObject(activity, handlerType, new ViewFinder(activity));
-    }
-
-    public static void inject(Object handler, View view) {
-        injectObject(handler, handler.getClass(), new ViewFinder(view));
     }
 
     /**

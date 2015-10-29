@@ -5,6 +5,7 @@ import android.app.Application;
 import org.xutils.common.TaskController;
 import org.xutils.common.task.TaskControllerImpl;
 import org.xutils.db.DbManagerImpl;
+import org.xutils.event.ViewInjectorImpl;
 import org.xutils.http.HttpManagerImpl;
 import org.xutils.image.ImageManagerImpl;
 
@@ -47,6 +48,13 @@ public final class x {
         return Ext.imageManager;
     }
 
+    public static ViewInjector view() {
+        if (Ext.viewInjector == null) {
+            ViewInjectorImpl.registerInstance();
+        }
+        return Ext.viewInjector;
+    }
+
     public static DbManager getDb(DbManager.DaoConfig daoConfig) {
         return DbManagerImpl.getInstance(daoConfig);
     }
@@ -57,6 +65,7 @@ public final class x {
         private static TaskController taskController;
         private static HttpManager httpManager;
         private static ImageManager imageManager;
+        private static ViewInjector viewInjector;
 
         private Ext() {
         }
@@ -87,6 +96,10 @@ public final class x {
 
         public static void setImageManager(ImageManager imageManager) {
             Ext.imageManager = imageManager;
+        }
+
+        public static void setViewInjector(ViewInjector viewInjector) {
+            Ext.viewInjector = viewInjector;
         }
     }
 }

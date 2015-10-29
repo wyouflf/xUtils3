@@ -70,6 +70,10 @@ public class ItemDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.item_detail)).setText(mItem.details);
         }
 
+        //testGetString();
+
+        //testUploadFile();
+
         return rootView;
     }
 
@@ -80,6 +84,31 @@ public class ItemDetailFragment extends Fragment {
         x.http().post(params, new Callback.CommonCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
+                Toast.makeText(getActivity(), "result: " + result, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
+    private void testGetString() {
+        RequestParams params = new RequestParams("http://www.baidu.com");
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
                 Toast.makeText(getActivity(), "result: " + result, Toast.LENGTH_SHORT).show();
             }
 

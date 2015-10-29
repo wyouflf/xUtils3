@@ -9,20 +9,6 @@ import org.xutils.ex.DbException;
  * 全局db配置
  */
 public enum DbConfigs {
-    DEFAULT(new DbManager.DaoConfig()
-            .setDbName("xUtils.db")
-            .setDbVersion(1)
-            .setDbUpgradeListener(new DbManager.DbUpgradeListener() {
-                @Override
-                public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
-                    try {
-                        db.dropDb(); // 默认删除所有表
-                    } catch (DbException ex) {
-                        LogUtil.e(ex.getMessage(), ex);
-                    }
-                }
-            })),
-
     HTTP(new DbManager.DaoConfig()
             .setDbName("xUtils_http_cache.db")
             .setDbVersion(1)

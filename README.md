@@ -12,7 +12,7 @@ ____
 ### 关于libwebpbackport
 * webp来自:https://github.com/webmproject/libwebp
 * webpbackport来自:https://github.com/alexey-pelykh/webp-android-backport
-* 其中webpbackport存在bug:
+* 其中webpbackport在Android 5.0以上系统存在bug:
 ```CPP
 // android_backport_webp.cpp
 // 修改:

@@ -193,6 +193,14 @@ public final class UriRequest implements Closeable {
                 throw new HttpException(code, connection.getResponseMessage());
             }
 
+            { // save cookies
+                try {
+                    COOKIE_MANAGER.put(url.toURI(), connection.getHeaderFields());
+                } catch (Throwable ex) {
+                    LogUtil.e(ex.getMessage(), ex);
+                }
+            }
+
         }
         isLoading = true;
     }

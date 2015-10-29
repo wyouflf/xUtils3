@@ -101,16 +101,19 @@ import java.util.Date;
         }
     }
 
+    private ResponseTracker tracker;
+
     @Override
     public void setResponseTracker(ResponseTracker tracker) {
-
+        this.tracker = tracker;
     }
 
     @Override
     public ResponseTracker getResponseTracker() {
         if (this.parser instanceof ResponseTracker) {
             return (ResponseTracker) parser;
+        } else {
+            return tracker;
         }
-        return null;
     }
 }

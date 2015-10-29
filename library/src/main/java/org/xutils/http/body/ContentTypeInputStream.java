@@ -8,12 +8,12 @@ import java.io.InputStream;
 /**
  * Created by wyouflf on 15/8/13.
  */
-public final class WrappedInputStream extends FilterInputStream {
+public final class ContentTypeInputStream extends FilterInputStream {
 
     private InputStream base;
     private String contentType;
 
-    public WrappedInputStream(InputStream in, String contentType) {
+    public ContentTypeInputStream(InputStream in, String contentType) {
         super(in);
         this.base = in;
         if (TextUtils.isEmpty(contentType)) {

@@ -2,8 +2,6 @@ package org.xutils.http;
 
 import android.text.TextUtils;
 
-import com.squareup.okhttp.RequestBody;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.common.task.Priority;
@@ -12,11 +10,12 @@ import org.xutils.http.annotation.HttpRequest;
 import org.xutils.http.app.DefaultParamsBuilder;
 import org.xutils.http.app.ParamsBuilder;
 import org.xutils.http.body.BodyParamsBody;
+import org.xutils.http.body.ContentTypeInputStream;
 import org.xutils.http.body.FileBody;
 import org.xutils.http.body.InputStreamBody;
 import org.xutils.http.body.MultipartBody;
+import org.xutils.http.body.RequestBody;
 import org.xutils.http.body.StringBody;
-import org.xutils.http.body.WrappedInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -345,10 +344,10 @@ public class RequestParams {
         if (this.fileParams == null) {
             this.fileParams = new HashMap<String, Object>();
         }
-        if (stream instanceof WrappedInputStream) {
+        if (stream instanceof ContentTypeInputStream) {
             this.fileParams.put(name, stream);
         } else {
-            this.fileParams.put(name, new WrappedInputStream(stream, contentType));
+            this.fileParams.put(name, new ContentTypeInputStream(stream, contentType));
         }
     }
 
@@ -496,8 +495,8 @@ public class RequestParams {
                 for (Object value : fileParams.values()) {
                     if (value instanceof File) {
                         result = new FileBody((File) value);
-                    } else if (value instanceof WrappedInputStream) {
-                        WrappedInputStream wIn = (WrappedInputStream) value;
+                    } else if (value instanceof ContentTypeInputStream) {
+                        ContentTypeInputStream wIn = (ContentTypeInputStream) value;
                         result = new InputStreamBody(wIn.getBase(), wIn.getContentType());
                     } else if (value instanceof InputStream) {
                         result = new InputStreamBody((InputStream) value, null);

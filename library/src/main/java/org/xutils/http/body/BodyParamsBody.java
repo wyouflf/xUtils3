@@ -3,19 +3,15 @@ package org.xutils.http.body;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.RequestBody;
-
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Map;
-
-import okio.BufferedSink;
 
 /**
  * Author: wyouflf
  * Time: 2014/05/30
  */
-public class BodyParamsBody extends RequestBody {
+public class BodyParamsBody implements RequestBody {
 
     private byte[] content;
     private String charset;
@@ -42,17 +38,17 @@ public class BodyParamsBody extends RequestBody {
     }
 
     @Override
-    public long contentLength() {
+    public long getContentLength() {
         return content.length;
     }
 
     @Override
-    public MediaType contentType() {
-        return MediaType.parse("application/x-www-form-urlencoded;charset=" + charset);
+    public String getContentType() {
+        return "application/x-www-form-urlencoded;charset=" + charset;
     }
 
     @Override
-    public void writeTo(BufferedSink sink) throws IOException {
+    public void writeTo(OutputStream sink) throws IOException {
         sink.write(this.content);
         sink.flush();
     }

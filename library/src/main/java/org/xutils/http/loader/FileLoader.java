@@ -2,8 +2,6 @@ package org.xutils.http.loader;
 
 import android.text.TextUtils;
 
-import com.squareup.okhttp.Response;
-
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.DiskCacheFile;
 import org.xutils.cache.LruDiskCache;
@@ -29,12 +27,12 @@ import java.util.Date;
 /**
  * Author: wyouflf
  * Time: 2014/05/30
- * <p>
+ * <p/>
  * 下载参数策略:
  * 1. RequestParams#saveFilePath不为空时, 目标文件保存在saveFilePath;
  * 否则由Cache策略分配文件下载路径.
  * 2. 下载时临时目标文件路径为tempSaveFilePath, 下载完后进行a: CacheFile#commit; b:重命名等操作.
- * <p>
+ * <p/>
  * 断点下载策略:
  * 1. 要下载的目标文件不存在或小于 CHECK_SIZE 时删除目标文件, 重新下载.
  * 2. 若文件存在且大于 CHECK_SIZE, range = fileLen - CHECK_SIZE , 校验check_buffer, 相同: 继续下载;
@@ -241,10 +239,10 @@ import java.util.Date;
 
             contentLength = request.getContentLength();
             if (isAutoRename) {
-                responseFileName = getResponseFileName(request.getResponse());
+                responseFileName = getResponseFileName(request);
             }
             if (isAutoResume) {
-                isAutoResume = isSupportRange(request.getResponse());
+                isAutoResume = isSupportRange(request);
             }
 
             if (callBackHandler != null && !callBackHandler.updateProgress(0, 0, false)) {
@@ -300,9 +298,9 @@ import java.util.Date;
         }
     }
 
-    private static String getResponseFileName(Response response) {
-        if (response == null) return null;
-        String disposition = response.header("Content-Disposition");
+    private static String getResponseFileName(UriRequest request) {
+        if (request == null) return null;
+        String disposition = request.getResponseHeader("Content-Disposition");
         if (!TextUtils.isEmpty(disposition)) {
             int startIndex = disposition.indexOf("filename=");
             if (startIndex > 0) {
@@ -317,13 +315,13 @@ import java.util.Date;
         return null;
     }
 
-    private static boolean isSupportRange(Response response) {
-        if (response == null) return false;
-        String ranges = response.header("Accept-Ranges");
+    private static boolean isSupportRange(UriRequest request) {
+        if (request == null) return false;
+        String ranges = request.getResponseHeader("Accept-Ranges");
         if (ranges != null) {
             return ranges.contains("bytes");
         }
-        ranges = response.header("Content-Range");
+        ranges = request.getResponseHeader("Content-Range");
         return ranges != null && ranges.contains("bytes");
     }
 

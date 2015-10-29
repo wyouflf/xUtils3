@@ -1,8 +1,6 @@
 package org.xutils.http.loader;
 
 
-import com.squareup.okhttp.Response;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.xutils.http.RequestParams;
@@ -46,7 +44,6 @@ public final class LoaderFactory {
         IntegerLoader integerLoader = new IntegerLoader();
         converterHashMap.put(int.class, integerLoader);
         converterHashMap.put(Integer.class, integerLoader);
-        converterHashMap.put(Response.class, new ResponseLoader());
     }
 
     @SuppressWarnings("unchecked")

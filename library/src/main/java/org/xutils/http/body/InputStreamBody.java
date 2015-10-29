@@ -2,22 +2,19 @@ package org.xutils.http.body;
 
 import android.text.TextUtils;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.RequestBody;
-
 import org.xutils.common.Callback;
 import org.xutils.http.ProgressCallbackHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
-import okio.BufferedSink;
 
 /**
  * Author: wyouflf
  * Time: 2014/05/30
  */
-public class InputStreamBody extends RequestBody implements ProgressBody {
+public class InputStreamBody implements ProgressBody {
 
     private InputStream content;
     private String contentType;
@@ -47,17 +44,17 @@ public class InputStreamBody extends RequestBody implements ProgressBody {
     }
 
     @Override
-    public long contentLength() throws IOException {
+    public long getContentLength() {
         return total;
     }
 
     @Override
-    public MediaType contentType() {
-        return MediaType.parse(contentType);
+    public String getContentType() {
+        return contentType;
     }
 
     @Override
-    public void writeTo(BufferedSink sink) throws IOException {
+    public void writeTo(OutputStream out) throws IOException {
         if (callBackHandler != null && !callBackHandler.updateProgress(total, current, true)) {
             throw new Callback.CancelledException("upload stopped!");
         }
@@ -66,13 +63,13 @@ public class InputStreamBody extends RequestBody implements ProgressBody {
         try {
             int len = 0;
             while ((len = content.read(buffer)) != -1) {
-                sink.write(buffer, 0, len);
+                out.write(buffer, 0, len);
                 current += len;
                 if (callBackHandler != null && !callBackHandler.updateProgress(total, current, false)) {
                     throw new Callback.CancelledException("upload stopped!");
                 }
             }
-            sink.flush();
+            out.flush();
 
             if (callBackHandler != null) {
                 callBackHandler.updateProgress(total, total, true);

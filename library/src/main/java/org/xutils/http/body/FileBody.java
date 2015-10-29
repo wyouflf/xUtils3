@@ -1,5 +1,7 @@
 package org.xutils.http.body;
 
+import android.text.TextUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,7 +20,7 @@ public class FileBody extends InputStreamBody {
     static String getFileContentType(File file) {
         String filename = file.getName();
         String contentType = HttpURLConnection.guessContentTypeFromName(filename);
-        if (null == contentType) {
+        if (TextUtils.isEmpty(contentType)) {
             contentType = "application/octet-stream";
         }
         return contentType.replaceFirst("\\/jpg$", "/jpeg");

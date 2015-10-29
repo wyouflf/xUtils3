@@ -71,7 +71,7 @@ import java.util.Date;
     @Override
     public Object load(final UriRequest request) throws Throwable {
         request.sendRequest();
-        parser.checkResponse(request.getResponse());
+        parser.checkResponse(request);
         return this.load(request.getInputStream());
     }
 

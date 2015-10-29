@@ -12,7 +12,7 @@ import org.xutils.ex.HttpException;
 import org.xutils.http.ProgressCallbackHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
-import org.xutils.http.app.ResponseTracker;
+import org.xutils.http.app.RequestTracker;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -335,15 +335,15 @@ import java.util.Date;
         // already saved by diskCacheFile#commit
     }
 
-    private ResponseTracker tracker;
+    private RequestTracker tracker;
 
     @Override
-    public void setResponseTracker(ResponseTracker tracker) {
+    public void setResponseTracker(RequestTracker tracker) {
         this.tracker = tracker;
     }
 
     @Override
-    public ResponseTracker getResponseTracker() {
+    public RequestTracker getResponseTracker() {
         return tracker;
     }
 }

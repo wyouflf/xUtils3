@@ -5,7 +5,7 @@ import org.xutils.http.UriRequest;
 /**
  * Created by wyouflf on 15/9/10.
  */
-public interface ResponseTracker {
+public interface RequestTracker {
 
     void onStart(UriRequest request);
 

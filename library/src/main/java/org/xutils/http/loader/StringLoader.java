@@ -8,7 +8,7 @@ import org.xutils.common.util.IOUtil;
 import org.xutils.http.ProgressCallbackHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
-import org.xutils.http.app.ResponseTracker;
+import org.xutils.http.app.RequestTracker;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -80,15 +80,15 @@ import java.util.Date;
         }
     }
 
-    private ResponseTracker tracker;
+    private RequestTracker tracker;
 
     @Override
-    public void setResponseTracker(ResponseTracker tracker) {
+    public void setResponseTracker(RequestTracker tracker) {
         this.tracker = tracker;
     }
 
     @Override
-    public ResponseTracker getResponseTracker() {
+    public RequestTracker getResponseTracker() {
         return tracker;
     }
 }

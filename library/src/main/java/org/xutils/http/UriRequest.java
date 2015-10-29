@@ -8,7 +8,7 @@ import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.ex.HttpException;
-import org.xutils.http.app.ResponseTracker;
+import org.xutils.http.app.RequestTracker;
 import org.xutils.http.body.ProgressBody;
 import org.xutils.http.body.RequestBody;
 import org.xutils.http.cookie.DbCookieStore;
@@ -226,7 +226,7 @@ public final class UriRequest implements Closeable {
         return cacheKey;
     }
 
-    /*package*/ ResponseTracker getResponseTracker() {
+    /*package*/ RequestTracker getResponseTracker() {
         return loader.getResponseTracker();
     }
 

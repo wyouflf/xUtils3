@@ -5,7 +5,7 @@ import org.xutils.cache.DiskCacheEntity;
 import org.xutils.http.ProgressCallbackHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
-import org.xutils.http.app.ResponseTracker;
+import org.xutils.http.app.RequestTracker;
 
 import java.io.InputStream;
 
@@ -29,7 +29,7 @@ public interface Loader<T> {
 
     void save2Cache(final UriRequest request);
 
-    void setResponseTracker(ResponseTracker tracker);
+    void setResponseTracker(RequestTracker tracker);
 
-    ResponseTracker getResponseTracker();
+    RequestTracker getResponseTracker();
 }

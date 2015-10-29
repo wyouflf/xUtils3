@@ -7,7 +7,7 @@ import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ParameterizedTypeUtil;
-import org.xutils.http.app.ResponseTracker;
+import org.xutils.http.app.RequestTracker;
 
 import java.io.Closeable;
 import java.io.File;
@@ -41,7 +41,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     private Callback.ProgressCallback progressCallback;
 
     // 日志追踪
-    private ResponseTracker tracker;
+    private RequestTracker tracker;
 
     // 文件下载线程数限制
     private Type loadType;
@@ -110,8 +110,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         result.setProgressCallbackHandler(this);
         result.setCallingClassLoader(callBackType.getClassLoader());
 
-        if (callback instanceof ResponseTracker) {
-            tracker = (ResponseTracker) callback;
+        if (callback instanceof RequestTracker) {
+            tracker = (RequestTracker) callback;
         } else {
             tracker = result.getResponseTracker();
         }

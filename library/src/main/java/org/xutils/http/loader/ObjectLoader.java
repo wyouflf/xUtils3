@@ -10,7 +10,7 @@ import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
 import org.xutils.http.annotation.HttpResponse;
 import org.xutils.http.app.ResponseParser;
-import org.xutils.http.app.ResponseTracker;
+import org.xutils.http.app.RequestTracker;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -101,17 +101,17 @@ import java.util.Date;
         }
     }
 
-    private ResponseTracker tracker;
+    private RequestTracker tracker;
 
     @Override
-    public void setResponseTracker(ResponseTracker tracker) {
+    public void setResponseTracker(RequestTracker tracker) {
         this.tracker = tracker;
     }
 
     @Override
-    public ResponseTracker getResponseTracker() {
-        if (this.parser instanceof ResponseTracker) {
-            return (ResponseTracker) parser;
+    public RequestTracker getResponseTracker() {
+        if (this.parser instanceof RequestTracker) {
+            return (RequestTracker) parser;
         } else {
             return tracker;
         }

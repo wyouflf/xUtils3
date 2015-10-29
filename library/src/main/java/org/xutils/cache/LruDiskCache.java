@@ -3,7 +3,6 @@ package org.xutils.cache;
 
 import android.text.TextUtils;
 
-import org.xutils.x;
 import org.xutils.DbManager;
 import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.FileUtil;
@@ -15,6 +14,7 @@ import org.xutils.config.DbConfigs;
 import org.xutils.db.sqlite.WhereBuilder;
 import org.xutils.ex.CacheFileLockException;
 import org.xutils.ex.DbException;
+import org.xutils.x;
 
 import java.io.File;
 import java.io.IOException;

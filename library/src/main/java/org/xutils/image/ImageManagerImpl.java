@@ -3,9 +3,9 @@ package org.xutils.image;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
-import org.xutils.x;
 import org.xutils.ImageManager;
 import org.xutils.common.Callback;
+import org.xutils.x;
 
 import java.io.File;
 

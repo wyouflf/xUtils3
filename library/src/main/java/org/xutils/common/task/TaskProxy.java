@@ -4,9 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import org.xutils.x;
 import org.xutils.common.Callback;
 import org.xutils.common.util.LogUtil;
+import org.xutils.x;
 
 import java.util.concurrent.Executor;
 

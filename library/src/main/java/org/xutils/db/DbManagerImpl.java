@@ -20,7 +20,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 
-import org.xutils.x;
 import org.xutils.DbManager;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
@@ -31,6 +30,7 @@ import org.xutils.db.table.ColumnEntity;
 import org.xutils.db.table.DbModel;
 import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;
+import org.xutils.x;
 
 import java.io.File;
 import java.io.IOException;

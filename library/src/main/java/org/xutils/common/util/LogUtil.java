@@ -24,7 +24,7 @@ import org.xutils.x;
  * Log工具，类似android.util.Log。
  * tag自动产生，格式: customTagPrefix:className.methodName(L:lineNumber),
  * customTagPrefix为空时只输出：className.methodName(L:lineNumber)。
- * <p>
+ * <p/>
  * Author: wyouflf
  * Date: 13-7-24
  * Time: 下午12:23

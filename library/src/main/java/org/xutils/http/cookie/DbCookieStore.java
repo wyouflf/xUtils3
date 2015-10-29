@@ -2,7 +2,6 @@ package org.xutils.http.cookie;
 
 import android.text.TextUtils;
 
-import org.xutils.x;
 import org.xutils.DbManager;
 import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.LogUtil;
@@ -10,6 +9,7 @@ import org.xutils.config.DbConfigs;
 import org.xutils.db.Selector;
 import org.xutils.db.sqlite.WhereBuilder;
 import org.xutils.db.table.DbModel;
+import org.xutils.x;
 
 import java.net.CookieStore;
 import java.net.HttpCookie;

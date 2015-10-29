@@ -2,10 +2,10 @@ package org.xutils.common.task;
 
 import android.os.Looper;
 
-import org.xutils.x;
 import org.xutils.common.Callback;
 import org.xutils.common.TaskController;
 import org.xutils.common.util.LogUtil;
+import org.xutils.x;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

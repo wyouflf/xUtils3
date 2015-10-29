@@ -2,9 +2,9 @@ package org.xutils.http;
 
 import android.text.TextUtils;
 
-import org.xutils.x;
 import org.xutils.HttpManager;
 import org.xutils.common.Callback;
+import org.xutils.x;
 
 import java.util.HashMap;
 

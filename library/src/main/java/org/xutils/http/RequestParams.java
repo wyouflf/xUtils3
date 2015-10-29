@@ -115,13 +115,17 @@ public class RequestParams {
             builder.buildSign(this, httpRequest.signs());
             buildUri = builder.buildUri(httpRequest);
             buildCacheKey = builder.buildCacheKey(this, httpRequest.cacheKeys());
-            sslSocketFactory = builder.getSSLSocketFactory();
+            if (sslSocketFactory == null) {
+                sslSocketFactory = builder.getSSLSocketFactory();
+            }
         } else if (this.builder != null) {
             builder.buildParams(this);
             builder.buildSign(this, signs);
             buildUri = uri;
             buildCacheKey = builder.buildCacheKey(this, cacheKeys);
-            sslSocketFactory = builder.getSSLSocketFactory();
+            if (sslSocketFactory == null) {
+                sslSocketFactory = builder.getSSLSocketFactory();
+            }
         }
     }
 
@@ -131,6 +135,10 @@ public class RequestParams {
 
     public String getCacheKey() {
         return buildCacheKey;
+    }
+
+    public void setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
+        this.sslSocketFactory = sslSocketFactory;
     }
 
     public SSLSocketFactory getSslSocketFactory() {

@@ -45,6 +45,7 @@ public final class ImageDecoder {
 
     private final static Object gifDecodeLock = new Object();
     private final static byte[] GIF_HEADER = new byte[]{'G', 'I', 'F'};
+    private final static byte[] WEBP_HEADER = new byte[]{'W', 'E', 'B', 'P'};
 
     private final static Executor THUMB_CACHE_EXECUTOR = new PriorityExecutor(1);
     private final static LruDiskCache THUMB_CACHE = LruDiskCache.getDiskCache("yl_img_thumb");
@@ -151,6 +152,21 @@ public final class ImageDecoder {
         return false;
     }
 
+    public static boolean isWebP(File file) {
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(file);
+            byte[] header = IOUtil.readBytes(in, 8, 4);
+            return Arrays.equals(WEBP_HEADER, header);
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
+        } finally {
+            IOUtil.closeQuietly(in);
+        }
+
+        return false;
+    }
+
     public static Bitmap decodeBitmap(final File file, final ImageOptions options, Callback.Cancelable cancelable) throws IOException {
         Bitmap result = null;
         try {
@@ -179,7 +195,13 @@ public final class ImageDecoder {
             }
 
             // decode file
-            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), bitmapOps);
+            Bitmap bitmap = null;
+            if (isWebP(file)) {
+                bitmap = WebPFactory.nativeDecodeFile(file.getAbsolutePath(), bitmapOps);
+            }
+            if (bitmap == null) {
+                bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), bitmapOps);
+            }
             if (bitmap == null) {
                 throw new IOException("decode image error");
             }
@@ -481,23 +503,20 @@ public final class ImageDecoder {
      */
     private static Bitmap getThumbCache(File file, ImageOptions options) {
         DiskCacheFile cacheFile = null;
-        InputStream in = null;
         try {
             cacheFile = THUMB_CACHE.getDiskCacheFile(
                     file.getAbsolutePath() + "@" + file.lastModified() + options.toString());
             if (cacheFile != null && cacheFile.exists()) {
-                in = new FileInputStream(cacheFile);
                 BitmapFactory.Options bitmapOps = new BitmapFactory.Options();
                 bitmapOps.inJustDecodeBounds = false;
                 bitmapOps.inPurgeable = true;
                 bitmapOps.inInputShareable = true;
                 bitmapOps.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                return WebPFactory.nativeDecodeByteArray(IOUtil.readBytes(in), bitmapOps);
+                return WebPFactory.nativeDecodeFile(cacheFile.getAbsolutePath(), bitmapOps);
             }
         } catch (Throwable ex) {
             LogUtil.w(ex.getMessage(), ex);
         } finally {
-            IOUtil.closeQuietly(in);
             IOUtil.closeQuietly(cacheFile);
         }
         return null;

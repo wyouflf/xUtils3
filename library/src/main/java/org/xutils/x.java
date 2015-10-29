@@ -30,7 +30,7 @@ public final class x {
         return Ext.app;
     }
 
-    public static TaskController taskCtr() {
+    public static TaskController task() {
         return Ext.taskController;
     }
 

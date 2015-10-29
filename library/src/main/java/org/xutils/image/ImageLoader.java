@@ -156,7 +156,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
         // ensure run ui thread
         if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-            x.taskCtr().post(new Runnable() {
+            x.task().post(new Runnable() {
                 @Override
                 public void run() {
                     doBind(view, url, options, callback);
@@ -497,7 +497,7 @@ import java.util.concurrent.atomic.AtomicLong;
     private static void postBindArgsException(
             final ImageView view, final ImageOptions options,
             final String exMsg, final Callback.CommonCallback<?> callback) {
-        x.taskCtr().autoPost(new Runnable() {
+        x.task().autoPost(new Runnable() {
             @Override
             public void run() {
                 try {

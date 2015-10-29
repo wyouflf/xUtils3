@@ -67,7 +67,7 @@ public final class HttpManagerImpl implements HttpManager {
         } else {
             task = new HttpTask<T>(entity, cancelable, callback);
         }
-        return x.taskCtr().start(task);
+        return x.task().start(task);
     }
 
     @Override
@@ -86,7 +86,7 @@ public final class HttpManagerImpl implements HttpManager {
                 cancelable = (Callback.Cancelable) callback;
             }
             HttpTask<T> task = new HttpTask<T>(entity, cancelable, callback);
-            return x.taskCtr().start(task);
+            return x.task().start(task);
         }
     }
 
@@ -105,7 +105,7 @@ public final class HttpManagerImpl implements HttpManager {
         entity.setMethod(method);
         SyncCallback<T> callback = new SyncCallback<T>(resultType);
         HttpTask<T> task = new HttpTask<T>(entity, null, callback);
-        return x.taskCtr().startSync(task);
+        return x.task().startSync(task);
     }
 
     private class SyncCallback<T> implements Callback.TypedCallback<T> {

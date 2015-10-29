@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by wyouflf on 15/7/23.
  * http 请求任务
  */
-public class HttpTask<ResultType> extends AbsTask<ResultType> implements ProgressCallbackHandler {
+public class HttpTask<ResultType> extends AbsTask<ResultType> implements ProgressHandler {
 
     // 请求相关
     private UriRequest request;
@@ -395,7 +395,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         return params.getPriority();
     }
 
-    // ############################### start: region implements ProgressCallbackHandler
+    // ############################### start: region implements ProgressHandler
     private final static long RATE = 300; // 0.3s
     private long lastUpdateTime;
 
@@ -427,7 +427,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         return !isCancelled() && !isFinished();
     }
 
-    // ############################### end: region implements ProgressCallbackHandler
+    // ############################### end: region implements ProgressHandler
 
     @Override
     public String toString() {

@@ -6,7 +6,7 @@ package org.xutils.http;
  * Author: wyouflf
  * Time: 2014/05/23
  */
-public interface ProgressCallbackHandler {
+public interface ProgressHandler {
     /**
      * @param total
      * @param current

@@ -3,7 +3,7 @@ package org.xutils.http.body;
 import android.text.TextUtils;
 
 import org.xutils.common.Callback;
-import org.xutils.http.ProgressCallbackHandler;
+import org.xutils.http.ProgressHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +22,7 @@ public class InputStreamBody implements ProgressBody {
     private long total;
     private long current = 0;
 
-    private ProgressCallbackHandler callBackHandler;
+    private ProgressHandler callBackHandler;
 
     public InputStreamBody(InputStream inputStream, String contentType) {
         this.content = inputStream;
@@ -39,8 +39,8 @@ public class InputStreamBody implements ProgressBody {
     }
 
     @Override
-    public void setProgressCallbackHandler(ProgressCallbackHandler progressCallbackHandler) {
-        this.callBackHandler = progressCallbackHandler;
+    public void setProgressHandler(ProgressHandler progressHandler) {
+        this.callBackHandler = progressHandler;
     }
 
     @Override

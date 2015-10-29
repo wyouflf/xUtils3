@@ -9,10 +9,8 @@ import org.xutils.common.Callback;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.ProcessLock;
 import org.xutils.ex.HttpException;
-import org.xutils.http.ProgressCallbackHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
-import org.xutils.http.app.RequestTracker;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -27,18 +25,18 @@ import java.util.Date;
 /**
  * Author: wyouflf
  * Time: 2014/05/30
- * <p/>
+ * <p>
  * 下载参数策略:
  * 1. RequestParams#saveFilePath不为空时, 目标文件保存在saveFilePath;
  * 否则由Cache策略分配文件下载路径.
  * 2. 下载时临时目标文件路径为tempSaveFilePath, 下载完后进行a: CacheFile#commit; b:重命名等操作.
- * <p/>
+ * <p>
  * 断点下载策略:
  * 1. 要下载的目标文件不存在或小于 CHECK_SIZE 时删除目标文件, 重新下载.
  * 2. 若文件存在且大于 CHECK_SIZE, range = fileLen - CHECK_SIZE , 校验check_buffer, 相同: 继续下载;
  * 不相同: 删掉目标文件, 并抛出RuntimeException(HttpRetryHandler会使下载重新开始).
  */
-/*package*/ class FileLoader implements Loader<File> {
+/*package*/ class FileLoader extends Loader<File> {
 
     private static final int CHECK_SIZE = 512;
     private static final int LOCK_WAIT = 1000 * 3; // 3s
@@ -50,7 +48,6 @@ import java.util.Date;
     private long contentLength;
     private String responseFileName;
 
-    private RequestParams params;
     private DiskCacheFile diskCacheFile;
 
     @Override
@@ -65,13 +62,6 @@ import java.util.Date;
             isAutoResume = params.isAutoResume();
             isAutoRename = params.isAutoRename();
         }
-    }
-
-    private ProgressCallbackHandler callBackHandler;
-
-    @Override
-    public void setProgressCallbackHandler(final ProgressCallbackHandler progressCallbackHandler) {
-        this.callBackHandler = progressCallbackHandler;
     }
 
     @Override
@@ -126,7 +116,7 @@ import java.util.Date;
             bis = new BufferedInputStream(in);
             bos = new BufferedOutputStream(fileOutputStream);
 
-            if (callBackHandler != null && !callBackHandler.updateProgress(total, current, true)) {
+            if (progressHandler != null && !progressHandler.updateProgress(total, current, true)) {
                 throw new Callback.CancelledException("download stopped!");
             }
 
@@ -142,8 +132,8 @@ import java.util.Date;
 
                 bos.write(tmp, 0, len);
                 current += len;
-                if (callBackHandler != null) {
-                    if (!callBackHandler.updateProgress(total, current, false)) {
+                if (progressHandler != null) {
+                    if (!progressHandler.updateProgress(total, current, false)) {
                         bos.flush();
                         throw new Callback.CancelledException("download stopped!");
                     }
@@ -155,8 +145,8 @@ import java.util.Date;
                 targetFile = diskCacheFile.commit();
             }
 
-            if (callBackHandler != null) {
-                callBackHandler.updateProgress(total, current, true);
+            if (progressHandler != null) {
+                progressHandler.updateProgress(total, current, true);
             }
         } finally {
             IOUtil.closeQuietly(bis);
@@ -194,7 +184,7 @@ import java.util.Date;
             diskCacheFile = null;
             if (TextUtils.isEmpty(saveFilePath)) {
 
-                if (callBackHandler != null && !callBackHandler.updateProgress(0, 0, false)) {
+                if (progressHandler != null && !progressHandler.updateProgress(0, 0, false)) {
                     throw new Callback.CancelledException("download stopped!");
                 }
 
@@ -204,7 +194,7 @@ import java.util.Date;
                 tempSaveFilePath = saveFilePath + ".tmp";
             }
 
-            if (callBackHandler != null && !callBackHandler.updateProgress(0, 0, false)) {
+            if (progressHandler != null && !progressHandler.updateProgress(0, 0, false)) {
                 throw new Callback.CancelledException("download stopped!");
             }
 
@@ -231,7 +221,7 @@ import java.util.Date;
                 params.addHeader("RANGE", "bytes=" + range + "-");
             }
 
-            if (callBackHandler != null && !callBackHandler.updateProgress(0, 0, false)) {
+            if (progressHandler != null && !progressHandler.updateProgress(0, 0, false)) {
                 throw new Callback.CancelledException("download stopped!");
             }
 
@@ -245,7 +235,7 @@ import java.util.Date;
                 isAutoResume = isSupportRange(request);
             }
 
-            if (callBackHandler != null && !callBackHandler.updateProgress(0, 0, false)) {
+            if (progressHandler != null && !progressHandler.updateProgress(0, 0, false)) {
                 throw new Callback.CancelledException("download stopped!");
             }
 
@@ -333,17 +323,5 @@ import java.util.Date;
     @Override
     public void save2Cache(final UriRequest request) {
         // already saved by diskCacheFile#commit
-    }
-
-    private RequestTracker tracker;
-
-    @Override
-    public void setResponseTracker(RequestTracker tracker) {
-        this.tracker = tracker;
-    }
-
-    @Override
-    public RequestTracker getResponseTracker() {
-        return tracker;
     }
 }

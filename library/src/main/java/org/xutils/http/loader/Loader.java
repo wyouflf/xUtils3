@@ -2,7 +2,7 @@ package org.xutils.http.loader;
 
 
 import org.xutils.cache.DiskCacheEntity;
-import org.xutils.http.ProgressCallbackHandler;
+import org.xutils.http.ProgressHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
 import org.xutils.http.app.RequestTracker;
@@ -13,23 +13,35 @@ import java.io.InputStream;
  * Author: wyouflf
  * Time: 2014/05/26
  */
-public interface Loader<T> {
+public abstract class Loader<T> {
 
-    Loader<T> newInstance();
+    protected RequestParams params;
+    protected RequestTracker tracker;
+    protected ProgressHandler progressHandler;
 
-    void setParams(final RequestParams params);
+    public void setParams(final RequestParams params) {
+        this.params = params;
+    }
 
-    void setProgressCallbackHandler(final ProgressCallbackHandler progressCallbackHandler);
+    public void setProgressHandler(final ProgressHandler callbackHandler) {
+        this.progressHandler = callbackHandler;
+    }
 
-    T load(final InputStream in) throws Throwable;
+    public void setResponseTracker(RequestTracker tracker) {
+        this.tracker = tracker;
+    }
 
-    T load(final UriRequest request) throws Throwable;
+    public RequestTracker getResponseTracker() {
+        return this.tracker;
+    }
 
-    T loadFromCache(final DiskCacheEntity cacheEntity) throws Throwable;
+    public abstract Loader<T> newInstance();
 
-    void save2Cache(final UriRequest request);
+    public abstract T load(final InputStream in) throws Throwable;
 
-    void setResponseTracker(RequestTracker tracker);
+    public abstract T load(final UriRequest request) throws Throwable;
 
-    RequestTracker getResponseTracker();
+    public abstract T loadFromCache(final DiskCacheEntity cacheEntity) throws Throwable;
+
+    public abstract void save2Cache(final UriRequest request);
 }

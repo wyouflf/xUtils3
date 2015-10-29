@@ -6,10 +6,8 @@ import org.json.JSONObject;
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
-import org.xutils.http.ProgressCallbackHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
-import org.xutils.http.app.RequestTracker;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -21,7 +19,7 @@ import java.util.Map;
  * Author: wyouflf
  * Time: 2014/06/16
  */
-/*package*/ class MapLoader implements Loader<Map<String, Object>> {
+/*package*/ class MapLoader extends Loader<Map<String, Object>> {
 
     private String charset = "UTF-8";
     private String contentStr = null;
@@ -39,11 +37,6 @@ import java.util.Map;
                 this.charset = charset;
             }
         }
-    }
-
-    @Override
-    public void setProgressCallbackHandler(ProgressCallbackHandler progressCallbackHandler) {
-
     }
 
     @Override
@@ -82,18 +75,6 @@ import java.util.Map;
             entity.setTextContent(contentStr);
             LruDiskCache.getDiskCache(request.getParams().getCacheDirName()).put(entity);
         }
-    }
-
-    private RequestTracker tracker;
-
-    @Override
-    public void setResponseTracker(RequestTracker tracker) {
-        this.tracker = tracker;
-    }
-
-    @Override
-    public RequestTracker getResponseTracker() {
-        return tracker;
     }
 
     private static Map<String, Object> getMapForJson(String jsonStr) throws Throwable {

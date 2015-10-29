@@ -1,10 +1,7 @@
 package org.xutils.http.loader;
 
 import org.xutils.cache.DiskCacheEntity;
-import org.xutils.http.ProgressCallbackHandler;
-import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
-import org.xutils.http.app.RequestTracker;
 
 import java.io.InputStream;
 
@@ -12,20 +9,10 @@ import java.io.InputStream;
  * @author: wyouflf
  * @date: 2014/10/17
  */
-/*package*/ class IntegerLoader implements Loader<Integer> {
+/*package*/ class IntegerLoader extends Loader<Integer> {
     @Override
     public Loader<Integer> newInstance() {
         return new IntegerLoader();
-    }
-
-    @Override
-    public void setParams(RequestParams params) {
-
-    }
-
-    @Override
-    public void setProgressCallbackHandler(ProgressCallbackHandler progressCallbackHandler) {
-
     }
 
     @Override
@@ -47,17 +34,5 @@ import java.io.InputStream;
     @Override
     public void save2Cache(UriRequest request) {
 
-    }
-
-    private RequestTracker tracker;
-
-    @Override
-    public void setResponseTracker(RequestTracker tracker) {
-        this.tracker = tracker;
-    }
-
-    @Override
-    public RequestTracker getResponseTracker() {
-        return tracker;
     }
 }

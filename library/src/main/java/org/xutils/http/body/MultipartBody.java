@@ -4,7 +4,7 @@ package org.xutils.http.body;
 import android.text.TextUtils;
 
 import org.xutils.common.Callback;
-import org.xutils.http.ProgressCallbackHandler;
+import org.xutils.http.ProgressHandler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,11 +45,11 @@ public class MultipartBody implements ProgressBody {
         }
     }
 
-    private ProgressCallbackHandler callBackHandler;
+    private ProgressHandler callBackHandler;
 
     @Override
-    public void setProgressCallbackHandler(ProgressCallbackHandler progressCallbackHandler) {
-        this.callBackHandler = progressCallbackHandler;
+    public void setProgressHandler(ProgressHandler progressHandler) {
+        this.callBackHandler = progressHandler;
     }
 
     private void generateContentType() {

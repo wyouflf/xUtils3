@@ -6,10 +6,8 @@ import org.json.JSONArray;
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
-import org.xutils.http.ProgressCallbackHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
-import org.xutils.http.app.RequestTracker;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -18,7 +16,7 @@ import java.util.Date;
  * Author: wyouflf
  * Time: 2014/06/16
  */
-/*package*/ class JSONArrayLoader implements Loader<JSONArray> {
+/*package*/ class JSONArrayLoader extends Loader<JSONArray> {
 
     private String contentStr;
     private String charset = "UTF-8";
@@ -36,11 +34,6 @@ import java.util.Date;
                 this.charset = charset;
             }
         }
-    }
-
-    @Override
-    public void setProgressCallbackHandler(ProgressCallbackHandler progressCallbackHandler) {
-
     }
 
     @Override
@@ -79,17 +72,5 @@ import java.util.Date;
             entity.setTextContent(contentStr);
             LruDiskCache.getDiskCache(request.getParams().getCacheDirName()).put(entity);
         }
-    }
-
-    private RequestTracker tracker;
-
-    @Override
-    public void setResponseTracker(RequestTracker tracker) {
-        this.tracker = tracker;
-    }
-
-    @Override
-    public RequestTracker getResponseTracker() {
-        return tracker;
     }
 }

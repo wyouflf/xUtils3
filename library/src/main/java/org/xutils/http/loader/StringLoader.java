@@ -5,10 +5,8 @@ import android.text.TextUtils;
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
-import org.xutils.http.ProgressCallbackHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
-import org.xutils.http.app.RequestTracker;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -17,7 +15,7 @@ import java.util.Date;
  * Author: wyouflf
  * Time: 2014/05/30
  */
-/*package*/ class StringLoader implements Loader<String> {
+/*package*/ class StringLoader extends Loader<String> {
 
     private String charset = "UTF-8";
     private String result = null;
@@ -35,11 +33,6 @@ import java.util.Date;
                 this.charset = charset;
             }
         }
-    }
-
-    @Override
-    public void setProgressCallbackHandler(final ProgressCallbackHandler progressCallbackHandler) {
-
     }
 
     @Override
@@ -78,17 +71,5 @@ import java.util.Date;
             entity.setTextContent(result);
             LruDiskCache.getDiskCache(request.getParams().getCacheDirName()).put(entity);
         }
-    }
-
-    private RequestTracker tracker;
-
-    @Override
-    public void setResponseTracker(RequestTracker tracker) {
-        this.tracker = tracker;
-    }
-
-    @Override
-    public RequestTracker getResponseTracker() {
-        return tracker;
     }
 }

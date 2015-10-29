@@ -52,7 +52,7 @@ public final class UriRequest implements Closeable {
     private InputStream inputStream = null;
     private HttpURLConnection connection = null;
 
-    private ProgressCallbackHandler progressHandler = null;
+    private ProgressHandler progressHandler = null;
 
     // cookie manager
     private static final CookieManager COOKIE_MANAGER =
@@ -94,9 +94,9 @@ public final class UriRequest implements Closeable {
         return queryBuilder.toString();
     }
 
-    public void setProgressCallbackHandler(ProgressCallbackHandler progressHandler) {
+    public void setProgressCallbackHandler(ProgressHandler progressHandler) {
         this.progressHandler = progressHandler;
-        this.loader.setProgressCallbackHandler(progressHandler);
+        this.loader.setProgressHandler(progressHandler);
     }
 
     public void setCallingClassLoader(ClassLoader callingClassLoader) {
@@ -176,7 +176,7 @@ public final class UriRequest implements Closeable {
                     RequestBody body = params.getRequestBody();
                     if (body != null) {
                         if (body instanceof ProgressBody) {
-                            ((ProgressBody) body).setProgressCallbackHandler(progressHandler);
+                            ((ProgressBody) body).setProgressHandler(progressHandler);
                         }
                         String contentType = body.getContentType();
                         if (!TextUtils.isEmpty(contentType)) {

@@ -5,12 +5,11 @@ import android.text.TextUtils;
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
-import org.xutils.http.ProgressCallbackHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.UriRequest;
 import org.xutils.http.annotation.HttpResponse;
-import org.xutils.http.app.ResponseParser;
 import org.xutils.http.app.RequestTracker;
+import org.xutils.http.app.ResponseParser;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -20,7 +19,7 @@ import java.util.Date;
  * 其他对象的下载转换.
  * 使用类型上的@HttpResponse注解信息进行数据转换.
  */
-/*package*/ class ObjectLoader implements Loader<Object> {
+/*package*/ class ObjectLoader extends Loader<Object> {
 
     private String charset = "UTF-8";
     private String contentStr = null;
@@ -55,11 +54,6 @@ import java.util.Date;
                 this.charset = charset;
             }
         }
-    }
-
-    @Override
-    public void setProgressCallbackHandler(ProgressCallbackHandler progressCallbackHandler) {
-
     }
 
     @Override
@@ -99,13 +93,6 @@ import java.util.Date;
             entity.setTextContent(contentStr);
             LruDiskCache.getDiskCache(request.getParams().getCacheDirName()).put(entity);
         }
-    }
-
-    private RequestTracker tracker;
-
-    @Override
-    public void setResponseTracker(RequestTracker tracker) {
-        this.tracker = tracker;
     }
 
     @Override

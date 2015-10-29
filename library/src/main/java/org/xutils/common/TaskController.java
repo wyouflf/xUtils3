@@ -46,9 +46,32 @@ public interface TaskController {
      */
     void removeCallbacks(Runnable runnable);
 
+    /**
+     * 开始一个异步任务
+     *
+     * @param task
+     * @param <T>
+     * @return
+     */
     <T> AbsTask<T> start(AbsTask<T> task);
 
+    /**
+     * 同步执行一个任务
+     *
+     * @param task
+     * @param <T>
+     * @return
+     * @throws Throwable
+     */
     <T> T startSync(AbsTask<T> task) throws Throwable;
 
+    /**
+     * 批量执行异步任务
+     *
+     * @param groupCallback
+     * @param tasks
+     * @param <T>
+     * @return
+     */
     <T extends AbsTask<?>> Callback.Cancelable startTasks(Callback.GroupCallback<T> groupCallback, T... tasks);
 }

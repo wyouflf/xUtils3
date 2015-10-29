@@ -149,7 +149,9 @@ public final class UriRequest implements Closeable {
                     Map<String, List<String>> singleMap =
                             COOKIE_MANAGER.get(url.toURI(), new HashMap<String, List<String>>(0));
                     List<String> cookies = singleMap.get("Cookie");
-                    connection.setRequestProperty("Cookie", TextUtils.join(";", cookies));
+                    if (cookies != null) {
+                        connection.setRequestProperty("Cookie", TextUtils.join(";", cookies));
+                    }
                 } catch (Throwable ex) {
                     LogUtil.e(ex.getMessage(), ex);
                 }
@@ -195,7 +197,10 @@ public final class UriRequest implements Closeable {
 
             { // save cookies
                 try {
-                    COOKIE_MANAGER.put(url.toURI(), connection.getHeaderFields());
+                    Map<String, List<String>> headers = connection.getHeaderFields();
+                    if (headers != null) {
+                        COOKIE_MANAGER.put(url.toURI(), headers);
+                    }
                 } catch (Throwable ex) {
                     LogUtil.e(ex.getMessage(), ex);
                 }

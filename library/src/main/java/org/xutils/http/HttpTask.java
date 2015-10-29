@@ -107,7 +107,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         }
 
         UriRequest result = new UriRequest(params, (Class<?>) loadType);
-        result.setProgressCallbackHandler(this);
+        result.setProgressHandler(this);
         result.setCallingClassLoader(callBackType.getClassLoader());
 
         if (callback instanceof RequestTracker) {

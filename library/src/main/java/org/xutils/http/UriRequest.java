@@ -94,7 +94,7 @@ public final class UriRequest implements Closeable {
         return queryBuilder.toString();
     }
 
-    public void setProgressCallbackHandler(ProgressHandler progressHandler) {
+    public void setProgressHandler(ProgressHandler progressHandler) {
         this.progressHandler = progressHandler;
         this.loader.setProgressHandler(progressHandler);
     }

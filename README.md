@@ -6,7 +6,7 @@
     1. HTTP实现替换HttpClient为UrlConnection, 自动解析回调泛型, 更安全的断点续传策略.
     2. 支持标准的Cookie策略, 区分domain, path...
     3. 事件和数据库注解去除不常用的功能, 提高性能.
-    4. 图片绑定支持gif, webp.
+    4. 图片绑定支持gif, webp; 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
 
 
 

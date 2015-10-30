@@ -1,18 +1,23 @@
-## xUtils简介
+## xUtils3简介
 * xUtils 包含了很多实用的android工具。
 * xUtils 支持大文件上传，更全面的http请求协议支持(10种谓词)，拥有更加灵活的ORM，更多的事件注解支持且不受混淆影响...
 * xUitls 最低兼容android 4.0 (api level 14)
+* xUtils3变化较多所以建立了新的项目不在旧版(github.com/wyouflf/xUtils)上继续维护, 相对于旧版本:
+    1. HTTP实现替换HttpClient为UrlConnection, 自动解析回调泛型, 更安全的断点续传策略.
+    2. 支持标准的Cookie策略, 区分domain, path...
+    3. 事件和数据库注解去除不常用的功能, 提高性能.
+    4. 图片绑定支持gif, webp.
 
 
 
-## 还在开发中, 请暂时不要使用, 待续...
+## 文档和实例正在完善中, 待续...
 
 
 ____
 ### 关于libwebpbackport
 * webp来自:https://github.com/webmproject/libwebp
 * webpbackport来自:https://github.com/alexey-pelykh/webp-android-backport
-* 其中webpbackport在Android 5.0以上系统存在bug:
+* 其中为webpbackport添加了nativeDecodeFile的实现, 并修复在Android 5.0以上系统存在bug:
 ```CPP
 // android_backport_webp.cpp
 // 修改:

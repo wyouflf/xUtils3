@@ -15,6 +15,7 @@
 
 ____
 ### 关于libwebpbackport
+* 部分4.x的机型对webp格式的支持仍然有问题, 需要借助webp.
 * webp来自:https://github.com/webmproject/libwebp
 * webpbackport来自:https://github.com/alexey-pelykh/webp-android-backport
 * 其中为webpbackport添加了nativeDecodeFile的实现, 并修复在Android 5.0以上系统存在bug:

@@ -172,7 +172,7 @@ public final class UriRequest implements Closeable {
             { // write body
                 HttpMethod method = params.getMethod();
                 connection.setRequestMethod(method.toString());
-                if (method == HttpMethod.POST || method == HttpMethod.PUT) {
+                if (HttpMethod.permitsRequestBody(method)) {
                     RequestBody body = params.getRequestBody();
                     if (body != null) {
                         if (body instanceof ProgressBody) {
@@ -250,15 +250,16 @@ public final class UriRequest implements Closeable {
         DiskCacheEntity cacheEntity = LruDiskCache.getDiskCache(params.getCacheDirName()).get(this.getCacheKey());
 
         if (cacheEntity != null) {
-            Date lastModified = cacheEntity.getLastModify();
-            if (lastModified.getTime() > 0) {
-                params.addHeader("If-Modified-Since", toGMTString(lastModified));
+            if (HttpMethod.permitsCache(params.getMethod())) {
+                Date lastModified = cacheEntity.getLastModify();
+                if (lastModified.getTime() > 0) {
+                    params.addHeader("If-Modified-Since", toGMTString(lastModified));
+                }
+                String eTag = cacheEntity.getEtag();
+                if (!TextUtils.isEmpty(eTag)) {
+                    params.addHeader("If-None-Match", eTag);
+                }
             }
-            String eTag = cacheEntity.getEtag();
-            if (!TextUtils.isEmpty(eTag)) {
-                params.addHeader("If-None-Match", eTag);
-            }
-
             return loader.loadFromCache(cacheEntity);
         } else {
             return null;

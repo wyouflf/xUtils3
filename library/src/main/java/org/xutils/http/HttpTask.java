@@ -144,7 +144,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
         // 检查缓存
         Object cacheResult = null;
-        if (cacheCallback != null) {
+        if (cacheCallback != null && HttpMethod.permitsCache(params.getMethod())) {
             // 尝试从缓存获取结果, 并为请求头加入缓存控制参数.
             while (retry) {
                 try {

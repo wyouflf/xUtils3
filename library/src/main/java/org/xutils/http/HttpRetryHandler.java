@@ -66,14 +66,14 @@ public final class HttpRetryHandler {
             return false;
         }
 
-        if (request.getParams().getMethod() != HttpMethod.GET) {
-            LogUtil.w("The http method is not HTTP GET! The NetWork operation can not be retried.");
+        if (!HttpMethod.permitsRetry(request.getParams().getMethod())) {
+            LogUtil.w("The Request Method can not be retried.");
             LogUtil.w(ex.getMessage(), ex);
             return false;
         }
 
         if (blackList.contains(ex.getClass())) {
-            LogUtil.w("The NetWork operation can not be retried.");
+            LogUtil.w("The Exception can not be retried.");
             LogUtil.w(ex.getMessage(), ex);
             return false;
         }

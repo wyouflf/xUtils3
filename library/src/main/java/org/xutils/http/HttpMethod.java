@@ -8,6 +8,7 @@ public enum HttpMethod {
     GET("GET"),
     POST("POST"),
     PUT("PUT"),
+    PATCH("PATCH"),
     HEAD("HEAD"),
     MOVE("MOVE"),
     COPY("COPY"),
@@ -25,5 +26,20 @@ public enum HttpMethod {
     @Override
     public String toString() {
         return this.value;
+    }
+
+    public static boolean permitsRetry(HttpMethod method) {
+        return method == GET;
+    }
+
+    public static boolean permitsCache(HttpMethod method) {
+        return method == GET;
+    }
+
+    public static boolean permitsRequestBody(HttpMethod method) {
+        return method == POST
+                || method == PUT
+                || method == PATCH
+                || method == DELETE;
     }
 }

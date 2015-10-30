@@ -296,7 +296,7 @@ public class RequestParams {
 
     public void addParameter(String name, Object value) {
         if (value == null) return;
-        if (method == HttpMethod.POST || method == HttpMethod.PUT) {
+        if (HttpMethod.permitsRequestBody(method)) {
             if (!TextUtils.isEmpty(name)) {
                 if (value instanceof File) {
                     this.addBodyParameter(name, (File) value);

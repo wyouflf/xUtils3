@@ -254,12 +254,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 }
 
                 // 保存缓存
-                if (cacheCallback != null) {
-                    try {
-                        this.request.save2Cache();
-                    } catch (Throwable ex) {
-                        LogUtil.e("save2Cache", ex);
-                    }
+                if (cacheCallback != null && HttpMethod.permitsCache(params.getMethod())) {
+                    this.request.save2Cache();
                 }
 
                 retry = false;

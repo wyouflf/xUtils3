@@ -14,6 +14,7 @@ import org.xutils.http.body.RequestBody;
 import org.xutils.http.cookie.DbCookieStore;
 import org.xutils.http.loader.Loader;
 import org.xutils.http.loader.LoaderFactory;
+import org.xutils.x;
 
 import java.io.Closeable;
 import java.io.File;
@@ -272,7 +273,16 @@ public final class UriRequest implements Closeable {
     }
 
     /*package*/ void save2Cache() {
-        loader.save2Cache(this);
+        x.task().run(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    loader.save2Cache(UriRequest.this);
+                } catch (Throwable ex) {
+                    LogUtil.e(ex.getMessage(), ex);
+                }
+            }
+        });
     }
 
     public File getFile() {

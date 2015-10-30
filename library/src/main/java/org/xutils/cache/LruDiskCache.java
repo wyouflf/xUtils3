@@ -337,7 +337,7 @@ public final class LruDiskCache {
     private boolean deleteFileWithLock(String path) {
         ProcessLock processLock = null;
         try {
-            processLock = ProcessLock.tryLock(path, true, 5);
+            processLock = ProcessLock.tryLock(path, true);
             if (processLock != null && processLock.isValid()) { // lock
                 File file = new File(path);
                 return IOUtil.deleteFileOrDir(file);

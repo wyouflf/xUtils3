@@ -2,6 +2,7 @@ package org.xutils.common.util;
 
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import org.xutils.x;
 
@@ -12,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.text.DecimalFormat;
 
 /**
  * @author: wyouflf
@@ -51,7 +53,7 @@ public final class ProcessLock implements Closeable {
         Closeable stream = null;
         FileChannel channel = null;
         try {
-            File file = new File(x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE), MD5.md5(lockName));
+            File file = new File(x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE), customHash(lockName));
             if (file.exists()) {
                 if (file.lastModified() + MAX_AGE < System.currentTimeMillis()) {
                     IOUtil.deleteFileOrDir(file);
@@ -155,6 +157,26 @@ public final class ProcessLock implements Closeable {
             }
         }
         IOUtil.deleteFileOrDir(file);
+    }
+
+    private final static DecimalFormat FORMAT = new DecimalFormat("0.##################");
+
+    /**
+     * 取得字符串的自定义hash值, 尽量保证255字节内的hash不重复.
+     *
+     * @param str
+     * @return
+     */
+    private static String customHash(String str) {
+        if (TextUtils.isEmpty(str)) return "0";
+        StringBuilder result = new StringBuilder();
+        double hash = 0.0;
+        byte[] bytes = str.getBytes();
+        for (int i = 0; i < str.length(); i++) {
+            hash = (255.0 * hash + bytes[i]) * 0.005;
+        }
+        result.append(FORMAT.format(hash));
+        return result.toString();
     }
 
     @Override

@@ -169,14 +169,12 @@ public final class ProcessLock implements Closeable {
      */
     private static String customHash(String str) {
         if (TextUtils.isEmpty(str)) return "0";
-        StringBuilder result = new StringBuilder();
         double hash = 0.0;
         byte[] bytes = str.getBytes();
         for (int i = 0; i < str.length(); i++) {
             hash = (255.0 * hash + bytes[i]) * 0.005;
         }
-        result.append(FORMAT.format(hash));
-        return result.toString();
+        return FORMAT.format(hash);
     }
 
     @Override

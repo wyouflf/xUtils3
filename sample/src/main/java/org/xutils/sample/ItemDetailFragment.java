@@ -11,6 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xutils.common.Callback;
+import org.xutils.event.annotation.ContentView;
+import org.xutils.event.annotation.ViewInject;
 import org.xutils.http.RequestParams;
 import org.xutils.sample.dummy.DummyContent;
 import org.xutils.x;
@@ -23,6 +25,7 @@ import java.io.File;
  * in two-pane mode (on tablets) or a {@link ItemDetailActivity}
  * on handsets.
  */
+@ContentView(R.layout.item_detail)
 public class ItemDetailFragment extends Fragment {
     /**
      * The fragment argument representing the item ID that this fragment
@@ -34,6 +37,9 @@ public class ItemDetailFragment extends Fragment {
      * The dummy content this fragment is presenting.
      */
     private DummyContent.DummyItem mItem;
+
+    @ViewInject(R.id.item_detail)
+    private TextView item_detail;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -63,11 +69,11 @@ public class ItemDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.item_detail, container, false);
+        View rootView = x.view().inject(this, inflater, container);
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.item_detail)).setText(mItem.details);
+            item_detail.setText(mItem.details);
         }
 
         //testGetString();

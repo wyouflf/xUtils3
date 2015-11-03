@@ -8,6 +8,8 @@ import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ParameterizedTypeUtil;
 import org.xutils.http.app.RequestTracker;
+import org.xutils.http.request.UriRequest;
+import org.xutils.http.request.UriRequestFactory;
 
 import java.io.Closeable;
 import java.io.File;
@@ -106,9 +108,10 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             }
         }
 
-        UriRequest result = new UriRequest(params, (Class<?>) loadType);
-        result.setProgressHandler(this);
+        params.init();
+        UriRequest result = UriRequestFactory.getUriRequest(params, (Class<?>) loadType);
         result.setCallingClassLoader(callBackType.getClassLoader());
+        result.setProgressHandler(this);
 
         if (callback instanceof RequestTracker) {
             tracker = (RequestTracker) callback;

@@ -1,4 +1,4 @@
-package org.xutils.http;
+package org.xutils.http.request;
 
 import android.net.Uri;
 import android.text.TextUtils;
@@ -8,17 +8,12 @@ import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.ex.HttpException;
-import org.xutils.http.app.RequestTracker;
+import org.xutils.http.HttpMethod;
+import org.xutils.http.RequestParams;
 import org.xutils.http.body.ProgressBody;
 import org.xutils.http.body.RequestBody;
 import org.xutils.http.cookie.DbCookieStore;
-import org.xutils.http.loader.Loader;
-import org.xutils.http.loader.LoaderFactory;
-import org.xutils.x;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.CookieManager;
@@ -41,33 +36,24 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by wyouflf on 15/7/23.
  * Uri请求发送和数据接收
  */
-public final class UriRequest implements Closeable {
-
-    private final String buildUri;
-    private final RequestParams params;
-    private final Loader<?> loader;
+public final class HttpRequest extends UriRequest {
 
     private String cacheKey = null;
     private boolean isLoading = false;
-    private ClassLoader callingClassLoader = null;
     private InputStream inputStream = null;
     private HttpURLConnection connection = null;
-
-    private ProgressHandler progressHandler = null;
 
     // cookie manager
     private static final CookieManager COOKIE_MANAGER =
             new CookieManager(DbCookieStore.INSTANCE, CookiePolicy.ACCEPT_ALL);
 
-    public UriRequest(RequestParams params, Class<?> loadType) throws Throwable {
-        params.init();
-        this.params = params;
-        this.buildUri = buildUri(params);
-        this.loader = LoaderFactory.getLoader(loadType, params);
+    /*package*/ HttpRequest(RequestParams params, Class<?> loadType) throws Throwable {
+        super(params, loadType);
     }
 
     // build query
-    private static String buildUri(RequestParams params) {
+    @Override
+    protected String buildQueryUrl(RequestParams params) {
         String uri = params.getUri();
         StringBuilder queryBuilder = new StringBuilder(uri);
         if (!uri.contains("?")) {
@@ -95,21 +81,9 @@ public final class UriRequest implements Closeable {
         return queryBuilder.toString();
     }
 
-    public void setProgressHandler(ProgressHandler progressHandler) {
-        this.progressHandler = progressHandler;
-        this.loader.setProgressHandler(progressHandler);
-    }
-
-    public void setCallingClassLoader(ClassLoader callingClassLoader) {
-        this.callingClassLoader = callingClassLoader;
-    }
-
-    public RequestParams getParams() {
-        return params;
-    }
-
+    @Override
     public String getRequestUri() {
-        String result = buildUri;
+        String result = queryUrl;
         if (connection != null) {
             URL url = connection.getURL();
             if (url != null) {
@@ -124,121 +98,114 @@ public final class UriRequest implements Closeable {
      *
      * @throws IOException
      */
+    @Override
     public void sendRequest() throws IOException {
         isLoading = false;
-        if (buildUri.startsWith("http")) {
 
-            URL url = new URL(buildUri);
-            { // init connection
-                Proxy proxy = params.getProxy();
-                if (proxy != null) {
-                    connection = (HttpURLConnection) url.openConnection(proxy);
-                } else {
-                    connection = (HttpURLConnection) url.openConnection();
+        URL url = new URL(queryUrl);
+        { // init connection
+            Proxy proxy = params.getProxy();
+            if (proxy != null) {
+                connection = (HttpURLConnection) url.openConnection(proxy);
+            } else {
+                connection = (HttpURLConnection) url.openConnection();
+            }
+            connection.setInstanceFollowRedirects(true);
+            connection.setReadTimeout(params.getConnectTimeout());
+            connection.setConnectTimeout(params.getConnectTimeout());
+            if (connection instanceof HttpsURLConnection) {
+                ((HttpsURLConnection) connection).setSSLSocketFactory(params.getSslSocketFactory());
+            }
+        }
+
+        {// add headers
+
+            try {
+                Map<String, List<String>> singleMap =
+                        COOKIE_MANAGER.get(url.toURI(), new HashMap<String, List<String>>(0));
+                List<String> cookies = singleMap.get("Cookie");
+                if (cookies != null) {
+                    connection.setRequestProperty("Cookie", TextUtils.join(";", cookies));
                 }
-                connection.setInstanceFollowRedirects(true);
-                connection.setReadTimeout(params.getConnectTimeout());
-                connection.setConnectTimeout(params.getConnectTimeout());
-                if (connection instanceof HttpsURLConnection) {
-                    ((HttpsURLConnection) connection).setSSLSocketFactory(params.getSslSocketFactory());
-                }
+            } catch (Throwable ex) {
+                LogUtil.e(ex.getMessage(), ex);
             }
 
-            {// add headers
-
-                try {
-                    Map<String, List<String>> singleMap =
-                            COOKIE_MANAGER.get(url.toURI(), new HashMap<String, List<String>>(0));
-                    List<String> cookies = singleMap.get("Cookie");
-                    if (cookies != null) {
-                        connection.setRequestProperty("Cookie", TextUtils.join(";", cookies));
+            HashMap<String, String> headers = params.getHeaders();
+            if (headers != null) {
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    String name = entry.getKey();
+                    String value = entry.getValue();
+                    if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
+                        connection.setRequestProperty(name, value);
                     }
-                } catch (Throwable ex) {
-                    LogUtil.e(ex.getMessage(), ex);
-                }
-
-                HashMap<String, String> headers = params.getHeaders();
-                if (headers != null) {
-                    for (Map.Entry<String, String> entry : headers.entrySet()) {
-                        String name = entry.getKey();
-                        String value = entry.getValue();
-                        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
-                            connection.setRequestProperty(name, value);
-                        }
-                    }
-                }
-
-            }
-
-            { // write body
-                HttpMethod method = params.getMethod();
-                connection.setRequestMethod(method.toString());
-                if (HttpMethod.permitsRequestBody(method)) {
-                    RequestBody body = params.getRequestBody();
-                    if (body != null) {
-                        if (body instanceof ProgressBody) {
-                            ((ProgressBody) body).setProgressHandler(progressHandler);
-                        }
-                        String contentType = body.getContentType();
-                        if (!TextUtils.isEmpty(contentType)) {
-                            connection.setRequestProperty("Content-Type", contentType);
-                        }
-                        connection.setRequestProperty("Content-Length", String.valueOf(body.getContentLength()));
-                        connection.setDoOutput(true);
-                        body.writeTo(connection.getOutputStream());
-                    }
-                }
-            }
-
-            LogUtil.d(buildUri);
-            int code = connection.getResponseCode();
-            if (code >= 300) {
-                throw new HttpException(code, connection.getResponseMessage());
-            }
-
-            { // save cookies
-                try {
-                    Map<String, List<String>> headers = connection.getHeaderFields();
-                    if (headers != null) {
-                        COOKIE_MANAGER.put(url.toURI(), headers);
-                    }
-                } catch (Throwable ex) {
-                    LogUtil.e(ex.getMessage(), ex);
                 }
             }
 
         }
+
+        { // write body
+            HttpMethod method = params.getMethod();
+            connection.setRequestMethod(method.toString());
+            if (HttpMethod.permitsRequestBody(method)) {
+                RequestBody body = params.getRequestBody();
+                if (body != null) {
+                    if (body instanceof ProgressBody) {
+                        ((ProgressBody) body).setProgressHandler(progressHandler);
+                    }
+                    String contentType = body.getContentType();
+                    if (!TextUtils.isEmpty(contentType)) {
+                        connection.setRequestProperty("Content-Type", contentType);
+                    }
+                    connection.setRequestProperty("Content-Length", String.valueOf(body.getContentLength()));
+                    connection.setDoOutput(true);
+                    body.writeTo(connection.getOutputStream());
+                }
+            }
+        }
+
+        LogUtil.d(queryUrl);
+        int code = connection.getResponseCode();
+        if (code >= 300) {
+            throw new HttpException(code, connection.getResponseMessage());
+        }
+
+        { // save cookies
+            try {
+                Map<String, List<String>> headers = connection.getHeaderFields();
+                if (headers != null) {
+                    COOKIE_MANAGER.put(url.toURI(), headers);
+                }
+            } catch (Throwable ex) {
+                LogUtil.e(ex.getMessage(), ex);
+            }
+        }
+
         isLoading = true;
     }
 
+    @Override
     public boolean isLoading() {
         return isLoading;
     }
 
+    @Override
     public String getCacheKey() {
         if (cacheKey == null) {
 
             cacheKey = params.getCacheKey();
 
             if (cacheKey == null) {
-                cacheKey = buildUri;
+                cacheKey = queryUrl;
             }
         }
         return cacheKey;
     }
 
-    /*package*/ RequestTracker getResponseTracker() {
-        return loader.getResponseTracker();
-    }
-
-    /**
-     * 由loader发起请求, 拿到结果.
-     *
-     * @return
-     * @throws Throwable
-     */
-    /*package*/ Object loadResult() throws Throwable {
-        return loader.load(this);
+    @Override
+    public Object loadResult() throws Throwable {
+        isLoading = true;
+        return super.loadResult();
     }
 
     /**
@@ -247,7 +214,9 @@ public final class UriRequest implements Closeable {
      * @return
      * @throws Throwable
      */
-    /*package*/ Object loadResultFromCache() throws Throwable {
+    @Override
+    public Object loadResultFromCache() throws Throwable {
+        isLoading = true;
         DiskCacheEntity cacheEntity = LruDiskCache.getDiskCache(params.getCacheDirName()).get(this.getCacheKey());
 
         if (cacheEntity != null) {
@@ -267,55 +236,16 @@ public final class UriRequest implements Closeable {
         }
     }
 
-    /*package*/ void clearCacheHeader() {
+    @Override
+    public void clearCacheHeader() {
         params.addHeader("If-Modified-Since", null);
         params.addHeader("If-None-Match", null);
     }
 
-    /*package*/ void save2Cache() {
-        x.task().run(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    loader.save2Cache(UriRequest.this);
-                } catch (Throwable ex) {
-                    LogUtil.e(ex.getMessage(), ex);
-                }
-            }
-        });
-    }
-
-    public File getFile() {
-        if (buildUri.startsWith("file://")) {
-            String filePath = buildUri.substring(7);
-            return new File(filePath);
-        } else {
-            try {
-                File file = new File(buildUri);
-                if (file.exists()) {
-                    return file;
-                }
-            } catch (Throwable ignored) {
-            }
-        }
-        return null;
-    }
-
+    @Override
     public InputStream getInputStream() throws IOException {
-        if (inputStream == null) {
-            if (connection != null) {
-                inputStream = connection.getInputStream();
-            } else {
-                if (callingClassLoader != null && buildUri.startsWith("assets://")) {
-                    String assetsPath = "assets/" + buildUri.substring(9);
-                    inputStream = callingClassLoader.getResourceAsStream(assetsPath);
-                } else {
-                    File file = getFile();
-                    if (file != null && file.exists()) {
-                        inputStream = new FileInputStream(file);
-                    }
-                }
-            }
+        if (connection != null && inputStream == null) {
+            inputStream = connection.getInputStream();
         }
         return inputStream;
     }
@@ -332,6 +262,7 @@ public final class UriRequest implements Closeable {
         }
     }
 
+    @Override
     public long getContentLength() {
         long result = 0;
         if (connection != null) {
@@ -355,6 +286,7 @@ public final class UriRequest implements Closeable {
         return result;
     }
 
+    @Override
     public int getResponseCode() throws IOException {
         if (connection != null) {
             return connection.getResponseCode();
@@ -367,6 +299,7 @@ public final class UriRequest implements Closeable {
         }
     }
 
+    @Override
     public long getExpiration() {
         if (connection == null) return -1;
         long result = connection.getExpiration();
@@ -376,26 +309,31 @@ public final class UriRequest implements Closeable {
         return result;
     }
 
+    @Override
     public long getLastModified() {
         return getHeaderFieldDate("Last-Modified", System.currentTimeMillis());
     }
 
+    @Override
     public String getETag() {
         if (connection == null) return null;
         return connection.getHeaderField("ETag");
     }
 
+    @Override
     public String getResponseHeader(String name) {
         if (connection == null) return null;
         return connection.getHeaderField(name);
     }
 
+    @Override
     public Map<String, List<String>> getResponseHeaders() {
         if (connection == null) return null;
         return connection.getHeaderFields();
     }
 
-    private long getHeaderFieldDate(String name, long defaultValue) {
+    @Override
+    public long getHeaderFieldDate(String name, long defaultValue) {
         if (connection == null) return defaultValue;
         return connection.getHeaderFieldDate(name, defaultValue);
     }
@@ -408,10 +346,5 @@ public final class UriRequest implements Closeable {
         GregorianCalendar gc = new GregorianCalendar(gmtZone);
         gc.setTimeInMillis(date.getTime());
         return sdf.format(date);
-    }
-
-    @Override
-    public String toString() {
-        return getRequestUri();
     }
 }

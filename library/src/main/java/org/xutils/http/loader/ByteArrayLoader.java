@@ -2,7 +2,7 @@ package org.xutils.http.loader;
 
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.common.util.IOUtil;
-import org.xutils.http.UriRequest;
+import org.xutils.http.request.UriRequest;
 
 import java.io.InputStream;
 

@@ -99,7 +99,7 @@ public class RequestParams {
         this.builder = builder;
     }
 
-    // invoke via UriRequest#<init>()
+    // invoke via HttpTask#initRequest
     /*package*/ void init() throws Throwable {
         if (TextUtils.isEmpty(uri) && getHttpRequest() == null) {
             throw new IllegalStateException("uri is empty && @HttpRequest == null");

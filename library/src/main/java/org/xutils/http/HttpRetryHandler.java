@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.xutils.common.Callback;
 import org.xutils.common.util.LogUtil;
 import org.xutils.ex.HttpException;
+import org.xutils.http.request.UriRequest;
 
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;

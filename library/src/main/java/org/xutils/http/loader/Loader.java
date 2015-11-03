@@ -4,8 +4,8 @@ package org.xutils.http.loader;
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.http.ProgressHandler;
 import org.xutils.http.RequestParams;
-import org.xutils.http.UriRequest;
 import org.xutils.http.app.RequestTracker;
+import org.xutils.http.request.UriRequest;
 
 import java.io.InputStream;
 

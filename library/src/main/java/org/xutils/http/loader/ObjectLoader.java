@@ -6,10 +6,10 @@ import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
 import org.xutils.http.RequestParams;
-import org.xutils.http.UriRequest;
 import org.xutils.http.annotation.HttpResponse;
 import org.xutils.http.app.RequestTracker;
 import org.xutils.http.app.ResponseParser;
+import org.xutils.http.request.UriRequest;
 
 import java.io.InputStream;
 import java.util.Date;

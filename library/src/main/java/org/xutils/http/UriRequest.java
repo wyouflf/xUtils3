@@ -307,7 +307,8 @@ public final class UriRequest implements Closeable {
                 inputStream = connection.getInputStream();
             } else {
                 if (callingClassLoader != null && buildUri.startsWith("assets://")) {
-                    inputStream = callingClassLoader.getResourceAsStream(buildUri);
+                    String assetsPath = "assets/" + buildUri.substring(9);
+                    inputStream = callingClassLoader.getResourceAsStream(assetsPath);
                 } else {
                     File file = getFile();
                     if (file != null && file.exists()) {

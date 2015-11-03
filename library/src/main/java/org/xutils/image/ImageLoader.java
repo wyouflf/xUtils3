@@ -182,7 +182,7 @@ import java.util.concurrent.atomic.AtomicLong;
                 return null;
             }
 
-            options.optimizeMaxSize(view);
+            localOptions.optimizeMaxSize(view);
         }
 
         // stop the old loader
@@ -221,7 +221,7 @@ import java.util.concurrent.atomic.AtomicLong;
                 }
                 // hit mem cache
                 view.setImageDrawable(drawable);
-                view.setScaleType(options.getImageScaleType());
+                view.setScaleType(localOptions.getImageScaleType());
                 if (callback instanceof CacheCallback) {
                     boolean trustCache = ((CacheCallback<Drawable>) callback).onCache(drawable);
                     if (!trustCache) {

@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicLong;
     private Callback.CacheCallback<Drawable> cacheCallback;
     private Callback.ProgressCallback<Drawable> progressCallback;
 
-    private final static String DISK_CACHE_DIR_NAME = "yl_img";
+    private final static String DISK_CACHE_DIR_NAME = "xUtils_img";
     private final static Executor EXECUTOR = new PriorityExecutor(10);
     private final static int MEM_CACHE_MIN_SIZE = 1024 * 1024 * 4; // 4M
     private final static LruCache<MemCacheKey, Drawable> MEM_CACHE =

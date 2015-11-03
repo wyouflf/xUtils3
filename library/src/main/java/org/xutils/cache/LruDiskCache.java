@@ -34,7 +34,7 @@ public final class LruDiskCache {
     private static final long LIMIT_SIZE = 1024L * 1024L * 100L; // 限制最多100M文件
 
     private static final int LOCK_WAIT = 1000 * 3; // 3s
-    private static final String CACHE_DIR_NAME = "yl_cache";
+    private static final String CACHE_DIR_NAME = "xUtils_cache";
     private static final String TEMP_FILE_SUFFIX = ".tmp";
     private static final Executor trimExecutor = new PriorityExecutor(1);
 

@@ -48,7 +48,7 @@ public final class ImageDecoder {
     private final static byte[] WEBP_HEADER = new byte[]{'W', 'E', 'B', 'P'};
 
     private final static Executor THUMB_CACHE_EXECUTOR = new PriorityExecutor(1);
-    private final static LruDiskCache THUMB_CACHE = LruDiskCache.getDiskCache("yl_img_thumb");
+    private final static LruDiskCache THUMB_CACHE = LruDiskCache.getDiskCache("xUtils_img_thumb");
 
     static {
         int cpuCount = Runtime.getRuntime().availableProcessors();

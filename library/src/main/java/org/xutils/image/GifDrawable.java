@@ -20,6 +20,9 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
         this.movie = movie;
         this.byteCount = byteCount;
         this.duration = movie.duration();
+        if (this.duration == 0) {
+            this.duration = 100;
+        }
     }
 
     public Movie getMovie() {

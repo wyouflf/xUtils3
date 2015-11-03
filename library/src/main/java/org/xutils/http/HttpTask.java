@@ -134,9 +134,6 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         Throwable exception = null;
         HttpRetryHandler retryHandler = new HttpRetryHandler(this.params.getMaxRetryCount());
         request = initRequest();
-        if (tracker != null) {
-            tracker.onStart(request);
-        }
 
         if (this.isCancelled()) {
             throw new Callback.CancelledException("cancelled before request");
@@ -330,6 +327,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         if (progressCallback != null) {
             progressCallback.onStarted();
         }
+        if (tracker != null) {
+            tracker.onStart(request);
+        }
     }
 
     @Override
@@ -344,10 +344,10 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     @Override
     protected void onError(Throwable ex, boolean isCallbackError) {
+        callback.onError(ex, isCallbackError);
         if (tracker != null) {
             tracker.onError(request, ex, isCallbackError);
         }
-        callback.onError(ex, isCallbackError);
     }
 
 

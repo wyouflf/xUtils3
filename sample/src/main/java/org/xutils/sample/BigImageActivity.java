@@ -19,6 +19,10 @@ public class BigImageActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         ImageOptions imageOptions = new ImageOptions.Builder()
+                // 加载中或错误图片的ScaleType
+                //.setPlaceholderScaleType(ImageView.ScaleType.MATRIX)
+                // 默认自动适应大小
+                // .setSize(...)
                 .setImageScaleType(ImageView.ScaleType.MATRIX).build();
 
         x.image().bind(iv_big_img, getIntent().getStringExtra("url"), imageOptions);

@@ -45,12 +45,6 @@ public class DbFragment extends BaseFragment {
 
         String temp = "";
 
-
-
-        /*Parent parent2 = new Parent();
-        parent2.name = "测试2";
-        parent2.isVIP = false;*/
-
         try {
 
             DbManager db = x.getDb(daoConfig);
@@ -59,7 +53,8 @@ public class DbFragment extends BaseFragment {
             child.name = "child's name";
 
             Parent test = db.selector(Parent.class).where("id", "in", new int[]{1, 3, 6}).findFirst();
-            //Parent test = db.selector(Parent.class).where("id", "between", new String[]{"1", "5"}).findFirst();
+            // long count = db.selector(Parent.class).where("id", "in", new int[]{1, 3, 6}).count();
+            // Parent test = db.selector(Parent.class).where("id", "between", new String[]{"1", "5"}).findFirst();
             if (test != null) {
                 child.parentId = test.getId();
                 temp += "first parent:" + test + "\n";

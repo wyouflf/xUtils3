@@ -108,15 +108,21 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             }
         }
 
+        // init request
         params.init();
         UriRequest result = UriRequestFactory.getUriRequest(params, (Class<?>) loadType);
         result.setCallingClassLoader(callBackType.getClassLoader());
         result.setProgressHandler(this);
 
+        // init tracker
+        RequestTracker customTracker = null;
         if (callback instanceof RequestTracker) {
-            tracker = (RequestTracker) callback;
+            customTracker = (RequestTracker) callback;
         } else {
-            tracker = result.getResponseTracker();
+            customTracker = result.getResponseTracker();
+        }
+        if (customTracker != null) {
+            tracker = new RequestTrackerWrapper(customTracker);
         }
 
         return result;
@@ -291,6 +297,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             case FLAG_CACHE: {
                 synchronized (cacheLock) {
                     try {
+                        if (tracker != null) {
+                            tracker.onCache(request);
+                        }
                         trustCache = this.cacheCallback.onCache((ResultType) args[0]);
                     } catch (Throwable ex) {
                         trustCache = false;
@@ -320,6 +329,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     @Override
     protected void onWaiting() {
+        if (tracker != null) {
+            tracker.onWaiting(request);
+        }
         if (progressCallback != null) {
             progressCallback.onWaiting();
         }
@@ -327,43 +339,46 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     @Override
     protected void onStarted() {
-        if (progressCallback != null) {
-            progressCallback.onStarted();
-        }
         if (tracker != null) {
             tracker.onStart(request);
+        }
+        if (progressCallback != null) {
+            progressCallback.onStarted();
         }
     }
 
     @Override
     protected void onSuccess(ResultType result) {
-        if (result != null) {
-            callback.onSuccess(result);
-        }
         if (tracker != null) {
             tracker.onSuccess(request);
+        }
+        if (result != null) {
+            callback.onSuccess(result);
         }
     }
 
     @Override
     protected void onError(Throwable ex, boolean isCallbackError) {
-        callback.onError(ex, isCallbackError);
         if (tracker != null) {
             tracker.onError(request, ex, isCallbackError);
         }
+        callback.onError(ex, isCallbackError);
     }
 
 
     @Override
     protected void onCancelled(Callback.CancelledException cex) {
-        callback.onCancelled(cex);
         if (tracker != null) {
             tracker.onCancelled(request);
         }
+        callback.onCancelled(cex);
     }
 
     @Override
     protected void onFinished() {
+        if (tracker != null) {
+            tracker.onFinished(request);
+        }
         clearRawResult();
         IOUtil.closeQuietly(request);
         callback.onFinished();

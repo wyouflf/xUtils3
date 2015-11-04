@@ -7,7 +7,11 @@ import org.xutils.http.request.UriRequest;
  */
 public interface RequestTracker {
 
+    void onWaiting(UriRequest request);
+
     void onStart(UriRequest request);
+
+    void onCache(UriRequest request);
 
     void onSuccess(UriRequest request);
 
@@ -15,4 +19,5 @@ public interface RequestTracker {
 
     void onError(UriRequest request, Throwable ex, boolean isCallbackError);
 
+    void onFinished(UriRequest request);
 }

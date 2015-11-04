@@ -195,7 +195,7 @@ public final class HttpRequest extends UriRequest {
 
             cacheKey = params.getCacheKey();
 
-            if (cacheKey == null) {
+            if (TextUtils.isEmpty(cacheKey)) {
                 cacheKey = queryUrl;
             }
         }

@@ -15,6 +15,7 @@
 
 package org.xutils.http.annotation;
 
+import org.xutils.http.app.DefaultParamsBuilder;
 import org.xutils.http.app.ParamsBuilder;
 
 import java.lang.annotation.ElementType;
@@ -30,9 +31,7 @@ public @interface HttpRequest {
 
     String path();
 
-    String version() default "";
-
-    Class<? extends ParamsBuilder> builder();
+    Class<? extends ParamsBuilder> builder() default DefaultParamsBuilder.class;
 
     String[] signs() default "";
 

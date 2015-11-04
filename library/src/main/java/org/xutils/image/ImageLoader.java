@@ -133,7 +133,7 @@ import java.util.concurrent.atomic.AtomicLong;
             return null;
         }
 
-        RequestParams params = new RequestParams(url, null, null, null);
+        RequestParams params = new RequestParams(url);
         params.setCacheDirName(DISK_CACHE_DIR_NAME);
         params.setConnectTimeout(1000 * 8);
         params.setPriority(Priority.BG_LOW);
@@ -295,7 +295,7 @@ import java.util.concurrent.atomic.AtomicLong;
         }
 
         // request
-        RequestParams params = new RequestParams(url, null, null, null);
+        RequestParams params = new RequestParams(url);
         params.setCacheDirName(DISK_CACHE_DIR_NAME);
         params.setConnectTimeout(1000 * 8);
         params.setPriority(Priority.BG_LOW);

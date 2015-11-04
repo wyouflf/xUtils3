@@ -558,11 +558,6 @@ public class RequestParams {
                 httpRequest = thisCls.getAnnotation(HttpRequest.class);
             }
         }
-
-        if (TextUtils.isEmpty(uri) && httpRequest == null) {
-            throw new IllegalStateException("uri is empty && @HttpRequest == null");
-        }
-
         return httpRequest;
     }
 }

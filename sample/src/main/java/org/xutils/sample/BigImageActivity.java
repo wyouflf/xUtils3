@@ -23,8 +23,11 @@ public class BigImageActivity extends BaseActivity {
                 //.setPlaceholderScaleType(ImageView.ScaleType.MATRIX)
                 // 默认自动适应大小
                 // .setSize(...)
+                .setIgnoreGif(false)
                 .setImageScaleType(ImageView.ScaleType.MATRIX).build();
 
         x.image().bind(iv_big_img, getIntent().getStringExtra("url"), imageOptions);
+        //x.image().bind(iv_big_img, "file:///sdcard/test.gif", imageOptions);
+        //x.image().bind(iv_big_img, "assets://test.gif", imageOptions);
     }
 }

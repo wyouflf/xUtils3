@@ -34,14 +34,16 @@ public class HttpFragment extends BaseFragment {
     private void onTestBaidu1Click(View view) {
         BaiduParams params = new BaiduParams();
         params.wd = "xUtils";
-        // params.uploadFile = new File("/sdcard/test.txt"); // 上传文件方式 1
-        // params.addBodyParameter("uploadFile", new File("/sdcard/test.txt")); // 上传文件方式 2
+        // 上传文件方式 1
+        // params.uploadFile = new File("/sdcard/test.txt");
+        // 上传文件方式 2
+        // params.addBodyParameter("uploadFile", new File("/sdcard/test.txt"));
         Callback.Cancelable cancelable
                 = x.http().get(params,
                 /**
                  * 1. callback的泛型:
                  * callback参数默认支持的泛型类型参见{@link org.xutils.http.loader.LoaderFactory},
-                 * 例如指定泛型为File则可实现文件下载.
+                 * 例如指定泛型为File则可实现文件下载. 默认支持断点续传(采用了文件锁和尾端校验续传文件的一致性).
                  * 其他常用类型可以自己在LoaderFactory中注册,
                  * 也可以使用{@link org.xutils.http.annotation.HttpResponse}
                  * 将注解HttpResponse加到自定义返回值类型上, 实现自定义ResponseParser接口来统一转换.

@@ -1,10 +1,122 @@
 package org.xutils.sample;
 
+import android.view.View;
+import android.widget.TextView;
+
+import org.xutils.DbManager;
+import org.xutils.db.table.DbModel;
 import org.xutils.event.annotation.ContentView;
+import org.xutils.event.annotation.Event;
+import org.xutils.event.annotation.ViewInject;
+import org.xutils.sample.db.Child;
+import org.xutils.sample.db.Parent;
+import org.xutils.x;
+
+import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by wyouflf on 15/11/4.
  */
 @ContentView(R.layout.fragment_db)
 public class DbFragment extends BaseFragment {
+
+    DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
+            .setDbName("test")
+            .setDbDir(new File("/sdcard"))
+            .setDbVersion(1)
+            .setDbUpgradeListener(new DbManager.DbUpgradeListener() {
+                @Override
+                public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
+                    // TODO: ...
+                    // db.addColumn(...);
+                    // db.dropTable(...);
+                    // ...
+                }
+            });
+
+    @ViewInject(R.id.tv_db_result)
+    private TextView tv_db_result;
+
+    @Event(R.id.btn_test_db)
+    private void onTestDbClick(View view) {
+
+        String temp = "";
+
+
+
+        /*Parent parent2 = new Parent();
+        parent2.name = "测试2";
+        parent2.isVIP = false;*/
+
+        try {
+
+            DbManager db = x.getDb(daoConfig);
+
+            Child child = new Child();
+            child.name = "child's name";
+
+            Parent test = db.selector(Parent.class).where("id", "in", new int[]{1, 3, 6}).findFirst();
+            //Parent test = db.selector(Parent.class).where("id", "between", new String[]{"1", "5"}).findFirst();
+            if (test != null) {
+                child.parentId = test.getId();
+                temp += "first parent:" + test + "\n";
+                tv_db_result.setText(temp);
+            }
+
+            Parent parent = new Parent();
+            parent.name = "测试" + System.currentTimeMillis();
+            parent.setAdmin(true);
+            parent.setEmail("wyouflf@qq.com");
+            parent.setTime(new Date());
+            parent.setDate(new java.sql.Date(new Date().getTime()));
+            db.save(parent);
+
+            db.saveBindingId(child);//保存对象关联数据库生成的id
+
+            List<Child> children = db.selector(Child.class).findAll();
+            temp += "children size:" + children.size() + "\n";
+            tv_db_result.setText(temp);
+            if (children.size() > 0) {
+                temp += "last children:" + children.get(children.size() - 1) + "\n";
+                tv_db_result.setText(temp);
+            }
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DATE, -1);
+            calendar.add(Calendar.HOUR, 3);
+
+            List<Parent> list = db.selector(Parent.class)
+                    .where("id", "<", 54)
+                    .and("time", ">", calendar.getTime())
+                    .orderBy("id")
+                    .limit(10).findAll();
+            temp += "find parent size:" + list.size() + "\n";
+            tv_db_result.setText(temp);
+            if (list.size() > 0) {
+                temp += "last parent:" + list.get(list.size() - 1) + "\n";
+                tv_db_result.setText(temp);
+            }
+
+            //parent.name = "hahaha123";
+            //db.update(parent);
+
+            Parent entity = db.findById(Parent.class, child.parentId);
+            temp += "find by id:" + entity.toString() + "\n";
+            tv_db_result.setText(temp);
+
+            List<DbModel> dbModels = db.selector(Parent.class)
+                    .groupBy("name")
+                    .select("name", "count(name) as count").findAll();
+            temp += "group by result:" + dbModels.get(0).getDataMap() + "\n";
+            tv_db_result.setText(temp);
+
+        } catch (Throwable e) {
+            temp += "error :" + e.getMessage() + "\n";
+            tv_db_result.setText(temp);
+        }
+    }
+
 }

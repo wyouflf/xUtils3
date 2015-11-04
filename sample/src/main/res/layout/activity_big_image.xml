@@ -9,4 +9,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.xutils.sample.BigImageActivity">
 
+    <ImageView
+        android:id="@+id/iv_big_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </RelativeLayout>

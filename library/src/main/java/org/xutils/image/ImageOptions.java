@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 
+import org.xutils.common.util.DensityUtil;
 import org.xutils.common.util.LogUtil;
 
 import java.lang.reflect.Field;
@@ -61,8 +62,8 @@ public class ImageOptions {
             return;
         }
 
-        int screenWidth = view.getResources().getDisplayMetrics().widthPixels;
-        int screenHeight = view.getResources().getDisplayMetrics().heightPixels;
+        int screenWidth = DensityUtil.getScreenWidth();
+        int screenHeight = DensityUtil.getScreenHeight();
 
         if (width < 0) {
             maxWidth = screenWidth * 3 / 2; //Integer.MAX_VALUE;

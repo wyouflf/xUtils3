@@ -10,8 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.xutils.event.annotation.ContentView;
-import org.xutils.event.annotation.ViewInject;
+import org.xutils.view.annotation.ContentView;
+import org.xutils.view.annotation.ViewInject;
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends BaseActivity {

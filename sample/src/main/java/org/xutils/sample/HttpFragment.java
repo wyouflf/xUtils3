@@ -4,8 +4,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import org.xutils.common.Callback;
-import org.xutils.event.annotation.ContentView;
-import org.xutils.event.annotation.Event;
+import org.xutils.view.annotation.ContentView;
+import org.xutils.view.annotation.Event;
 import org.xutils.http.RequestParams;
 import org.xutils.sample.http.BaiduParams;
 import org.xutils.x;
@@ -27,7 +27,7 @@ public class HttpFragment extends BaseFragment {
      * *** *Event(...);
      * }
      * 3. 方法参数形式必须和type对应的Listener接口一致.
-     * 4. 其他见{@link org.xutils.event.annotation.Event}类的说明.
+     * 4. 其他见{@link org.xutils.view.annotation.Event}类的说明.
      **/
     @Event(value = R.id.btn_test_baidu1,
             type = View.OnClickListener.class/*可选参数, 默认是View.OnClickListener.class*/)

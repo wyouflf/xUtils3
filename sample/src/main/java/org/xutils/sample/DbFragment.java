@@ -5,9 +5,9 @@ import android.widget.TextView;
 
 import org.xutils.DbManager;
 import org.xutils.db.table.DbModel;
-import org.xutils.event.annotation.ContentView;
-import org.xutils.event.annotation.Event;
-import org.xutils.event.annotation.ViewInject;
+import org.xutils.view.annotation.ContentView;
+import org.xutils.view.annotation.Event;
+import org.xutils.view.annotation.ViewInject;
 import org.xutils.sample.db.Child;
 import org.xutils.sample.db.Parent;
 import org.xutils.x;

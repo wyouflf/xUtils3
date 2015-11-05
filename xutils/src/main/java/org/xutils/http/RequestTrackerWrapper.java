@@ -6,8 +6,9 @@ import org.xutils.http.request.UriRequest;
 
 /**
  * Created by wyouflf on 15/11/4.
+ * Wrapper for tracker
  */
-/**/ final class RequestTrackerWrapper implements RequestTracker {
+/*package*/ final class RequestTrackerWrapper implements RequestTracker {
 
     private final RequestTracker base;
 

@@ -4,13 +4,11 @@ import android.text.TextUtils;
 
 import org.json.JSONObject;
 import org.xutils.cache.DiskCacheEntity;
-import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.http.request.UriRequest;
 
 import java.io.InputStream;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,7 +20,7 @@ import java.util.Map;
 /*package*/ class MapLoader extends Loader<Map<String, Object>> {
 
     private String charset = "UTF-8";
-    private String contentStr = null;
+    private String resultStr = null;
 
     @Override
     public Loader<Map<String, Object>> newInstance() {
@@ -41,8 +39,8 @@ import java.util.Map;
 
     @Override
     public Map<String, Object> load(final InputStream in) throws Throwable {
-        contentStr = IOUtil.readStr(in, charset);
-        return getMapForJson(contentStr);
+        resultStr = IOUtil.readStr(in, charset);
+        return getMapForJson(resultStr);
     }
 
     @Override
@@ -55,7 +53,7 @@ import java.util.Map;
     public Map<String, Object> loadFromCache(final DiskCacheEntity cacheEntity) throws Throwable {
         if (cacheEntity != null) {
             String text = cacheEntity.getTextContent();
-            if (text != null) {
+            if (!TextUtils.isEmpty(text)) {
                 return getMapForJson(text);
             }
         }
@@ -65,16 +63,7 @@ import java.util.Map;
 
     @Override
     public void save2Cache(UriRequest request) {
-        if (!TextUtils.isEmpty(contentStr)) {
-            DiskCacheEntity entity = new DiskCacheEntity();
-            entity.setKey(request.getCacheKey());
-            entity.setLastAccess(System.currentTimeMillis());
-            entity.setEtag(request.getETag());
-            entity.setExpires(request.getExpiration());
-            entity.setLastModify(new Date(request.getLastModified()));
-            entity.setTextContent(contentStr);
-            LruDiskCache.getDiskCache(request.getParams().getCacheDirName()).put(entity);
-        }
+        saveStringCache(request, resultStr);
     }
 
     private static Map<String, Object> getMapForJson(String jsonStr) throws Throwable {

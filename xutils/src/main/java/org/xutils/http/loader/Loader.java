@@ -1,13 +1,17 @@
 package org.xutils.http.loader;
 
 
+import android.text.TextUtils;
+
 import org.xutils.cache.DiskCacheEntity;
+import org.xutils.cache.LruDiskCache;
 import org.xutils.http.ProgressHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.app.RequestTracker;
 import org.xutils.http.request.UriRequest;
 
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * Author: wyouflf
@@ -33,6 +37,19 @@ public abstract class Loader<T> {
 
     public RequestTracker getResponseTracker() {
         return this.tracker;
+    }
+
+    protected void saveStringCache(UriRequest request, String resultStr) {
+        if (!TextUtils.isEmpty(resultStr)) {
+            DiskCacheEntity entity = new DiskCacheEntity();
+            entity.setKey(request.getCacheKey());
+            entity.setLastAccess(System.currentTimeMillis());
+            entity.setEtag(request.getETag());
+            entity.setExpires(request.getExpiration());
+            entity.setLastModify(new Date(request.getLastModified()));
+            entity.setTextContent(resultStr);
+            LruDiskCache.getDiskCache(request.getParams().getCacheDirName()).put(entity);
+        }
     }
 
     public abstract Loader<T> newInstance();

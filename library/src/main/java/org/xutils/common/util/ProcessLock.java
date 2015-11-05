@@ -16,8 +16,6 @@ import java.nio.channels.FileLock;
 import java.text.DecimalFormat;
 
 /**
- * @author: wyouflf
- * @date: 2015/06/26
  * 进程间锁, 仅在同一个应用中有效.
  * 一个锁的最大有效期时为1min.
  */

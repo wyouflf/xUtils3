@@ -5,9 +5,9 @@ import android.app.Application;
 import org.xutils.common.TaskController;
 import org.xutils.common.task.TaskControllerImpl;
 import org.xutils.db.DbManagerImpl;
-import org.xutils.view.ViewInjectorImpl;
 import org.xutils.http.HttpManagerImpl;
 import org.xutils.image.ImageManagerImpl;
+import org.xutils.view.ViewInjectorImpl;
 
 
 /**

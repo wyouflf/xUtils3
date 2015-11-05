@@ -25,12 +25,10 @@ import java.util.Date;
 /**
  * Author: wyouflf
  * Time: 2014/05/30
- * <p/>
  * 下载参数策略:
  * 1. RequestParams#saveFilePath不为空时, 目标文件保存在saveFilePath;
  * 否则由Cache策略分配文件下载路径.
  * 2. 下载时临时目标文件路径为tempSaveFilePath, 下载完后进行a: CacheFile#commit; b:重命名等操作.
- * <p/>
  * 断点下载策略:
  * 1. 要下载的目标文件不存在或小于 CHECK_SIZE 时删除目标文件, 重新下载.
  * 2. 若文件存在且大于 CHECK_SIZE, range = fileLen - CHECK_SIZE , 校验check_buffer, 相同: 继续下载;

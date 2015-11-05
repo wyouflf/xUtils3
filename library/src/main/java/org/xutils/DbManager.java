@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * @author: wyouflf
- * @date: 2015/07/29
  * 数据库访问接口
  */
 public interface DbManager extends Closeable {

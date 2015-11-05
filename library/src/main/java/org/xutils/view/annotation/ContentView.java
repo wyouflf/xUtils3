@@ -13,19 +13,15 @@
  * limitations under the License.
  */
 
-package org.xutils.event.annotation;
+package org.xutils.view.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ViewInject {
-
+public @interface ContentView {
     int value();
-
-    /* parent view id */
-    int parentId() default 0;
 }

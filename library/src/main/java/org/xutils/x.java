@@ -5,14 +5,15 @@ import android.app.Application;
 import org.xutils.common.TaskController;
 import org.xutils.common.task.TaskControllerImpl;
 import org.xutils.db.DbManagerImpl;
-import org.xutils.event.ViewInjectorImpl;
+import org.xutils.view.ViewInjectorImpl;
 import org.xutils.http.HttpManagerImpl;
 import org.xutils.image.ImageManagerImpl;
 
 
 /**
  * Created by wyouflf on 15/6/10.
- * 任务控制中心, http, image, db接口的入口.
+ * 任务控制中心, http, image, db, view注入等接口的入口.
+ * 需要在在application的onCreate中初始化: x.Ext.init(this);
  */
 public final class x {
 

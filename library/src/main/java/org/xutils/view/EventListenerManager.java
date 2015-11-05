@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-package org.xutils.event;
+package org.xutils.view;
 
 import android.text.TextUtils;
 import android.view.View;
 
 import org.xutils.common.util.LogUtil;
-import org.xutils.event.annotation.Event;
+import org.xutils.view.annotation.Event;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;

@@ -1,4 +1,4 @@
-package org.xutils.event.annotation;
+package org.xutils.view.annotation;
 
 import android.view.View;
 

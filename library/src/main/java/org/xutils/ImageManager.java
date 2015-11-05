@@ -10,6 +10,7 @@ import java.io.File;
 
 /**
  * Created by wyouflf on 15/6/17.
+ * 图片绑定接口
  */
 public interface ImageManager {
 

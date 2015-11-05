@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.xutils.event;
+package org.xutils.view;
 
 import java.util.ArrayList;
 import java.util.Collection;

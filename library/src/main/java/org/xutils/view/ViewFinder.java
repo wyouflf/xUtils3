@@ -1,4 +1,4 @@
-package org.xutils.event;
+package org.xutils.view;
 
 import android.app.Activity;
 import android.content.Context;

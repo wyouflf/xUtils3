@@ -7,7 +7,7 @@ import org.xutils.http.request.UriRequest;
 /**
  * Created by wyouflf on 15/11/4.
  */
-public class RequestTrackerWrapper implements RequestTracker {
+/**/ final class RequestTrackerWrapper implements RequestTracker {
 
     private final RequestTracker base;
 

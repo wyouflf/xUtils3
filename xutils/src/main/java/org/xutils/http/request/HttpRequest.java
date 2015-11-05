@@ -36,7 +36,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by wyouflf on 15/7/23.
  * Uri请求发送和数据接收
  */
-public final class HttpRequest extends UriRequest {
+public class HttpRequest extends UriRequest {
 
     private String cacheKey = null;
     private boolean isLoading = false;

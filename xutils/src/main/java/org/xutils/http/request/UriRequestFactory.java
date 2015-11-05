@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 
 /**
  * Created by wyouflf on 15/11/4.
+ * Uri请求创建工厂
  */
 public final class UriRequestFactory {
 

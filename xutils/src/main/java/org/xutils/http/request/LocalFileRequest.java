@@ -13,8 +13,9 @@ import java.util.Map;
 
 /**
  * Created by wyouflf on 15/11/4.
+ * 本地文件请求
  */
-public final class LocalFileRequest extends UriRequest {
+public class LocalFileRequest extends UriRequest {
 
     private InputStream inputStream;
 

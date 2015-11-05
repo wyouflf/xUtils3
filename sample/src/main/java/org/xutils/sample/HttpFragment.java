@@ -90,7 +90,7 @@ public class HttpFragment extends BaseFragment {
         // 3. 在LoaderFactory注册.
     }
 
-    // 忘记上面那个高度定制化的版本, 如果你只需要一个简单的版本.
+    // 如果你只需要一个简单的版本.
     @Event(value = R.id.btn_test_baidu2)
     private void onTestBaidu2Click(View view) {
         RequestParams params = new RequestParams("https://www.baidu.com/s");

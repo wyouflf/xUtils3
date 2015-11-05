@@ -8,7 +8,7 @@
     3. 事件和数据库注解去除不常用的功能, 提高性能.
     4. 图片绑定支持gif, webp; 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
 
-### 使用事件注解(@ContentView, @ViewInject等更多示例参考sample项目)
+### 使用@Event事件注解(@ContentView, @ViewInject等更多示例参考sample项目)
 ```java
 /**
  * 1. 方法必须私有限定,
@@ -88,7 +88,7 @@ Callback.Cancelable cancelable
 // 2. 自定义ResponseParser同时实现RequestTracker接口;
 // 3. 在LoaderFactory注册.
 ```
-#### 忘记上面那个高度定制化的版本, 如果你只需要一个简单的版本.
+#### 如果你只需要一个简单的版本:
 ```java
 @Event(value = R.id.btn_test_baidu2)
 private void onTestBaidu2Click(View view) {

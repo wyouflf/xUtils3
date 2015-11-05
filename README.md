@@ -8,6 +8,23 @@
     3. 事件和数据库注解去除不常用的功能, 提高性能.
     4. 图片绑定支持gif, webp; 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
 
+#### 使用前配置
+需要的权限
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+初始化
+```java
+// 在application的onCreate中初始化
+@Override
+public void onCreate() {
+    super.onCreate();
+    x.Ext.init(this);
+    ...
+}
+```
+
 ### 使用@Event事件注解(@ContentView, @ViewInject等更多示例参考sample项目)
 ```java
 /**

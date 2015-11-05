@@ -34,6 +34,8 @@ public class HttpFragment extends BaseFragment {
     private void onTestBaidu1Click(View view) {
         BaiduParams params = new BaiduParams();
         params.wd = "xUtils";
+        // 有上传文件时使用multipart表单, 否则上传原始文件流.
+        // params.setMultipart(true);
         // 上传文件方式 1
         // params.uploadFile = new File("/sdcard/test.txt");
         // 上传文件方式 2

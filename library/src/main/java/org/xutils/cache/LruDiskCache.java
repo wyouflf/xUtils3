@@ -12,7 +12,7 @@ import org.xutils.common.util.MD5;
 import org.xutils.common.util.ProcessLock;
 import org.xutils.config.DbConfigs;
 import org.xutils.db.sqlite.WhereBuilder;
-import org.xutils.ex.CacheFileLockException;
+import org.xutils.ex.CacheLockedException;
 import org.xutils.ex.DbException;
 import org.xutils.x;
 
@@ -155,7 +155,7 @@ public final class LruDiskCache {
                 result.mkdirs();
             }
         } else {
-            throw new CacheFileLockException(entity.getPath());
+            throw new CacheLockedException(entity.getPath());
         }
 
         return result;
@@ -202,7 +202,7 @@ public final class LruDiskCache {
                         throw new IOException("rename:" + cacheFile.getAbsolutePath());
                     }
                 } else {
-                    throw new CacheFileLockException(destPath);
+                    throw new CacheLockedException(destPath);
                 }
             } finally {
                 if (result == null) {

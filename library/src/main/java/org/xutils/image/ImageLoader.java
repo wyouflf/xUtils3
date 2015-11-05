@@ -20,7 +20,7 @@ import org.xutils.common.task.Priority;
 import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
-import org.xutils.ex.CacheFileLockException;
+import org.xutils.ex.CacheLockedException;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
@@ -406,7 +406,7 @@ import java.util.concurrent.atomic.AtomicLong;
         LogUtil.e(key.url, ex);
         if (!validView4Callback(false)) return;
 
-        if (ex instanceof CacheFileLockException) {
+        if (ex instanceof CacheLockedException) {
             doBind(viewRef.get(), key.url, options, callback);
             return;
         }

@@ -412,7 +412,7 @@ public class RequestParams {
         requestBody = null;
     }
 
-    public void removeParams(String name) {
+    public void removeParameter(String name) {
         if (queryStringParams != null) {
             queryStringParams.remove(name);
         }
@@ -424,7 +424,7 @@ public class RequestParams {
         }
     }
 
-    public String getStringParam(String key) {
+    public String getStringParameter(String key) {
         if (queryStringParams != null && queryStringParams.containsKey(key)) {
             return queryStringParams.get(key);
         } else if (bodyParams != null && bodyParams.containsKey(key)) {
@@ -432,52 +432,6 @@ public class RequestParams {
             return value == null ? null : value.toString();
         } else {
             return null;
-        }
-    }
-
-    private void checkBodyParams() {
-        if (bodyParams != null && (!TextUtils.isEmpty(bodyContent) || requestBody != null)) {
-            if (this.queryStringParams == null) {
-                this.queryStringParams = new HashMap<String, String>();
-            }
-            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
-                    queryStringParams.put(key, value);
-                }
-            }
-
-            bodyParams.clear();
-            bodyParams = null;
-        }
-
-        if (bodyParams != null && (multipart || (fileParams != null && fileParams.size() > 0))) {
-            if (this.fileParams == null) {
-                this.fileParams = new HashMap<String, Object>();
-            }
-            fileParams.putAll(bodyParams);
-            bodyParams.clear();
-            bodyParams = null;
-        }
-
-        if (asJsonContent && bodyParams != null && !bodyParams.isEmpty()) {
-            JSONObject jsonObject = new JSONObject();
-            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
-                    try {
-                        jsonObject.put(key, value);
-                    } catch (JSONException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-
-            setBodyContent(jsonObject.toString());
-            bodyParams.clear();
-            bodyParams = null;
         }
     }
 
@@ -558,5 +512,51 @@ public class RequestParams {
         }
 
         return httpRequest;
+    }
+
+    private void checkBodyParams() {
+        if (bodyParams != null && (!TextUtils.isEmpty(bodyContent) || requestBody != null)) {
+            if (this.queryStringParams == null) {
+                this.queryStringParams = new HashMap<String, String>();
+            }
+            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+                    queryStringParams.put(key, value);
+                }
+            }
+
+            bodyParams.clear();
+            bodyParams = null;
+        }
+
+        if (bodyParams != null && (multipart || (fileParams != null && fileParams.size() > 0))) {
+            if (this.fileParams == null) {
+                this.fileParams = new HashMap<String, Object>();
+            }
+            fileParams.putAll(bodyParams);
+            bodyParams.clear();
+            bodyParams = null;
+        }
+
+        if (asJsonContent && bodyParams != null && !bodyParams.isEmpty()) {
+            JSONObject jsonObject = new JSONObject();
+            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+                    try {
+                        jsonObject.put(key, value);
+                    } catch (JSONException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+
+            setBodyContent(jsonObject.toString());
+            bodyParams.clear();
+            bodyParams = null;
+        }
     }
 }

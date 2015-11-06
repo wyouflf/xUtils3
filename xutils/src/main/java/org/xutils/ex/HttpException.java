@@ -44,7 +44,7 @@ public class HttpException extends BaseException {
     }
 
     /**
-     * @param code The http response status code, 0 if the http request error and has no response.
+     * @param code          The http response status code, 0 if the http request error and has no response.
      * @param detailMessage
      */
     public HttpException(int code, String detailMessage) {
@@ -53,7 +53,7 @@ public class HttpException extends BaseException {
     }
 
     /**
-     * @param code The http response status code, 0 if the http request error and has no response.
+     * @param code          The http response status code, 0 if the http request error and has no response.
      * @param detailMessage
      * @param throwable
      */
@@ -63,7 +63,7 @@ public class HttpException extends BaseException {
     }
 
     /**
-     * @param code The http response status code, 0 if the http request error and has no response.
+     * @param code      The http response status code, 0 if the http request error and has no response.
      * @param throwable
      */
     public HttpException(int code, Throwable throwable) {

@@ -155,6 +155,8 @@ public final class ViewInjectorImpl implements ViewInjector {
                         if (view != null) {
                             field.setAccessible(true);
                             field.set(handler, view);
+                        } else {
+                            throw new RuntimeException("Invalid id for @ViewInject!");
                         }
                     } catch (Throwable ex) {
                         LogUtil.e(ex.getMessage(), ex);

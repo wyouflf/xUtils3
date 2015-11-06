@@ -1,5 +1,7 @@
 package org.xutils.http.cookie;
 
+import android.text.TextUtils;
+
 import org.xutils.db.annotation.Column;
 import org.xutils.db.annotation.Table;
 
@@ -65,6 +67,9 @@ import java.net.URI;
             }
         }
         this.path = cookie.getPath();
+        if (!TextUtils.isEmpty(path) && path.length() > 1 && path.endsWith("/")) {
+            this.path = path.substring(0, path.length() - 1);
+        }
         this.portList = cookie.getPortlist();
         this.secure = cookie.getSecure();
         this.version = cookie.getVersion();

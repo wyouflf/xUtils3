@@ -24,13 +24,17 @@ public class InputStreamBody implements ProgressBody {
 
     private ProgressHandler callBackHandler;
 
+    public InputStreamBody(ContentTypeWrapper<InputStream> wrapper) {
+        this(wrapper.getObject(), wrapper.getContentType());
+    }
+
+    public InputStreamBody(InputStream inputStream) {
+        this(inputStream, null);
+    }
+
     public InputStreamBody(InputStream inputStream, String contentType) {
         this.content = inputStream;
-        if (TextUtils.isEmpty(contentType)) {
-            this.contentType = "application/octet-stream";
-        } else {
-            this.contentType = contentType;
-        }
+        this.contentType = contentType;
         try {
             this.total = inputStream.available();
         } catch (IOException e) {
@@ -49,8 +53,13 @@ public class InputStreamBody implements ProgressBody {
     }
 
     @Override
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    @Override
     public String getContentType() {
-        return contentType;
+        return TextUtils.isEmpty(contentType) ? "application/octet-stream" : contentType;
     }
 
     @Override

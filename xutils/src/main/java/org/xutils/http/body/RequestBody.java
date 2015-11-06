@@ -10,6 +10,8 @@ public interface RequestBody {
 
     long getContentLength();
 
+    void setContentType(String contentType);
+
     String getContentType();
 
     void writeTo(OutputStream out) throws IOException;

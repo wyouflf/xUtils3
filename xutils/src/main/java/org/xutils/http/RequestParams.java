@@ -10,7 +10,7 @@ import org.xutils.http.annotation.HttpRequest;
 import org.xutils.http.app.DefaultParamsBuilder;
 import org.xutils.http.app.ParamsBuilder;
 import org.xutils.http.body.BodyParamsBody;
-import org.xutils.http.body.ContentTypeInputStream;
+import org.xutils.http.body.ContentTypeWrapper;
 import org.xutils.http.body.FileBody;
 import org.xutils.http.body.InputStreamBody;
 import org.xutils.http.body.MultipartBody;
@@ -49,7 +49,7 @@ public class RequestParams {
     private String bodyContent;
     private HashMap<String, String> headers;
     private HashMap<String, String> queryStringParams;
-    private HashMap<String, Object> bodyParams;
+    private HashMap<String, String> bodyParams;
     private HashMap<String, Object> fileParams;
     private RequestBody requestBody;
 
@@ -57,7 +57,7 @@ public class RequestParams {
     private Proxy proxy; // 代理
     private String charset = "UTF-8";
     private String cacheDirName; // 缓存文件夹名称
-    private boolean asJsonContent = false; // 用json形式的bodyContent上传
+    private boolean asJsonContent = false; // 用json形式的bodyParams上传
     private HttpRequest httpRequest; // 注解参数
     private Executor executor; // 自定义线程池
     private Priority priority = Priority.DEFAULT; // 请求优先级
@@ -85,7 +85,7 @@ public class RequestParams {
 
     /**
      * @param uri       不可为空
-     * @param builder
+     * @param builder   不可为空
      * @param signs
      * @param cacheKeys
      */
@@ -99,7 +99,7 @@ public class RequestParams {
         this.builder = builder;
     }
 
-    // invoke via HttpTask#initRequest
+    // invoke via UriRequest#<init>()
     /*package*/ void init() throws Throwable {
         if (TextUtils.isEmpty(uri) && getHttpRequest() == null) {
             throw new IllegalStateException("uri is empty && @HttpRequest == null");
@@ -115,17 +115,13 @@ public class RequestParams {
             builder.buildSign(this, httpRequest.signs());
             buildUri = builder.buildUri(httpRequest);
             buildCacheKey = builder.buildCacheKey(this, httpRequest.cacheKeys());
-            if (sslSocketFactory == null) {
-                sslSocketFactory = builder.getSSLSocketFactory();
-            }
+            sslSocketFactory = builder.getSSLSocketFactory();
         } else if (this.builder != null) {
             builder.buildParams(this);
             builder.buildSign(this, signs);
             buildUri = uri;
             buildCacheKey = builder.buildCacheKey(this, cacheKeys);
-            if (sslSocketFactory == null) {
-                sslSocketFactory = builder.getSSLSocketFactory();
-            }
+            sslSocketFactory = builder.getSSLSocketFactory();
         }
     }
 
@@ -135,10 +131,6 @@ public class RequestParams {
 
     public String getCacheKey() {
         return buildCacheKey;
-    }
-
-    public void setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
-        this.sslSocketFactory = sslSocketFactory;
     }
 
     public SSLSocketFactory getSslSocketFactory() {
@@ -298,17 +290,10 @@ public class RequestParams {
         if (value == null) return;
         if (HttpMethod.permitsRequestBody(method)) {
             if (!TextUtils.isEmpty(name)) {
-                if (value instanceof File) {
-                    this.addBodyParameter(name, (File) value);
-                } else if (value instanceof InputStream) {
-                    this.addBodyParameter(name, (InputStream) value, null);
-                } else if (value instanceof byte[]) {
-                    this.addBodyParameter(name, (byte[]) value);
+                if (value instanceof String) {
+                    this.addBodyParameter(name, (String) value);
                 } else {
-                    if (this.bodyParams == null) {
-                        this.bodyParams = new HashMap<String, Object>();
-                    }
-                    this.bodyParams.put(name, value);
+                    this.addBodyParameter(name, value, null);
                 }
             } else if (TextUtils.isEmpty(name)) {
                 this.setBodyContent(value.toString());
@@ -329,33 +314,26 @@ public class RequestParams {
 
     public void addBodyParameter(String name, String value) {
         if (this.bodyParams == null) {
-            this.bodyParams = new HashMap<String, Object>();
+            this.bodyParams = new HashMap<String, String>();
         }
         this.bodyParams.put(name, value);
     }
 
-    public void addBodyParameter(String name, File file) {
+    /**
+     * 添加body参数
+     *
+     * @param name
+     * @param value       可以是String, File, InputStream 或 byte[]
+     * @param contentType 可为null
+     */
+    public void addBodyParameter(String name, Object value, String contentType) {
         if (this.fileParams == null) {
             this.fileParams = new HashMap<String, Object>();
         }
-        this.fileParams.put(name, file);
-    }
-
-    public void addBodyParameter(String name, byte[] data) {
-        if (this.fileParams == null) {
-            this.fileParams = new HashMap<String, Object>();
-        }
-        this.fileParams.put(name, data);
-    }
-
-    public void addBodyParameter(String name, InputStream stream, String contentType) {
-        if (this.fileParams == null) {
-            this.fileParams = new HashMap<String, Object>();
-        }
-        if (stream instanceof ContentTypeInputStream) {
-            this.fileParams.put(name, stream);
+        if (TextUtils.isEmpty(contentType)) {
+            this.fileParams.put(name, value);
         } else {
-            this.fileParams.put(name, new ContentTypeInputStream(stream, contentType));
+            this.fileParams.put(name, new ContentTypeWrapper<Object>(value, contentType));
         }
     }
 
@@ -394,9 +372,13 @@ public class RequestParams {
         return queryStringParams;
     }
 
-    public HashMap<String, Object> getBodyParams() {
+    public HashMap<String, String> getBodyParams() {
         checkBodyParams();
         return bodyParams;
+    }
+
+    public HashMap<String, Object> getFileParams() {
+        return fileParams;
     }
 
     public HashMap<String, String> getStringParams() {
@@ -405,11 +387,11 @@ public class RequestParams {
             result.putAll(queryStringParams);
         }
         if (bodyParams != null) {
-            for (Map.Entry<String, Object> entry : bodyParams.entrySet()) {
+            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
                 String key = entry.getKey();
-                Object value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && value != null) {
-                    result.put(key, value.toString());
+                String value = entry.getValue();
+                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+                    result.put(key, value);
                 }
             }
         }
@@ -426,7 +408,20 @@ public class RequestParams {
         if (fileParams != null) {
             fileParams.clear();
         }
+        bodyContent = null;
         requestBody = null;
+    }
+
+    public void removeParams(String name) {
+        if (queryStringParams != null) {
+            queryStringParams.remove(name);
+        }
+        if (bodyParams != null) {
+            bodyParams.remove(name);
+        }
+        if (fileParams != null) {
+            fileParams.remove(name);
+        }
     }
 
     public String getStringParam(String key) {
@@ -445,11 +440,11 @@ public class RequestParams {
             if (this.queryStringParams == null) {
                 this.queryStringParams = new HashMap<String, String>();
             }
-            for (Map.Entry<String, Object> entry : bodyParams.entrySet()) {
+            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
                 String key = entry.getKey();
-                Object value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && value != null) {
-                    queryStringParams.put(key, value.toString());
+                String value = entry.getValue();
+                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+                    queryStringParams.put(key, value);
                 }
             }
 
@@ -468,10 +463,10 @@ public class RequestParams {
 
         if (asJsonContent && bodyParams != null && !bodyParams.isEmpty()) {
             JSONObject jsonObject = new JSONObject();
-            for (Map.Entry<String, Object> entry : bodyParams.entrySet()) {
+            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
                 String key = entry.getKey();
-                Object value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && value != null) {
+                String value = entry.getValue();
+                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
                     try {
                         jsonObject.put(key, value);
                     } catch (JSONException ex) {
@@ -501,15 +496,18 @@ public class RequestParams {
         } else if (multipart || (fileParams != null && fileParams.size() > 0)) {
             if (!multipart && fileParams.size() == 1) {
                 for (Object value : fileParams.values()) {
+                    String contentType = null;
+                    if (value instanceof ContentTypeWrapper) {
+                        ContentTypeWrapper wrapper = (ContentTypeWrapper) value;
+                        value = wrapper.getObject();
+                        contentType = wrapper.getContentType();
+                    }
                     if (value instanceof File) {
-                        result = new FileBody((File) value);
-                    } else if (value instanceof ContentTypeInputStream) {
-                        ContentTypeInputStream wIn = (ContentTypeInputStream) value;
-                        result = new InputStreamBody(wIn.getBase(), wIn.getContentType());
+                        result = new FileBody((File) value, contentType);
                     } else if (value instanceof InputStream) {
-                        result = new InputStreamBody((InputStream) value, null);
+                        result = new InputStreamBody((InputStream) value, contentType);
                     } else if (value instanceof byte[]) {
-                        result = new InputStreamBody(new ByteArrayInputStream((byte[]) value), null);
+                        result = new InputStreamBody(new ByteArrayInputStream((byte[]) value), contentType);
                     }
                     break;
                 }
@@ -558,6 +556,7 @@ public class RequestParams {
                 httpRequest = thisCls.getAnnotation(HttpRequest.class);
             }
         }
+
         return httpRequest;
     }
 }

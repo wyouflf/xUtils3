@@ -2,20 +2,16 @@ package org.xutils.http.body;
 
 import android.text.TextUtils;
 
-import java.io.FilterInputStream;
-import java.io.InputStream;
-
 /**
  * Created by wyouflf on 15/8/13.
  */
-public final class ContentTypeInputStream extends FilterInputStream {
+public final class ContentTypeWrapper<T> {
 
-    private InputStream base;
-    private String contentType;
+    private final T object;
+    private final String contentType;
 
-    public ContentTypeInputStream(InputStream in, String contentType) {
-        super(in);
-        this.base = in;
+    public ContentTypeWrapper(T object, String contentType) {
+        this.object = object;
         if (TextUtils.isEmpty(contentType)) {
             this.contentType = "application/octet-stream";
         } else {
@@ -23,8 +19,8 @@ public final class ContentTypeInputStream extends FilterInputStream {
         }
     }
 
-    public InputStream getBase() {
-        return base;
+    public T getObject() {
+        return object;
     }
 
     public String getContentType() {

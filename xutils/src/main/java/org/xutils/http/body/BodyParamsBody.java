@@ -16,19 +16,19 @@ public class BodyParamsBody implements RequestBody {
     private byte[] content;
     private String charset;
 
-    public BodyParamsBody(Map<String, Object> params, String charset) throws IOException {
+    public BodyParamsBody(Map<String, String> params, String charset) throws IOException {
         StringBuilder contentSb = new StringBuilder();
         if (params != null) {
-            for (Map.Entry<String, Object> kv : params.entrySet()) {
+            for (Map.Entry<String, String> kv : params.entrySet()) {
                 String name = kv.getKey();
-                Object value = kv.getValue();
-                if (!TextUtils.isEmpty(name) && value != null) {
+                String value = kv.getValue();
+                if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
                     if (contentSb.length() > 0) {
                         contentSb.append("&");
                     }
                     contentSb.append(Uri.encode(name, charset))
                             .append("=")
-                            .append(Uri.encode(value.toString(), charset));
+                            .append(Uri.encode(value, charset));
                 }
             }
         }
@@ -40,6 +40,10 @@ public class BodyParamsBody implements RequestBody {
     @Override
     public long getContentLength() {
         return content.length;
+    }
+
+    @Override
+    public void setContentType(String contentType) {
     }
 
     @Override

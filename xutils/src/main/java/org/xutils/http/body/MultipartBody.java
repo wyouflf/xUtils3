@@ -64,6 +64,18 @@ public class MultipartBody implements ProgressBody {
         return -1;
     }
 
+    /**
+     * only change subType:
+     * "multipart/subType; boundary=xxx..."
+     *
+     * @param subType
+     */
+    @Override
+    public void setContentType(String subType) {
+        int index = contentType.indexOf(";");
+        this.contentType = "multipart/" + subType + contentType.substring(index);
+    }
+
     @Override
     public String getContentType() {
         return contentType;
@@ -97,10 +109,20 @@ public class MultipartBody implements ProgressBody {
                                String name, Object value,
                                String charset, byte[] boundaryPostfixBytes) throws IOException {
         writeLine(out, TWO_DASHES_BYTES, BOUNDARY_PREFIX_BYTES, boundaryPostfixBytes);
+
+        String contentType = null;
+        if (value instanceof ContentTypeWrapper) {
+            ContentTypeWrapper wrapper = (ContentTypeWrapper) value;
+            value = wrapper.getObject();
+            contentType = wrapper.getContentType();
+        }
+
         if (value instanceof File) {
             File file = (File) value;
             String filename = file.getName();
-            String contentType = FileBody.getFileContentType(file);
+            if (TextUtils.isEmpty(contentType)) {
+                contentType = FileBody.getFileContentType(file);
+            }
             writeLine(out, ("Content-Disposition: form-data; name=\""
                     + name.replace("\"", "%22") + "\"; filename=\""
                     + filename.replace("\"", "%22") + "\"").getBytes());
@@ -114,12 +136,10 @@ public class MultipartBody implements ProgressBody {
                     + name.replace("\"", "%22") + "\"; filename=\""
                     + name.replace("\"", "%22") + "\"").getBytes());
             if (value instanceof InputStream) {
-                if (value instanceof ContentTypeInputStream) {
-                    ContentTypeInputStream wIn = (ContentTypeInputStream) value;
-                    value = wIn.getBase();
-                    String contentType = wIn.getContentType();
-                    writeLine(out, ("Content-Type: " + contentType).getBytes());
+                if (TextUtils.isEmpty(contentType)) {
+                    contentType = "application/octet-stream";
                 }
+                writeLine(out, ("Content-Type: " + contentType).getBytes());
                 writeLine(out); // 内容前空一行
                 if (!writeStreamAndCloseIn(out, (InputStream) value)) {
                     return false;
@@ -127,9 +147,15 @@ public class MultipartBody implements ProgressBody {
             } else {
                 byte[] content;
                 if (value instanceof byte[]) {
+                    if (!TextUtils.isEmpty(contentType)) {
+                        writeLine(out, ("Content-Type: " + contentType).getBytes());
+                    }
                     content = (byte[]) value;
                 } else {
-                    writeLine(out, ("Content-Type:text/plain; charset:" + charset).getBytes());
+                    if (TextUtils.isEmpty(contentType)) {
+                        contentType = "text/plain; charset:" + charset;
+                    }
+                    writeLine(out, ("Content-Type: " + contentType).getBytes());
                     content = String.valueOf(value).getBytes(charset);
                 }
                 writeLine(out); // 内容前空一行

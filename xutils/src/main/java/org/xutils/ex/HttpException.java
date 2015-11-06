@@ -18,7 +18,8 @@ package org.xutils.ex;
 public class HttpException extends BaseException {
     private static final long serialVersionUID = 1L;
 
-    private int exceptionCode;
+    private int code;
+    private String result;
 
     public HttpException() {
     }
@@ -36,44 +37,52 @@ public class HttpException extends BaseException {
     }
 
     /**
-     * @param exceptionCode The http response status code, 0 if the http request error and has no response.
+     * @param code The http response status code, 0 if the http request error and has no response.
      */
-    public HttpException(int exceptionCode) {
-        this.exceptionCode = exceptionCode;
+    public HttpException(int code) {
+        this.code = code;
     }
 
     /**
-     * @param exceptionCode The http response status code, 0 if the http request error and has no response.
+     * @param code The http response status code, 0 if the http request error and has no response.
      * @param detailMessage
      */
-    public HttpException(int exceptionCode, String detailMessage) {
+    public HttpException(int code, String detailMessage) {
         super(detailMessage);
-        this.exceptionCode = exceptionCode;
+        this.code = code;
     }
 
     /**
-     * @param exceptionCode The http response status code, 0 if the http request error and has no response.
+     * @param code The http response status code, 0 if the http request error and has no response.
      * @param detailMessage
      * @param throwable
      */
-    public HttpException(int exceptionCode, String detailMessage, Throwable throwable) {
+    public HttpException(int code, String detailMessage, Throwable throwable) {
         super(detailMessage, throwable);
-        this.exceptionCode = exceptionCode;
+        this.code = code;
     }
 
     /**
-     * @param exceptionCode The http response status code, 0 if the http request error and has no response.
+     * @param code The http response status code, 0 if the http request error and has no response.
      * @param throwable
      */
-    public HttpException(int exceptionCode, Throwable throwable) {
+    public HttpException(int code, Throwable throwable) {
         super(throwable);
-        this.exceptionCode = exceptionCode;
+        this.code = code;
     }
 
     /**
      * @return The http response status code, 0 if the http request error and has no response.
      */
-    public int getExceptionCode() {
-        return exceptionCode;
+    public int getCode() {
+        return code;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

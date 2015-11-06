@@ -241,7 +241,7 @@ public class FileLoader extends Loader<File> {
             }
             result = this.load(request.getInputStream());
         } catch (HttpException httpException) {
-            if (httpException.getExceptionCode() == 416) {
+            if (httpException.getCode() == 416) {
                 if (saveFilePath != null) {
                     result = new File(saveFilePath);
                 } else {

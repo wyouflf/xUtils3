@@ -167,7 +167,12 @@ public class HttpRequest extends UriRequest {
         LogUtil.d(queryUrl);
         int code = connection.getResponseCode();
         if (code >= 300) {
-            throw new HttpException(code, connection.getResponseMessage());
+            HttpException httpException = new HttpException(code, connection.getResponseMessage());
+            try {
+                httpException.setResult(IOUtil.readStr(connection.getInputStream(), params.getCharset()));
+            } catch (Throwable ignored) {
+            }
+            throw httpException;
         }
 
         { // save cookies

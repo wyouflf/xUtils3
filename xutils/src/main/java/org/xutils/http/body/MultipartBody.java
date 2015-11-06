@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Author: wyouflf
@@ -39,7 +40,7 @@ public class MultipartBody implements ProgressBody {
         CounterOutputStream counter = new CounterOutputStream();
         try {
             this.writeTo(counter);
-            this.total = counter.total;
+            this.total = counter.total.get();
         } catch (IOException e) {
             this.total = -1;
         }
@@ -60,7 +61,7 @@ public class MultipartBody implements ProgressBody {
 
     @Override
     public long getContentLength() {
-        return total;
+        return -1;
     }
 
     @Override
@@ -105,11 +106,12 @@ public class MultipartBody implements ProgressBody {
                     + filename.replace("\"", "%22") + "\"").getBytes());
             writeLine(out, ("Content-Type: " + contentType).getBytes());
             writeLine(out); // 内容前空一行
-            if (!writeStreamAndCloseIn(out, new FileInputStream(file))) {
+            if (!writeFile(out, file)) {
                 return false;
             }
         } else {
             writeLine(out, ("Content-Disposition: form-data; name=\""
+                    + name.replace("\"", "%22") + "\"; filename=\""
                     + name.replace("\"", "%22") + "\"").getBytes());
             if (value instanceof InputStream) {
                 if (value instanceof ContentTypeInputStream) {
@@ -151,7 +153,19 @@ public class MultipartBody implements ProgressBody {
         out.write(END_BYTES);
     }
 
+    private boolean writeFile(OutputStream out, File file) throws IOException {
+        if (out instanceof CounterOutputStream) {
+            ((CounterOutputStream) out).addCount(file.length());
+            return true;
+        }
+        return writeStreamAndCloseIn(out, new FileInputStream(file));
+    }
+
     private boolean writeStreamAndCloseIn(OutputStream out, InputStream in) throws IOException {
+        if (out instanceof CounterOutputStream) {
+            ((CounterOutputStream) out).addCount(in.available());
+            return true;
+        }
         byte[] buf = new byte[1024];
         int len;
         while ((len = in.read(buf)) >= 0) {
@@ -168,24 +182,28 @@ public class MultipartBody implements ProgressBody {
 
     private class CounterOutputStream extends OutputStream {
 
-        long total = 0;
+        final AtomicLong total = new AtomicLong(0);
 
         public CounterOutputStream() {
         }
 
+        public void addCount(long count) {
+            total.addAndGet(count);
+        }
+
         @Override
         public void write(int oneByte) throws IOException {
-            total++;
+            total.incrementAndGet();
         }
 
         @Override
         public void write(byte[] buffer) throws IOException {
-            total += buffer.length;
+            total.addAndGet(buffer.length);
         }
 
         @Override
         public void write(byte[] buffer, int offset, int count) throws IOException {
-            total += count;
+            total.addAndGet(count);
         }
     }
 }

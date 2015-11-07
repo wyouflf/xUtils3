@@ -9,8 +9,8 @@ import org.xutils.common.util.LogUtil;
 import org.xutils.http.annotation.HttpRequest;
 import org.xutils.http.app.DefaultParamsBuilder;
 import org.xutils.http.app.ParamsBuilder;
+import org.xutils.http.body.BodyEntityWrapper;
 import org.xutils.http.body.BodyParamsBody;
-import org.xutils.http.body.ContentTypeWrapper;
 import org.xutils.http.body.FileBody;
 import org.xutils.http.body.InputStreamBody;
 import org.xutils.http.body.MultipartBody;
@@ -322,7 +322,7 @@ public class RequestParams {
     /**
      * 添加body参数
      *
-     * @param name
+     * @param name        参数名
      * @param value       可以是String, File, InputStream 或 byte[]
      * @param contentType 可为null
      */
@@ -333,7 +333,26 @@ public class RequestParams {
         if (TextUtils.isEmpty(contentType)) {
             this.fileParams.put(name, value);
         } else {
-            this.fileParams.put(name, new ContentTypeWrapper<Object>(value, contentType));
+            this.fileParams.put(name, new BodyEntityWrapper<Object>(value, contentType));
+        }
+    }
+
+    /**
+     * 添加body参数
+     *
+     * @param name        参数名
+     * @param value       可以是String, File, InputStream 或 byte[]
+     * @param contentType 可为null
+     * @param fileName    服务端看到的文件名
+     */
+    public void addBodyParameter(String name, Object value, String contentType, String fileName) {
+        if (this.fileParams == null) {
+            this.fileParams = new HashMap<String, Object>();
+        }
+        if (TextUtils.isEmpty(contentType)) {
+            this.fileParams.put(name, value);
+        } else {
+            this.fileParams.put(name, new BodyEntityWrapper<Object>(value, contentType, fileName));
         }
     }
 
@@ -451,8 +470,8 @@ public class RequestParams {
             if (!multipart && fileParams.size() == 1) {
                 for (Object value : fileParams.values()) {
                     String contentType = null;
-                    if (value instanceof ContentTypeWrapper) {
-                        ContentTypeWrapper wrapper = (ContentTypeWrapper) value;
+                    if (value instanceof BodyEntityWrapper) {
+                        BodyEntityWrapper wrapper = (BodyEntityWrapper) value;
                         value = wrapper.getObject();
                         contentType = wrapper.getContentType();
                     }

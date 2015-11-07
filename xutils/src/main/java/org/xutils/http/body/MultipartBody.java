@@ -68,7 +68,7 @@ public class MultipartBody implements ProgressBody {
      * only change subType:
      * "multipart/subType; boundary=xxx..."
      *
-     * @param subType
+     * @param subType "form-data" or "related"
      */
     @Override
     public void setContentType(String subType) {
@@ -110,55 +110,44 @@ public class MultipartBody implements ProgressBody {
                                String charset, byte[] boundaryPostfixBytes) throws IOException {
         writeLine(out, TWO_DASHES_BYTES, BOUNDARY_PREFIX_BYTES, boundaryPostfixBytes);
 
+        String fileName = "";
         String contentType = null;
-        if (value instanceof ContentTypeWrapper) {
-            ContentTypeWrapper wrapper = (ContentTypeWrapper) value;
+        if (value instanceof BodyEntityWrapper) {
+            BodyEntityWrapper wrapper = (BodyEntityWrapper) value;
             value = wrapper.getObject();
+            fileName = wrapper.getFileName();
             contentType = wrapper.getContentType();
         }
 
         if (value instanceof File) {
             File file = (File) value;
-            String filename = file.getName();
+            if (TextUtils.isEmpty(fileName)) {
+                fileName = file.getName();
+            }
             if (TextUtils.isEmpty(contentType)) {
                 contentType = FileBody.getFileContentType(file);
             }
-            writeLine(out, ("Content-Disposition: form-data; name=\""
-                    + name.replace("\"", "%22") + "\"; filename=\""
-                    + filename.replace("\"", "%22") + "\"").getBytes());
-            writeLine(out, ("Content-Type: " + contentType).getBytes());
+            writeLine(out, buildContentDisposition(name, fileName));
+            writeLine(out, buildContentType(value, contentType, charset));
             writeLine(out); // 内容前空一行
             if (!writeFile(out, file)) {
                 return false;
             }
         } else {
-            writeLine(out, ("Content-Disposition: form-data; name=\""
-                    + name.replace("\"", "%22") + "\"; filename=\""
-                    + name.replace("\"", "%22") + "\"").getBytes());
+            writeLine(out, buildContentDisposition(name, fileName));
+            writeLine(out, buildContentType(value, contentType, charset));
+            writeLine(out); // 内容前空一行
             if (value instanceof InputStream) {
-                if (TextUtils.isEmpty(contentType)) {
-                    contentType = "application/octet-stream";
-                }
-                writeLine(out, ("Content-Type: " + contentType).getBytes());
-                writeLine(out); // 内容前空一行
                 if (!writeStreamAndCloseIn(out, (InputStream) value)) {
                     return false;
                 }
             } else {
                 byte[] content;
                 if (value instanceof byte[]) {
-                    if (!TextUtils.isEmpty(contentType)) {
-                        writeLine(out, ("Content-Type: " + contentType).getBytes());
-                    }
                     content = (byte[]) value;
                 } else {
-                    if (TextUtils.isEmpty(contentType)) {
-                        contentType = "text/plain; charset:" + charset;
-                    }
-                    writeLine(out, ("Content-Type: " + contentType).getBytes());
                     content = String.valueOf(value).getBytes(charset);
                 }
-                writeLine(out); // 内容前空一行
                 writeLine(out, content);
                 current += content.length;
                 if (callBackHandler != null && !callBackHandler.updateProgress(total, current, false)) {
@@ -204,6 +193,30 @@ public class MultipartBody implements ProgressBody {
         in.close();
         out.write(END_BYTES);
         return true;
+    }
+
+    private static byte[] buildContentDisposition(String name, String fileName) {
+        StringBuilder result = new StringBuilder("Content-Disposition: form-data");
+        result.append("; name=\"").append(name.replace("\"", "%22")).append("\"");
+        if (!TextUtils.isEmpty(fileName)) {
+            result.append("; filename=\"").append(fileName.replace("\"", "%22")).append("\"");
+        }
+        return result.toString().getBytes();
+    }
+
+    private static byte[] buildContentType(Object value, String contentType, String charset) {
+        StringBuilder result = new StringBuilder("Content-Type: ");
+        if (TextUtils.isEmpty(contentType)) {
+            if (value instanceof String) {
+                contentType = "text/plain; charset:" + charset;
+            } else {
+                contentType = "application/octet-stream";
+            }
+        } else {
+            contentType = contentType.replaceFirst("\\/jpg$", "/jpeg");
+        }
+        result.append(contentType);
+        return result.toString().getBytes();
     }
 
     private class CounterOutputStream extends OutputStream {

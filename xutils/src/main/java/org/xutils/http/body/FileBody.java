@@ -15,7 +15,7 @@ public class FileBody extends InputStreamBody {
     private File file;
     private String contentType;
 
-    public FileBody(ContentTypeWrapper<File> wrapper) throws IOException {
+    public FileBody(BodyEntityWrapper<File> wrapper) throws IOException {
         this(wrapper.getObject(), wrapper.getContentType());
     }
 
@@ -48,7 +48,7 @@ public class FileBody extends InputStreamBody {
         if (TextUtils.isEmpty(contentType)) {
             contentType = "application/octet-stream";
         } else {
-            contentType.replaceFirst("\\/jpg$", "/jpeg");
+            contentType = contentType.replaceFirst("\\/jpg$", "/jpeg");
         }
         return contentType;
     }

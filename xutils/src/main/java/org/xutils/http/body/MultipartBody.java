@@ -93,9 +93,7 @@ public class MultipartBody implements ProgressBody {
             String name = kv.getKey();
             Object value = kv.getValue();
             if (!TextUtils.isEmpty(name) && value != null) {
-                if (!writeEntry(out, name, value, charset, boundaryPostfixBytes)) {
-                    throw new Callback.CancelledException("upload stopped!");
-                }
+                writeEntry(out, name, value, charset, boundaryPostfixBytes);
             }
         }
         writeLine(out, TWO_DASHES_BYTES, BOUNDARY_PREFIX_BYTES, boundaryPostfixBytes, TWO_DASHES_BYTES);
@@ -106,9 +104,9 @@ public class MultipartBody implements ProgressBody {
         }
     }
 
-    private boolean writeEntry(OutputStream out,
-                               String name, Object value,
-                               String charset, byte[] boundaryPostfixBytes) throws IOException {
+    private void writeEntry(OutputStream out,
+                            String name, Object value,
+                            String charset, byte[] boundaryPostfixBytes) throws IOException {
         writeLine(out, TWO_DASHES_BYTES, BOUNDARY_PREFIX_BYTES, boundaryPostfixBytes);
 
         String fileName = "";
@@ -131,18 +129,14 @@ public class MultipartBody implements ProgressBody {
             writeLine(out, buildContentDisposition(name, fileName));
             writeLine(out, buildContentType(value, contentType, charset));
             writeLine(out); // 内容前空一行
-            if (!writeFile(out, file)) {
-                return false;
-            }
+            writeFile(out, file);
             writeLine(out);
         } else {
             writeLine(out, buildContentDisposition(name, fileName));
             writeLine(out, buildContentType(value, contentType, charset));
             writeLine(out); // 内容前空一行
             if (value instanceof InputStream) {
-                if (!writeStreamAndCloseIn(out, (InputStream) value)) {
-                    return false;
-                }
+                writeStreamAndCloseIn(out, (InputStream) value);
                 writeLine(out);
             } else {
                 byte[] content;
@@ -154,12 +148,10 @@ public class MultipartBody implements ProgressBody {
                 writeLine(out, content);
                 current += content.length;
                 if (callBackHandler != null && !callBackHandler.updateProgress(total, current, false)) {
-                    return false;
+                    throw new Callback.CancelledException("upload stopped!");
                 }
             }
         }
-
-        return true;
     }
 
     private void writeLine(OutputStream out, byte[]... bs) throws IOException {
@@ -171,33 +163,32 @@ public class MultipartBody implements ProgressBody {
         out.write(END_BYTES);
     }
 
-    private boolean writeFile(OutputStream out, File file) throws IOException {
+    private void writeFile(OutputStream out, File file) throws IOException {
         if (out instanceof CounterOutputStream) {
             ((CounterOutputStream) out).addFile(file);
-            return true;
+        } else {
+            writeStreamAndCloseIn(out, new FileInputStream(file));
         }
-        return writeStreamAndCloseIn(out, new FileInputStream(file));
     }
 
-    private boolean writeStreamAndCloseIn(OutputStream out, InputStream in) throws IOException {
+    private void writeStreamAndCloseIn(OutputStream out, InputStream in) throws IOException {
         if (out instanceof CounterOutputStream) {
             ((CounterOutputStream) out).addStream(in);
-            return true;
-        }
-        try {
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) >= 0) {
-                out.write(buf, 0, len);
-                current += len;
-                if (callBackHandler != null && !callBackHandler.updateProgress(total, current, false)) {
-                    return false;
+        } else {
+            try {
+                int len;
+                byte[] buf = new byte[1024];
+                while ((len = in.read(buf)) >= 0) {
+                    out.write(buf, 0, len);
+                    current += len;
+                    if (callBackHandler != null && !callBackHandler.updateProgress(total, current, false)) {
+                        throw new Callback.CancelledException("upload stopped!");
+                    }
                 }
+            } finally {
+                IOUtil.closeQuietly(in);
             }
-        } finally {
-            IOUtil.closeQuietly(in);
         }
-        return true;
     }
 
     private static byte[] buildContentDisposition(String name, String fileName) {
@@ -239,7 +230,11 @@ public class MultipartBody implements ProgressBody {
         public void addStream(InputStream inputStream) {
             if (total.get() == -1L) return;
             long length = InputStreamBody.getInputStreamLength(inputStream);
-            total.set(length > 0 ? length : -1L);
+            if (length > 0) {
+                total.addAndGet(length);
+            } else {
+                total.set(-1L);
+            }
         }
 
         @Override

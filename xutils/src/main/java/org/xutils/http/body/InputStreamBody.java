@@ -3,6 +3,7 @@ package org.xutils.http.body;
 import android.text.TextUtils;
 
 import org.xutils.common.Callback;
+import org.xutils.common.util.IOUtil;
 import org.xutils.http.ProgressHandler;
 
 import java.io.ByteArrayInputStream;
@@ -82,10 +83,7 @@ public class InputStreamBody implements ProgressBody {
                 callBackHandler.updateProgress(total, total, true);
             }
         } finally {
-            try {
-                content.close();
-            } catch (Throwable ignored) {
-            }
+            IOUtil.closeQuietly(content);
         }
     }
 

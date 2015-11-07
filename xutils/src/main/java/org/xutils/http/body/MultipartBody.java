@@ -4,6 +4,7 @@ package org.xutils.http.body;
 import android.text.TextUtils;
 
 import org.xutils.common.Callback;
+import org.xutils.common.util.IOUtil;
 import org.xutils.http.ProgressHandler;
 
 import java.io.File;
@@ -61,7 +62,7 @@ public class MultipartBody implements ProgressBody {
 
     @Override
     public long getContentLength() {
-        return -1;
+        return total;
     }
 
     /**
@@ -133,6 +134,7 @@ public class MultipartBody implements ProgressBody {
             if (!writeFile(out, file)) {
                 return false;
             }
+            writeLine(out);
         } else {
             writeLine(out, buildContentDisposition(name, fileName));
             writeLine(out, buildContentType(value, contentType, charset));
@@ -141,6 +143,7 @@ public class MultipartBody implements ProgressBody {
                 if (!writeStreamAndCloseIn(out, (InputStream) value)) {
                     return false;
                 }
+                writeLine(out);
             } else {
                 byte[] content;
                 if (value instanceof byte[]) {
@@ -170,7 +173,7 @@ public class MultipartBody implements ProgressBody {
 
     private boolean writeFile(OutputStream out, File file) throws IOException {
         if (out instanceof CounterOutputStream) {
-            ((CounterOutputStream) out).addCount(file.length());
+            ((CounterOutputStream) out).addFile(file);
             return true;
         }
         return writeStreamAndCloseIn(out, new FileInputStream(file));
@@ -178,20 +181,22 @@ public class MultipartBody implements ProgressBody {
 
     private boolean writeStreamAndCloseIn(OutputStream out, InputStream in) throws IOException {
         if (out instanceof CounterOutputStream) {
-            ((CounterOutputStream) out).addCount(in.available());
+            ((CounterOutputStream) out).addStream(in);
             return true;
         }
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) >= 0) {
-            out.write(buf, 0, len);
-            current += len;
-            if (callBackHandler != null && !callBackHandler.updateProgress(total, current, false)) {
-                return false;
+        try {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) >= 0) {
+                out.write(buf, 0, len);
+                current += len;
+                if (callBackHandler != null && !callBackHandler.updateProgress(total, current, false)) {
+                    return false;
+                }
             }
+        } finally {
+            IOUtil.closeQuietly(in);
         }
-        in.close();
-        out.write(END_BYTES);
         return true;
     }
 
@@ -221,27 +226,37 @@ public class MultipartBody implements ProgressBody {
 
     private class CounterOutputStream extends OutputStream {
 
-        final AtomicLong total = new AtomicLong(0);
+        final AtomicLong total = new AtomicLong(0L);
 
         public CounterOutputStream() {
         }
 
-        public void addCount(long count) {
-            total.addAndGet(count);
+        public void addFile(File file) {
+            if (total.get() == -1L) return;
+            total.addAndGet(file.length());
+        }
+
+        public void addStream(InputStream inputStream) {
+            if (total.get() == -1L) return;
+            long length = InputStreamBody.getInputStreamLength(inputStream);
+            total.set(length > 0 ? length : -1L);
         }
 
         @Override
         public void write(int oneByte) throws IOException {
+            if (total.get() == -1L) return;
             total.incrementAndGet();
         }
 
         @Override
         public void write(byte[] buffer) throws IOException {
+            if (total.get() == -1L) return;
             total.addAndGet(buffer.length);
         }
 
         @Override
         public void write(byte[] buffer, int offset, int count) throws IOException {
+            if (total.get() == -1L) return;
             total.addAndGet(count);
         }
     }

@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import org.xutils.common.Callback;
 import org.xutils.http.ProgressHandler;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,11 +37,7 @@ public class InputStreamBody implements ProgressBody {
     public InputStreamBody(InputStream inputStream, String contentType) {
         this.content = inputStream;
         this.contentType = contentType;
-        try {
-            this.total = inputStream.available();
-        } catch (IOException e) {
-            this.total = -1;
-        }
+        this.total = getInputStreamLength(inputStream);
     }
 
     @Override
@@ -89,5 +87,16 @@ public class InputStreamBody implements ProgressBody {
             } catch (Throwable ignored) {
             }
         }
+    }
+
+    public static long getInputStreamLength(InputStream inputStream) {
+        try {
+            if (inputStream instanceof FileInputStream ||
+                    inputStream instanceof ByteArrayInputStream) {
+                return inputStream.available();
+            }
+        } catch (Throwable ignored) {
+        }
+        return -1L;
     }
 }

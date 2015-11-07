@@ -157,7 +157,13 @@ public class HttpRequest extends UriRequest {
                     if (!TextUtils.isEmpty(contentType)) {
                         connection.setRequestProperty("Content-Type", contentType);
                     }
-                    connection.setRequestProperty("Content-Length", String.valueOf(body.getContentLength()));
+                    long contentLength = body.getContentLength();
+                    if (contentLength < 0) {
+                        connection.setChunkedStreamingMode(256 * 1024);
+                    } else {
+                        connection.setFixedLengthStreamingMode((int) contentLength);
+                    }
+                    connection.setRequestProperty("Content-Length", String.valueOf(contentLength));
                     connection.setDoOutput(true);
                     body.writeTo(connection.getOutputStream());
                 }

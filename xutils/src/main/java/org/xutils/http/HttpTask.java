@@ -427,6 +427,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         }
 
         if (progressCallback != null && request != null && total > 0) {
+            if (total < current) {
+                total = current;
+            }
             if (forceUpdateUI) {
                 this.update(FLAG_PROGRESS, total, current, request.isLoading());
             } else {

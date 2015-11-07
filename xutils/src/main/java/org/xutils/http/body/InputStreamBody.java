@@ -21,7 +21,7 @@ public class InputStreamBody implements ProgressBody {
     private InputStream content;
     private String contentType;
 
-    private long total;
+    private final long total;
     private long current = 0;
 
     private ProgressHandler callBackHandler;

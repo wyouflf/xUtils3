@@ -4,11 +4,15 @@ import android.view.View;
 import android.widget.Toast;
 
 import org.xutils.common.Callback;
-import org.xutils.view.annotation.ContentView;
-import org.xutils.view.annotation.Event;
 import org.xutils.http.RequestParams;
 import org.xutils.sample.http.BaiduParams;
+import org.xutils.view.annotation.ContentView;
+import org.xutils.view.annotation.Event;
 import org.xutils.x;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
  * Created by wyouflf on 15/11/4.
@@ -94,10 +98,19 @@ public class HttpFragment extends BaseFragment {
 
     // 如果你只需要一个简单的版本.
     @Event(value = R.id.btn_test_baidu2)
-    private void onTestBaidu2Click(View view) {
-        RequestParams params = new RequestParams("https://www.baidu.com/s");
+    private void onTestBaidu2Click(View view) throws FileNotFoundException {
+        RequestParams params = new RequestParams("http://192.168.199.160:8080/upload");
         params.addQueryStringParameter("wd", "xUtils");
-        x.http().get(params, new Callback.CommonCallback<String>() {
+        params.addBodyParameter(
+                "file",
+                new File("/sdcard/test.jpg"),
+                null); // 如果文件没有扩展名, 最好设置contentType参数.
+        params.addBodyParameter(
+                "file2",
+                new FileInputStream(new File("/sdcard/test2.jpg")),
+                "image/jpeg",
+                "test2.jpg"); // InputStream参数获取不到文件名, 最好设置, 除非服务端不关心这个参数.
+        x.http().post(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
                 Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();

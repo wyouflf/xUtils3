@@ -1,6 +1,8 @@
 package org.xutils.http.request;
 
+import android.annotation.TargetApi;
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 
 import org.xutils.cache.DiskCacheEntity;
@@ -99,6 +101,7 @@ public class HttpRequest extends UriRequest {
      * @throws IOException
      */
     @Override
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public void sendRequest() throws IOException {
         isLoading = false;
 
@@ -161,7 +164,13 @@ public class HttpRequest extends UriRequest {
                     if (contentLength < 0) {
                         connection.setChunkedStreamingMode(256 * 1024);
                     } else {
-                        connection.setFixedLengthStreamingMode((int) contentLength);
+                        if (contentLength < Integer.MAX_VALUE) {
+                            connection.setFixedLengthStreamingMode((int) contentLength);
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                            connection.setFixedLengthStreamingMode(contentLength);
+                        } else {
+                            connection.setChunkedStreamingMode(256 * 1024);
+                        }
                     }
                     connection.setRequestProperty("Content-Length", String.valueOf(contentLength));
                     connection.setDoOutput(true);

@@ -8,6 +8,7 @@ import android.widget.ImageView;
 
 import org.xutils.common.util.DensityUtil;
 import org.xutils.common.util.LogUtil;
+import org.xutils.http.RequestParams;
 
 import java.lang.reflect.Field;
 
@@ -50,6 +51,8 @@ public class ImageOptions {
     private Animation animation = null;
     // end region ############ display options
 
+    // extends
+    private ParamsBuilder paramsBuilder;
 
     protected ImageOptions() {
     }
@@ -210,6 +213,10 @@ public class ImageOptions {
         return forceLoadingDrawable;
     }
 
+    public ParamsBuilder getParamsBuilder() {
+        return paramsBuilder;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -275,6 +282,9 @@ public class ImageOptions {
         return value;
     }
 
+    public interface ParamsBuilder {
+        RequestParams buildParams(RequestParams params, ImageOptions options);
+    }
 
     public static class Builder {
 
@@ -382,6 +392,11 @@ public class ImageOptions {
 
         public Builder setForceLoadingDrawable(boolean forceLoadingDrawable) {
             options.forceLoadingDrawable = forceLoadingDrawable;
+            return this;
+        }
+
+        public Builder setParamsBuilder(ParamsBuilder paramsBuilder) {
+            options.paramsBuilder = paramsBuilder;
             return this;
         }
     }

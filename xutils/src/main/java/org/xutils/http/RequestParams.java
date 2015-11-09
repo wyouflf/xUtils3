@@ -133,6 +133,10 @@ public class RequestParams {
         return buildCacheKey;
     }
 
+    public void setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
+        this.sslSocketFactory = sslSocketFactory;
+    }
+
     public SSLSocketFactory getSslSocketFactory() {
         return sslSocketFactory;
     }

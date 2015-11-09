@@ -301,6 +301,10 @@ import java.util.concurrent.atomic.AtomicLong;
         params.setPriority(Priority.BG_LOW);
         params.setExecutor(EXECUTOR);
         params.setCancelFast(true);
+        ImageOptions.ParamsBuilder paramsBuilder = options.getParamsBuilder();
+        if (paramsBuilder != null) {
+            paramsBuilder.buildParams(params, options);
+        }
         if (view instanceof FakeImageView) {
             synchronized (FAKE_IMG_MAP) {
                 FAKE_IMG_MAP.put(url, (FakeImageView) view);

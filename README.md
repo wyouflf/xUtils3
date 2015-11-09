@@ -30,6 +30,7 @@ compile 'org.xutils:xutils:3.0'
 public void onCreate() {
     super.onCreate();
     x.Ext.init(this);
+    x.Ext.setDebug(true); // 是否输出debug日志
     ...
 }
 ```

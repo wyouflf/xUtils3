@@ -122,6 +122,7 @@ Callback.Cancelable cancelable
 @Event(value = R.id.btn_test_baidu2)
 private void onTestBaidu2Click(View view) {
     RequestParams params = new RequestParams("https://www.baidu.com/s");
+    params.setSslSocketFactory(...); // 设置ssl
     params.addQueryStringParameter("wd", "xUtils");
     x.http().get(params, new Callback.CommonCallback<String>() {
         @Override

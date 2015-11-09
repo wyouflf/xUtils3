@@ -13,9 +13,7 @@ import org.xutils.http.request.UriRequestFactory;
 
 import java.io.Closeable;
 import java.io.File;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -98,19 +96,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             loadType = ParameterizedTypeUtil.getParameterizedType(callBackType, Callback.CommonCallback.class, 0);
         }
 
-        // check loadType & resultType
-        {
-            if (loadType instanceof ParameterizedType) {
-                loadType = ((ParameterizedType) loadType).getRawType();
-            } else if (loadType instanceof TypeVariable) {
-                throw new IllegalArgumentException(
-                        "not support callback type" + callBackType.getCanonicalName());
-            }
-        }
-
         // init request
         params.init();
-        UriRequest result = UriRequestFactory.getUriRequest(params, (Class<?>) loadType);
+        UriRequest result = UriRequestFactory.getUriRequest(params, loadType);
         result.setCallingClassLoader(callBackType.getClassLoader());
         result.setProgressHandler(this);
 

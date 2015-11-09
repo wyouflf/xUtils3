@@ -11,6 +11,9 @@ import org.xutils.http.app.ResponseParser;
 import org.xutils.http.request.UriRequest;
 
 import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 /**
  * Created by lei.jiao on 2014/6/27.
@@ -22,12 +25,26 @@ import java.io.InputStream;
     private String charset = "UTF-8";
     private String resultStr = null;
 
-    private final Class<?> objectType;
+    private final Type objectType;
+    private final Class<?> objectClass;
     private final ResponseParser parser;
 
-    public ObjectLoader(Class<?> objectType) {
+    public ObjectLoader(Type objectType) {
         this.objectType = objectType;
-        HttpResponse response = objectType.getAnnotation(HttpResponse.class);
+
+        // check loadType & resultType
+        {
+            if (objectType instanceof ParameterizedType) {
+                objectClass = (Class<?>) ((ParameterizedType) objectType).getRawType();
+            } else if (objectType instanceof TypeVariable) {
+                throw new IllegalArgumentException(
+                        "not support callback type" + objectType.toString());
+            } else {
+                objectClass = (Class<?>) objectType;
+            }
+        }
+
+        HttpResponse response = objectClass.getAnnotation(HttpResponse.class);
         if (response != null) {
             try {
                 this.parser = response.parser().newInstance();
@@ -35,7 +52,7 @@ import java.io.InputStream;
                 throw new RuntimeException("create parser error", ex);
             }
         } else {
-            throw new IllegalArgumentException("not found @HttpResponse from " + objectType.getName());
+            throw new IllegalArgumentException("not found @HttpResponse from " + objectClass.getName());
         }
     }
 
@@ -57,7 +74,7 @@ import java.io.InputStream;
     @Override
     public Object load(final InputStream in) throws Throwable {
         resultStr = IOUtil.readStr(in, charset);
-        return parser.parse(objectType, resultStr);
+        return parser.parse(objectType, objectClass, resultStr);
     }
 
     @Override
@@ -72,7 +89,7 @@ import java.io.InputStream;
         if (cacheEntity != null) {
             String text = cacheEntity.getTextContent();
             if (!TextUtils.isEmpty(text)) {
-                return parser.parse(objectType, text);
+                return parser.parse(objectType, objectClass, text);
             }
         }
 

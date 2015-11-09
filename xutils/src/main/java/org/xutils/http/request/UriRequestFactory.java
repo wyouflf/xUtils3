@@ -3,6 +3,7 @@ package org.xutils.http.request;
 import org.xutils.http.RequestParams;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 
 /**
  * Created by wyouflf on 15/11/4.
@@ -15,7 +16,7 @@ public final class UriRequestFactory {
     private UriRequestFactory() {
     }
 
-    public static UriRequest getUriRequest(RequestParams params, Class<?> loadType) throws Throwable {
+    public static UriRequest getUriRequest(RequestParams params, Type loadType) throws Throwable {
         String uri = params.getUri();
         if (uri.startsWith("http")) {
             return new HttpRequest(params, loadType);

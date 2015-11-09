@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class LocalFileRequest extends UriRequest {
 
     private InputStream inputStream;
 
-    LocalFileRequest(RequestParams params, Class<?> loadType) throws Throwable {
+    LocalFileRequest(RequestParams params, Type loadType) throws Throwable {
         super(params, loadType);
     }
 

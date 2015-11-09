@@ -18,6 +18,7 @@ import org.xutils.http.cookie.DbCookieStore;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
@@ -49,7 +50,7 @@ public class HttpRequest extends UriRequest {
     private static final CookieManager COOKIE_MANAGER =
             new CookieManager(DbCookieStore.INSTANCE, CookiePolicy.ACCEPT_ALL);
 
-    /*package*/ HttpRequest(RequestParams params, Class<?> loadType) throws Throwable {
+    /*package*/ HttpRequest(RequestParams params, Type loadType) throws Throwable {
         super(params, loadType);
     }
 

@@ -7,6 +7,7 @@ import org.xutils.http.RequestParams;
 import org.xutils.http.app.RequestTracker;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,12 +25,12 @@ public final class LoaderFactory {
     /**
      * key: loadType
      */
-    private static final HashMap<Class<?>, RequestTracker> trackerHashMap = new HashMap<Class<?>, RequestTracker>();
+    private static final HashMap<Type, RequestTracker> trackerHashMap = new HashMap<Type, RequestTracker>();
 
     /**
      * key: loadType
      */
-    private static final HashMap<Class<?>, Loader> converterHashMap = new HashMap<Class<?>, Loader>();
+    private static final HashMap<Type, Loader> converterHashMap = new HashMap<Type, Loader>();
 
     static {
         converterHashMap.put(Map.class, new MapLoader());
@@ -47,7 +48,7 @@ public final class LoaderFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public static Loader<?> getLoader(Class<?> type, RequestParams params) {
+    public static Loader<?> getLoader(Type type, RequestParams params) {
         Loader<?> result = converterHashMap.get(type);
         if (result == null) {
             result = new ObjectLoader(type);
@@ -60,7 +61,7 @@ public final class LoaderFactory {
         return result;
     }
 
-    public static <T> void registerLoader(Class<T> type, Loader<T> loader) {
+    public static <T> void registerLoader(Type type, Loader<T> loader) {
         converterHashMap.put(type, loader);
     }
 
@@ -68,7 +69,7 @@ public final class LoaderFactory {
         defaultTracker = tracker;
     }
 
-    public static void registerTracker(Class<?> type, RequestTracker tracker) {
+    public static void registerTracker(Type type, RequestTracker tracker) {
         trackerHashMap.put(type, tracker);
     }
 }

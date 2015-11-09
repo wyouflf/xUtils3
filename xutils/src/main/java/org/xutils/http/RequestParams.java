@@ -353,7 +353,7 @@ public class RequestParams {
         if (this.fileParams == null) {
             this.fileParams = new HashMap<String, Object>();
         }
-        if (TextUtils.isEmpty(contentType)) {
+        if (TextUtils.isEmpty(contentType) && TextUtils.isEmpty(fileName)) {
             this.fileParams.put(name, value);
         } else {
             this.fileParams.put(name, new BodyEntityWrapper<Object>(value, contentType, fileName));

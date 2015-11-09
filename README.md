@@ -1,12 +1,13 @@
 ## xUtils3简介
-* xUtils 包含了很多实用的android工具。
+* xUtils 包含了很多实用的android工具.
 * xUtils 支持超大文件(超过2G)上传，更全面的http请求协议支持(11种谓词)，拥有更加灵活的ORM，更多的事件注解支持且不受混淆影响...
-* xUtils 最低兼容android 4.0 (api level 14), (源码最低兼容至2.3.3, 可以自己修改最低兼容设置).
+* xUtils 最低兼容android 4.0 (api level 14).
 * xUtils3变化较多所以建立了新的项目不在旧版(github.com/wyouflf/xUtils)上继续维护, 相对于旧版本:
     1. HTTP实现替换HttpClient为UrlConnection, 自动解析回调泛型, 更安全的断点续传策略.
     2. 支持标准的Cookie策略, 区分domain, path...
-    3. 事件和数据库注解去除不常用的功能, 提高性能.
-    4. 图片绑定支持gif, webp; 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
+    3. 事件注解去除不常用的功能, 提高性能.
+    4. 数据库api简化提高性能, 达到和greenDao一致的性能.
+    5. 图片绑定支持gif, webp; 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
 
 #### 使用Gradle构建时添加一下依赖即可:
 ```javascript

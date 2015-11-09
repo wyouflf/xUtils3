@@ -61,6 +61,7 @@ public final class TableEntity<T> {
         for (ColumnEntity column : columnMap.values()) {
             if (column.isId()) {
                 this.id = column;
+                break;
             }
         }
     }

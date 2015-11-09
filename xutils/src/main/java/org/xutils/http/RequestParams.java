@@ -290,6 +290,12 @@ public class RequestParams {
         this.headers.put(name, value);
     }
 
+    /**
+     * 添加请求参数(根据请求谓词, 将参数加入QueryString或Body.)
+     *
+     * @param name  参数名
+     * @param value 可以是String, File, InputStream 或 byte[]
+     */
     public void addParameter(String name, Object value) {
         if (value == null) return;
         if (HttpMethod.permitsRequestBody(method)) {
@@ -309,6 +315,12 @@ public class RequestParams {
         }
     }
 
+    /**
+     * 添加参数至Query String
+     *
+     * @param name
+     * @param value
+     */
     public void addQueryStringParameter(String name, String value) {
         if (this.queryStringParams == null) {
             this.queryStringParams = new HashMap<String, String>();
@@ -316,6 +328,12 @@ public class RequestParams {
         this.queryStringParams.put(name, value);
     }
 
+    /**
+     * 添加参数至Body
+     *
+     * @param name
+     * @param value
+     */
     public void addBodyParameter(String name, String value) {
         if (this.bodyParams == null) {
             this.bodyParams = new HashMap<String, String>();
@@ -370,7 +388,7 @@ public class RequestParams {
     }
 
     /**
-     * 用json形式的bodyContent上传
+     * 以json形式提交body参数
      *
      * @param asJsonContent
      */

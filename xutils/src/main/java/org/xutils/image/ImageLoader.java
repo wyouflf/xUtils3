@@ -303,7 +303,7 @@ import java.util.concurrent.atomic.AtomicLong;
         params.setCancelFast(true);
         ImageOptions.ParamsBuilder paramsBuilder = options.getParamsBuilder();
         if (paramsBuilder != null) {
-            paramsBuilder.buildParams(params, options);
+            params = paramsBuilder.buildParams(params, options);
         }
         if (view instanceof FakeImageView) {
             synchronized (FAKE_IMG_MAP) {

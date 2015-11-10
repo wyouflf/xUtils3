@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/download_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:focusable="false"
+        android:text="download_label" />
+
+    <TextView
+        android:id="@+id/download_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:focusable="false"
+        android:text="download_state" />
+
+    <ProgressBar
+        android:id="@+id/download_pb"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/download_label"
+        android:focusable="false" />
+
+    <Button
+        android:id="@+id/download_stop_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/download_pb"
+        android:focusable="false"
+        android:text="@string/stop" />
+
+    <Button
+        android:id="@+id/download_remove_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/download_pb"
+        android:layout_toRightOf="@id/download_stop_btn"
+        android:focusable="false"
+        android:text="@string/remove" />
+
+</RelativeLayout>

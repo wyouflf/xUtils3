@@ -10,7 +10,7 @@ import java.util.Date;
  * Date: 13-7-25
  * Time: 下午7:06
  */
-@Table(name = "parent", runOnTableCreated = "CREATE UNIQUE INDEX index_name ON parent(name,email)")
+@Table(name = "parent", onCreated = "CREATE UNIQUE INDEX index_name ON parent(name,email)")
 public class Parent {
 
     @Column(name = "id", isId = true)

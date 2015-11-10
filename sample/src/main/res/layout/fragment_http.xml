@@ -5,14 +5,33 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn_test_baidu1"
+        android:id="@+id/btn_test1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TEST BAIDU 1" />
 
     <Button
-        android:id="@+id/btn_test_baidu2"
+        android:id="@+id/btn_test2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TEST BAIDU 2" />
+
+    <EditText
+        android:id="@+id/et_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="false"
+        android:text="@string/test_download_url" />
+
+    <Button
+        android:id="@+id/btn_test3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TEST DOWNLOAD" />
+
+    <Button
+        android:id="@+id/btn_test4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OPEN DOWNLOAD LIST" />
 </LinearLayout>

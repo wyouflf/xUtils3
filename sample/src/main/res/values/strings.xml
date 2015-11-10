@@ -2,4 +2,8 @@
 <resources>
     <string name="app_name">xUtils3 Sample</string>
     <string name="action_settings">Settings</string>
+    <string name="remove">移除</string>
+    <string name="stop">停止</string>
+    <string name="start">开始下载</string>
+    <string name="test_download_url">http://dl.bintray.com/wyouflf/maven/org/xutils/xutils/3.0/xutils-3.0.aar</string>
 </resources>

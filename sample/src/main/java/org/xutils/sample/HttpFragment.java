@@ -1,13 +1,18 @@
 package org.xutils.sample;
 
+import android.content.Intent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import org.xutils.common.Callback;
+import org.xutils.ex.DbException;
 import org.xutils.http.RequestParams;
+import org.xutils.sample.download.DownloadService;
 import org.xutils.sample.http.BaiduParams;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
+import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
 
 import java.io.File;
@@ -33,9 +38,9 @@ public class HttpFragment extends BaseFragment {
      * 3. 方法参数形式必须和type对应的Listener接口一致.
      * 4. 其他见{@link org.xutils.view.annotation.Event}类的说明.
      **/
-    @Event(value = R.id.btn_test_baidu1,
+    @Event(value = R.id.btn_test1,
             type = View.OnClickListener.class/*可选参数, 默认是View.OnClickListener.class*/)
-    private void onTestBaidu1Click(View view) {
+    private void onTest1Click(View view) {
         BaiduParams params = new BaiduParams();
         params.wd = "xUtils";
         // 有上传文件时使用multipart表单, 否则上传原始文件流.
@@ -97,8 +102,8 @@ public class HttpFragment extends BaseFragment {
     }
 
     // 如果你只需要一个简单的版本.
-    @Event(value = R.id.btn_test_baidu2)
-    private void onTestBaidu2Click(View view) throws FileNotFoundException {
+    @Event(value = R.id.btn_test2)
+    private void onTest2Click(View view) throws FileNotFoundException {
         RequestParams params = new RequestParams("http://192.168.199.160:8080/upload");
         params.addQueryStringParameter("wd", "xUtils");
         params.addBodyParameter(
@@ -131,6 +136,27 @@ public class HttpFragment extends BaseFragment {
 
             }
         });
+    }
+
+    @ViewInject(R.id.et_url)
+    private EditText et_url;
+
+    // 添加到下载列表
+    @Event(value = R.id.btn_test3)
+    private void onTest3Click(View view) throws DbException {
+        for (int i = 0; i < 20; i++) {
+            String url = et_url.getText().toString();
+            String label = "xUtils_" + System.nanoTime();
+            DownloadService.getDownloadManager().startDownload(
+                    url, label,
+                    "/sdcard/xUtils/" + label + ".aar", true, false, null);
+        }
+    }
+
+    // 添加到下载列表
+    @Event(value = R.id.btn_test4)
+    private void onTest4Click(View view) throws DbException {
+        getActivity().startActivity(new Intent(getActivity(), DownloadActivity.class));
     }
 
 }

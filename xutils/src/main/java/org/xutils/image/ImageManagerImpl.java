@@ -34,23 +34,43 @@ public final class ImageManagerImpl implements ImageManager {
 
 
     @Override
-    public void bind(ImageView view, String url) {
-        ImageLoader.doBind(view, url, null, null);
+    public void bind(final ImageView view, final String url) {
+        x.task().autoPost(new Runnable() {
+            @Override
+            public void run() {
+                ImageLoader.doBind(view, url, null, null);
+            }
+        });
     }
 
     @Override
-    public void bind(ImageView view, String url, ImageOptions options) {
-        ImageLoader.doBind(view, url, options, null);
+    public void bind(final ImageView view, final String url, final ImageOptions options) {
+        x.task().autoPost(new Runnable() {
+            @Override
+            public void run() {
+                ImageLoader.doBind(view, url, options, null);
+            }
+        });
     }
 
     @Override
-    public void bind(ImageView view, String url, Callback.CommonCallback<Drawable> callback) {
-        ImageLoader.doBind(view, url, null, callback);
+    public void bind(final ImageView view, final String url, final Callback.CommonCallback<Drawable> callback) {
+        x.task().autoPost(new Runnable() {
+            @Override
+            public void run() {
+                ImageLoader.doBind(view, url, null, callback);
+            }
+        });
     }
 
     @Override
-    public void bind(ImageView view, String url, ImageOptions options, Callback.CommonCallback<Drawable> callback) {
-        ImageLoader.doBind(view, url, options, callback);
+    public void bind(final ImageView view, final String url, final ImageOptions options, final Callback.CommonCallback<Drawable> callback) {
+        x.task().autoPost(new Runnable() {
+            @Override
+            public void run() {
+                ImageLoader.doBind(view, url, options, callback);
+            }
+        });
     }
 
     @Override

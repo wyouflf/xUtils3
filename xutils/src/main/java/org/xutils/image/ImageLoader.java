@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
@@ -94,7 +93,7 @@ import java.util.concurrent.atomic.AtomicLong;
     private final static HashMap<String, FakeImageView> FAKE_IMG_MAP = new HashMap<String, FakeImageView>();
 
     /**
-     * load from Network or DiskCache
+     * load from Network or DiskCache, invoke in any thread.
      *
      * @param url
      * @param options
@@ -119,7 +118,7 @@ import java.util.concurrent.atomic.AtomicLong;
     }
 
     /**
-     * load from Network or DiskCache
+     * load from Network or DiskCache, invoke in any thread.
      *
      * @param url
      * @param options
@@ -138,11 +137,17 @@ import java.util.concurrent.atomic.AtomicLong;
         params.setConnectTimeout(1000 * 8);
         params.setPriority(Priority.BG_LOW);
         params.setExecutor(EXECUTOR);
+        if (options != null) {
+            ImageOptions.ParamsBuilder paramsBuilder = options.getParamsBuilder();
+            if (paramsBuilder != null) {
+                params = paramsBuilder.buildParams(params, options);
+            }
+        }
         return x.http().get(params, callback);
     }
 
     /**
-     * load from Network or DiskCache
+     * load from Network or DiskCache, invoke in ui thread.
      *
      * @param view
      * @param url
@@ -154,17 +159,6 @@ import java.util.concurrent.atomic.AtomicLong;
                                     final ImageOptions options,
                                     final Callback.CommonCallback<Drawable> callback) {
 
-        // ensure run ui thread
-        if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-            x.task().post(new Runnable() {
-                @Override
-                public void run() {
-                    doBind(view, url, options, callback);
-                }
-            });
-            return null;
-        }
-
         // check params
         ImageOptions localOptions = options;
         {
@@ -173,15 +167,14 @@ import java.util.concurrent.atomic.AtomicLong;
                 return null;
             }
 
-            if (localOptions == null) {
-                localOptions = ImageOptions.DEFAULT;
-            }
-
             if (TextUtils.isEmpty(url)) {
                 postBindArgsException(view, localOptions, "url is null", callback);
                 return null;
             }
 
+            if (localOptions == null) {
+                localOptions = ImageOptions.DEFAULT;
+            }
             localOptions.optimizeMaxSize(view);
         }
 
@@ -233,13 +226,9 @@ import java.util.concurrent.atomic.AtomicLong;
                     callback.onSuccess(drawable);
                 }
             } catch (Throwable ex) {
-                if (callback != null) {
-                    try {
-                        callback.onError(ex, true);
-                    } catch (Throwable ignored) {
-                        LogUtil.e(ignored.getMessage(), ignored);
-                    }
-                }
+                LogUtil.e(ex.getMessage(), ex);
+                // try load from Network or DiskCache
+                return new ImageLoader().doLoad(view, url, localOptions, callback);
             } finally {
                 if (callback != null) {
                     try {

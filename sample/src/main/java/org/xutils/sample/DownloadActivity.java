@@ -157,6 +157,7 @@ public class DownloadActivity extends BaseActivity {
             }
         }
 
+        @Override
         public void update(DownloadInfo downloadInfo) {
             super.update(downloadInfo);
             refresh();

@@ -146,7 +146,7 @@ public class HttpFragment extends BaseFragment {
     private void onTest3Click(View view) throws DbException {
         for (int i = 0; i < 20; i++) {
             String url = et_url.getText().toString();
-            String label = "xUtils_" + System.nanoTime();
+            String label = i + "xUtils_" + System.nanoTime();
             DownloadService.getDownloadManager().startDownload(
                     url, label,
                     "/sdcard/xUtils/" + label + ".aar", true, false, null);

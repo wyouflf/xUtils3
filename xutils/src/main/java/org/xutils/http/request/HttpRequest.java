@@ -9,7 +9,6 @@ import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
-import org.xutils.ex.HttpException;
 import org.xutils.http.HttpMethod;
 import org.xutils.http.RequestParams;
 import org.xutils.http.body.ProgressBody;
@@ -180,17 +179,6 @@ public class HttpRequest extends UriRequest {
             }
         }
 
-        LogUtil.d(queryUrl);
-        int code = connection.getResponseCode();
-        if (code >= 300) {
-            HttpException httpException = new HttpException(code, connection.getResponseMessage());
-            try {
-                httpException.setResult(IOUtil.readStr(connection.getInputStream(), params.getCharset()));
-            } catch (Throwable ignored) {
-            }
-            throw httpException;
-        }
-
         { // save cookies
             try {
                 Map<String, List<String>> headers = connection.getHeaderFields();
@@ -317,6 +305,15 @@ public class HttpRequest extends UriRequest {
             } else {
                 return 404;
             }
+        }
+    }
+
+    @Override
+    public String getResponseMessage() throws IOException {
+        if (connection != null) {
+            return connection.getResponseMessage();
+        } else {
+            return null;
         }
     }
 

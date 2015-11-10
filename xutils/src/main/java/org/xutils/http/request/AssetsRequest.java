@@ -107,6 +107,11 @@ public class AssetsRequest extends UriRequest {
     }
 
     @Override
+    public String getResponseMessage() throws IOException {
+        return null;
+    }
+
+    @Override
     public long getExpiration() {
         return Long.MAX_VALUE;
     }

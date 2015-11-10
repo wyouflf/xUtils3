@@ -113,6 +113,8 @@ public abstract class UriRequest implements Closeable {
 
     public abstract int getResponseCode() throws IOException;
 
+    public abstract String getResponseMessage() throws IOException;
+
     public abstract long getExpiration();
 
     public abstract long getLastModified();

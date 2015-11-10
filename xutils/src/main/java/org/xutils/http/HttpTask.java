@@ -7,6 +7,8 @@ import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ParameterizedTypeUtil;
+import org.xutils.ex.HttpException;
+import org.xutils.http.app.InterceptResponseListener;
 import org.xutils.http.app.RequestTracker;
 import org.xutils.http.request.UriRequest;
 import org.xutils.http.request.UriRequestFactory;
@@ -39,6 +41,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     private Callback.CacheCallback<ResultType> cacheCallback;
     private Callback.PrepareCallback prepareCallback;
     private Callback.ProgressCallback progressCallback;
+    private InterceptResponseListener interceptResponseListener;
 
     // 日志追踪
     private RequestTracker tracker;
@@ -70,6 +73,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         }
         if (callback instanceof Callback.ProgressCallback) {
             this.progressCallback = (Callback.ProgressCallback<ResultType>) callback;
+        }
+        if (callback instanceof InterceptResponseListener) {
+            this.interceptResponseListener = (InterceptResponseListener) callback;
         }
 
         // init executor
@@ -479,6 +485,22 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 }
 
                 this.result = request.loadResult();
+
+                // intercept response
+                if (interceptResponseListener != null) {
+                    interceptResponseListener.intercept(request);
+                }
+
+                // check error code
+                int code = request.getResponseCode();
+                if (code >= 300) {
+                    HttpException httpException = new HttpException(code, request.getResponseMessage());
+                    try {
+                        httpException.setResult(IOUtil.readStr(request.getInputStream(), params.getCharset()));
+                    } catch (Throwable ignored) {
+                    }
+                    throw httpException;
+                }
             } catch (Throwable ex) {
                 this.ex = ex;
             } finally {

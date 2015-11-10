@@ -13,7 +13,7 @@ import java.net.URI;
  * 数据库中的cookie实体
  */
 @Table(name = "cookie",
-        runOnTableCreated = "CREATE UNIQUE INDEX index_cookie_unique ON cookie(\"name\",\"domain\",\"path\")")
+        onCreated = "CREATE UNIQUE INDEX index_cookie_unique ON cookie(\"name\",\"domain\",\"path\")")
 /*package*/ final class CookieEntity {
 
     // ~ 100 year

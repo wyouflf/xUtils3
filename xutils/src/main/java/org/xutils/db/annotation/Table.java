@@ -26,5 +26,5 @@ public @interface Table {
 
     String name();
 
-    String runOnTableCreated() default "";
+    String onCreated() default "";
 }

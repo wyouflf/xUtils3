@@ -55,7 +55,7 @@ public final class TableEntity<T> {
         this.constructor.setAccessible(true);
         Table table = entityType.getAnnotation(Table.class);
         this.tableName = table.name();
-        this.runOnTableCreated = table.runOnTableCreated();
+        this.runOnTableCreated = table.onCreated();
         this.columnMap = TableUtils.findColumnMap(entityType);
 
         for (ColumnEntity column : columnMap.values()) {

@@ -122,7 +122,8 @@ public final class DownloadManager {
         params.setSaveFilePath(downloadInfo.getFileSavePath());
         params.setExecutor(executor);
         params.setCancelFast(true);
-        x.http().get(params, callback);
+        Callback.Cancelable cancelable = x.http().get(params, callback);
+        callback.setCancelable(cancelable);
         callbackMap.put(downloadInfo, callback);
 
         if (!downloadInfoList.contains(downloadInfo)) {
@@ -137,7 +138,7 @@ public final class DownloadManager {
 
     public void stopDownload(DownloadInfo downloadInfo) {
         Callback.Cancelable cancelable = callbackMap.get(downloadInfo);
-        if (cancelable != null && !cancelable.isCancelled()) {
+        if (cancelable != null) {
             cancelable.cancel();
         }
     }
@@ -145,7 +146,7 @@ public final class DownloadManager {
     public void stopAllDownload() {
         for (DownloadInfo downloadInfo : downloadInfoList) {
             Callback.Cancelable cancelable = callbackMap.get(downloadInfo);
-            if (cancelable != null && !cancelable.isCancelled()) {
+            if (cancelable != null) {
                 cancelable.cancel();
             }
         }

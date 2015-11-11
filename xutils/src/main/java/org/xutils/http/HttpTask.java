@@ -7,7 +7,6 @@ import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ParameterizedTypeUtil;
-import org.xutils.ex.HttpException;
 import org.xutils.http.app.InterceptResponseListener;
 import org.xutils.http.app.RequestTracker;
 import org.xutils.http.request.UriRequest;
@@ -489,17 +488,6 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 // intercept response
                 if (interceptResponseListener != null) {
                     interceptResponseListener.intercept(request);
-                }
-
-                // check error code
-                int code = request.getResponseCode();
-                if (code >= 300) {
-                    HttpException httpException = new HttpException(code, request.getResponseMessage());
-                    try {
-                        httpException.setResult(IOUtil.readStr(request.getInputStream(), params.getCharset()));
-                    } catch (Throwable ignored) {
-                    }
-                    throw httpException;
                 }
             } catch (Throwable ex) {
                 this.ex = ex;

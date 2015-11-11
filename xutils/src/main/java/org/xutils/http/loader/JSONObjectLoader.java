@@ -16,8 +16,8 @@ import java.io.InputStream;
  */
 /*package*/ class JSONObjectLoader extends Loader<JSONObject> {
 
-    private String resultStr;
     private String charset = "UTF-8";
+    private String resultStr = null;
 
     @Override
     public Loader<JSONObject> newInstance() {

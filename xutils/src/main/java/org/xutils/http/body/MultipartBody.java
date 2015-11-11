@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -25,16 +26,18 @@ public class MultipartBody implements ProgressBody {
     private static byte[] END_BYTES = "\r\n".getBytes();
     private static byte[] TWO_DASHES_BYTES = "--".getBytes();
     private byte[] boundaryPostfixBytes;
-    private String contentType;
-    private String charset;
+    private String contentType; // multipart/subtype; boundary=xxx...
+    private String charset = "UTF-8";
 
     private Map<String, Object> multipartParams;
     private long total = 0;
     private long current = 0;
 
     public MultipartBody(Map<String, Object> multipartParams, String charset) {
+        if (!TextUtils.isEmpty(charset)) {
+            this.charset = charset;
+        }
         this.multipartParams = multipartParams;
-        this.charset = charset;
         generateContentType();
 
         // calc total
@@ -93,7 +96,7 @@ public class MultipartBody implements ProgressBody {
             String name = kv.getKey();
             Object value = kv.getValue();
             if (!TextUtils.isEmpty(name) && value != null) {
-                writeEntry(out, name, value, charset, boundaryPostfixBytes);
+                writeEntry(out, name, value);
             }
         }
         writeLine(out, TWO_DASHES_BYTES, BOUNDARY_PREFIX_BYTES, boundaryPostfixBytes, TWO_DASHES_BYTES);
@@ -104,9 +107,15 @@ public class MultipartBody implements ProgressBody {
         }
     }
 
-    private void writeEntry(OutputStream out,
-                            String name, Object value,
-                            String charset, byte[] boundaryPostfixBytes) throws IOException {
+    /**
+     * 写入multipart中的一项
+     *
+     * @param out
+     * @param name
+     * @param value
+     * @throws IOException
+     */
+    private void writeEntry(OutputStream out, String name, Object value) throws IOException {
         writeLine(out, TWO_DASHES_BYTES, BOUNDARY_PREFIX_BYTES, boundaryPostfixBytes);
 
         String fileName = "";
@@ -126,13 +135,13 @@ public class MultipartBody implements ProgressBody {
             if (TextUtils.isEmpty(contentType)) {
                 contentType = FileBody.getFileContentType(file);
             }
-            writeLine(out, buildContentDisposition(name, fileName));
+            writeLine(out, buildContentDisposition(name, fileName, charset));
             writeLine(out, buildContentType(value, contentType, charset));
             writeLine(out); // 内容前空一行
             writeFile(out, file);
             writeLine(out);
         } else {
-            writeLine(out, buildContentDisposition(name, fileName));
+            writeLine(out, buildContentDisposition(name, fileName, charset));
             writeLine(out, buildContentType(value, contentType, charset));
             writeLine(out); // 内容前空一行
             if (value instanceof InputStream) {
@@ -191,16 +200,16 @@ public class MultipartBody implements ProgressBody {
         }
     }
 
-    private static byte[] buildContentDisposition(String name, String fileName) {
+    private static byte[] buildContentDisposition(String name, String fileName, String charset) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder("Content-Disposition: form-data");
         result.append("; name=\"").append(name.replace("\"", "%22")).append("\"");
         if (!TextUtils.isEmpty(fileName)) {
             result.append("; filename=\"").append(fileName.replace("\"", "%22")).append("\"");
         }
-        return result.toString().getBytes();
+        return result.toString().getBytes(charset);
     }
 
-    private static byte[] buildContentType(Object value, String contentType, String charset) {
+    private static byte[] buildContentType(Object value, String contentType, String charset) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder("Content-Type: ");
         if (TextUtils.isEmpty(contentType)) {
             if (value instanceof String) {
@@ -212,7 +221,7 @@ public class MultipartBody implements ProgressBody {
             contentType = contentType.replaceFirst("\\/jpg$", "/jpeg");
         }
         result.append(contentType);
-        return result.toString().getBytes();
+        return result.toString().getBytes(charset);
     }
 
     private class CounterOutputStream extends OutputStream {

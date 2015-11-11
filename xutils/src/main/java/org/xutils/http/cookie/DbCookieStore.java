@@ -205,6 +205,9 @@ public enum DbCookieStore implements CookieStore {
 
             String path = cookie.getPath();
             if (!TextUtils.isEmpty(path)) {
+                if (path.length() > 1 && path.endsWith("/")) {
+                    path = path.substring(0, path.length() - 1);
+                }
                 where.and("path", "=", path);
             }
 

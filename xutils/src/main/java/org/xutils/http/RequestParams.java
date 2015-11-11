@@ -111,15 +111,15 @@ public class RequestParams {
         HttpRequest httpRequest = this.getHttpRequest();
         if (httpRequest != null) {
             builder = httpRequest.builder().newInstance();
+            buildUri = builder.buildUri(httpRequest);
             builder.buildParams(this);
             builder.buildSign(this, httpRequest.signs());
-            buildUri = builder.buildUri(httpRequest);
             buildCacheKey = builder.buildCacheKey(this, httpRequest.cacheKeys());
             sslSocketFactory = builder.getSSLSocketFactory();
         } else if (this.builder != null) {
+            buildUri = uri;
             builder.buildParams(this);
             builder.buildSign(this, signs);
-            buildUri = uri;
             buildCacheKey = builder.buildCacheKey(this, cacheKeys);
             sslSocketFactory = builder.getSSLSocketFactory();
         }

@@ -1,6 +1,7 @@
 package org.xutils.common.util;
 
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -76,10 +77,12 @@ public class IOUtil {
     }
 
     public static String readStr(InputStream in) throws IOException {
-        return readStr(in, "utf-8");
+        return readStr(in, "UTF-8");
     }
 
     public static String readStr(InputStream in, String charset) throws IOException {
+        if (TextUtils.isEmpty(charset)) charset = "UTF-8";
+
         if (!(in instanceof BufferedInputStream)) {
             in = new BufferedInputStream(in);
         }
@@ -94,10 +97,12 @@ public class IOUtil {
     }
 
     public static void writeStr(OutputStream out, String str) throws IOException {
-        writeStr(out, str, "utf-8");
+        writeStr(out, str, "UTF-8");
     }
 
     public static void writeStr(OutputStream out, String str, String charset) throws IOException {
+        if (TextUtils.isEmpty(charset)) charset = "UTF-8";
+
         Writer writer = new OutputStreamWriter(out, charset);
         writer.write(str);
         writer.flush();

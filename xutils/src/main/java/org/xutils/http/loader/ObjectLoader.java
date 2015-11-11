@@ -65,7 +65,7 @@ import java.lang.reflect.TypeVariable;
     public void setParams(final RequestParams params) {
         if (params != null) {
             String charset = params.getCharset();
-            if (charset != null) {
+            if (!TextUtils.isEmpty(charset)) {
                 this.charset = charset;
             }
         }

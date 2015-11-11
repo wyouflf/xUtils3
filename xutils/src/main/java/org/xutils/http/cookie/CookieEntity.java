@@ -62,7 +62,7 @@ import java.net.URI;
         long maxAge = cookie.getMaxAge();
         if (maxAge != -1L) {
             this.expiry = (maxAge * 1000L) + System.currentTimeMillis();
-            if (maxAge < 0 && this.expiry < 0) {
+            if (this.expiry < 0L) {
                 this.expiry = MAX_EXPIRY;
             }
         }

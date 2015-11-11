@@ -70,7 +70,8 @@ public class HttpFragment extends BaseFragment {
                  * b. 组合使用PrepareCallback的prepare方法将为callback提供一次后台执行耗时任务的机会,
                  * 然后将结果给onCache或onSuccess.
                  * c. 组合使用ProgressCallback将提供进度回调.
-                 * ...(可参考{@link org.xutils.image.ImageLoader})
+                 * ...(可参考{@link org.xutils.image.ImageLoader}
+                 * 或 示例代码中的 {@link org.xutils.sample.download.DownloadCallback})
                  *
                  **/
                 new Callback.CommonCallback<String>() {

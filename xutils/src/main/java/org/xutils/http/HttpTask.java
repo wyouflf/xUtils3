@@ -7,7 +7,7 @@ import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ParameterizedTypeUtil;
-import org.xutils.http.app.InterceptResponseListener;
+import org.xutils.http.app.InterceptRequestListener;
 import org.xutils.http.app.RequestTracker;
 import org.xutils.http.request.UriRequest;
 import org.xutils.http.request.UriRequestFactory;
@@ -40,7 +40,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     private Callback.CacheCallback<ResultType> cacheCallback;
     private Callback.PrepareCallback prepareCallback;
     private Callback.ProgressCallback progressCallback;
-    private InterceptResponseListener interceptResponseListener;
+    private InterceptRequestListener interceptRequestListener;
 
     // 日志追踪
     private RequestTracker tracker;
@@ -73,8 +73,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         if (callback instanceof Callback.ProgressCallback) {
             this.progressCallback = (Callback.ProgressCallback<ResultType>) callback;
         }
-        if (callback instanceof InterceptResponseListener) {
-            this.interceptResponseListener = (InterceptResponseListener) callback;
+        if (callback instanceof InterceptRequestListener) {
+            this.interceptRequestListener = (InterceptRequestListener) callback;
         }
 
         // init executor
@@ -483,11 +483,16 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                     throw new Callback.CancelledException("cancelled before request");
                 }
 
+                // intercept response
+                if (interceptRequestListener != null) {
+                    interceptRequestListener.beforeRequest(request);
+                }
+
                 this.result = request.loadResult();
 
                 // intercept response
-                if (interceptResponseListener != null) {
-                    interceptResponseListener.intercept(request);
+                if (interceptRequestListener != null) {
+                    interceptRequestListener.afterRequest(request);
                 }
             } catch (Throwable ex) {
                 this.ex = ex;

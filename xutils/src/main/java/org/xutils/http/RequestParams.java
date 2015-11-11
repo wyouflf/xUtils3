@@ -300,10 +300,12 @@ public class RequestParams {
         if (value == null) return;
         if (HttpMethod.permitsRequestBody(method)) {
             if (!TextUtils.isEmpty(name)) {
-                if (value instanceof String) {
-                    this.addBodyParameter(name, (String) value);
-                } else {
+                if (value instanceof File
+                        || value instanceof InputStream
+                        || value instanceof byte[]) {
                     this.addBodyParameter(name, value, null);
+                } else {
+                    this.addBodyParameter(name, value.toString());
                 }
             } else if (TextUtils.isEmpty(name)) {
                 this.setBodyContent(value.toString());

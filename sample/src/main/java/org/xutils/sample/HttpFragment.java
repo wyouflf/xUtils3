@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import org.xutils.common.Callback;
 import org.xutils.ex.DbException;
+import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
 import org.xutils.sample.download.DownloadService;
 import org.xutils.sample.http.BaiduParams;
@@ -82,7 +83,16 @@ public class HttpFragment extends BaseFragment {
 
                     @Override
                     public void onError(Throwable ex, boolean isOnCallback) {
-                        Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                        if (ex instanceof HttpException) { // 网络错误
+                            HttpException httpEx = (HttpException) ex;
+                            int responseCode = httpEx.getCode();
+                            String responseMsg = httpEx.getMessage();
+                            String errorResult = httpEx.getResult();
+                            // ...
+                        } else { // 其他错误
+                            // ...
+                        }
                     }
 
                     @Override

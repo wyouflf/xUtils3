@@ -99,6 +99,16 @@ Callback.Cancelable cancelable
 
            @Override
            public void onError(Throwable ex, boolean isOnCallback) {
+               //Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+               if (ex instanceof HttpException) { // 网络错误
+                   HttpException httpEx = (HttpException) ex;
+                   int responseCode = httpEx.getCode();
+                   String responseMsg = httpEx.getMessage();
+                   String errorResult = httpEx.getResult();
+                   // ...
+               } else { // 其他错误
+                   // ...
+               }
                Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
            }
 

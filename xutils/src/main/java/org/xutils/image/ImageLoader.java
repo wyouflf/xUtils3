@@ -208,6 +208,7 @@ import java.util.concurrent.atomic.AtomicLong;
             }
         }
         if (drawable != null) { // has mem cache
+            boolean trustMemCache = false;
             try {
                 if (callback instanceof ProgressCallback) {
                     ((ProgressCallback) callback).onWaiting();
@@ -215,9 +216,10 @@ import java.util.concurrent.atomic.AtomicLong;
                 // hit mem cache
                 view.setImageDrawable(drawable);
                 view.setScaleType(localOptions.getImageScaleType());
+                trustMemCache = true;
                 if (callback instanceof CacheCallback) {
-                    boolean trustCache = ((CacheCallback<Drawable>) callback).onCache(drawable);
-                    if (!trustCache) {
+                    trustMemCache = ((CacheCallback<Drawable>) callback).onCache(drawable);
+                    if (!trustMemCache) {
                         // not trust the cache
                         // load from Network or DiskCache
                         return new ImageLoader().doLoad(view, url, localOptions, callback);
@@ -228,9 +230,10 @@ import java.util.concurrent.atomic.AtomicLong;
             } catch (Throwable ex) {
                 LogUtil.e(ex.getMessage(), ex);
                 // try load from Network or DiskCache
+                trustMemCache = false;
                 return new ImageLoader().doLoad(view, url, localOptions, callback);
             } finally {
-                if (callback != null) {
+                if (trustMemCache && callback != null) {
                     try {
                         callback.onFinished();
                     } catch (Throwable ignored) {

@@ -155,7 +155,7 @@ public class HttpFragment extends BaseFragment {
         }
     }
 
-    // 添加到下载列表
+    // 打开下载列表页
     @Event(value = R.id.btn_test4)
     private void onTest4Click(View view) throws DbException {
         getActivity().startActivity(new Intent(getActivity(), DownloadActivity.class));

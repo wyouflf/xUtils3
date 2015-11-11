@@ -14,11 +14,11 @@ import android.widget.ProgressBar;
 
 import org.xutils.common.Callback;
 import org.xutils.common.util.DensityUtil;
+import org.xutils.http.RequestParams;
+import org.xutils.image.ImageOptions;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
 import org.xutils.view.annotation.ViewInject;
-import org.xutils.http.RequestParams;
-import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
 import java.util.ArrayList;

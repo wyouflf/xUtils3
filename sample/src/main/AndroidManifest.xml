@@ -28,7 +28,9 @@
         <activity android:name=".BigImageActivity" />
         <activity android:name=".DownloadActivity" />
 
-        <service android:name=".download.DownloadService" />
+        <service
+            android:name=".download.DownloadService"
+            android:process=":dl" />
     </application>
 
 </manifest>

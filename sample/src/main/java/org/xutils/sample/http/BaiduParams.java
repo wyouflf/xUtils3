@@ -13,5 +13,6 @@ import org.xutils.http.app.DefaultParamsBuilder;
         builder = DefaultParamsBuilder.class/*可选参数, 控制参数构建过程, 定义参数签名, SSL证书等*/)
 public class BaiduParams extends RequestParams {
     public String wd;
+    //public long timestamp = System.currentTimeMillis();
     //public File uploadFile;
 }

@@ -63,7 +63,7 @@ import java.lang.ref.WeakReference;
     @Override
     public void onWaiting() {
         try {
-            downloadInfo.setState(DownloadState.STARTED);
+            downloadInfo.setState(DownloadState.WAITING);
             downloadManager.updateDownloadInfo(downloadInfo);
         } catch (DbException ex) {
             LogUtil.e(ex.getMessage(), ex);

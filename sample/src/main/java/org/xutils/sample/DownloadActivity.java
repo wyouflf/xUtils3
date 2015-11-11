@@ -84,7 +84,7 @@ public class DownloadActivity extends BaseActivity {
                 holder.update(downloadInfo);
             }
 
-            if (downloadInfo.getState() == DownloadState.STARTED) {
+            if (downloadInfo.getState().value() < DownloadState.FINISHED.value()) {
                 try {
                     downloadManager.startDownload(
                             downloadInfo.getUrl(),

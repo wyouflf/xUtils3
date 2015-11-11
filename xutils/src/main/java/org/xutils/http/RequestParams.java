@@ -298,7 +298,7 @@ public class RequestParams {
      */
     public void addParameter(String name, Object value) {
         if (value == null) return;
-        if (HttpMethod.permitsRequestBody(method)) {
+        if (method == null || HttpMethod.permitsRequestBody(method)) {
             if (!TextUtils.isEmpty(name)) {
                 if (value instanceof File
                         || value instanceof InputStream
@@ -558,7 +558,10 @@ public class RequestParams {
     }
 
     private void checkBodyParams() {
-        if (bodyParams != null && (!TextUtils.isEmpty(bodyContent) || requestBody != null)) {
+        if (bodyParams != null &&
+                (!HttpMethod.permitsRequestBody(method)
+                        || !TextUtils.isEmpty(bodyContent)
+                        || requestBody != null)) {
             if (this.queryStringParams == null) {
                 this.queryStringParams = new HashMap<String, String>();
             }

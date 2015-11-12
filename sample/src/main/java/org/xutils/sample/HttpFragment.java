@@ -116,7 +116,7 @@ public class HttpFragment extends BaseFragment {
     // 如果你只需要一个简单的版本.
     @Event(value = R.id.btn_test2)
     private void onTest2Click(View view) throws FileNotFoundException {
-        RequestParams params = new RequestParams("http://192.168.199.160:8080/upload");
+        RequestParams params = new RequestParams("http://192.168.0.13:8080/upload");
         params.addQueryStringParameter("wd", "xUtils");
         params.addBodyParameter(
                 "file",
@@ -126,7 +126,8 @@ public class HttpFragment extends BaseFragment {
                 "file2",
                 new FileInputStream(new File("/sdcard/test2.jpg")),
                 "image/jpeg",
-                "test2.jpg"); // InputStream参数获取不到文件名, 最好设置, 除非服务端不关心这个参数.
+                // 测试中文文件名
+                "你+& \" 好.jpg"); // InputStream参数获取不到文件名, 最好设置, 除非服务端不关心这个参数.
         x.http().post(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {

@@ -183,7 +183,7 @@ public class HttpRequest extends UriRequest {
         // check response code
         int code = connection.getResponseCode();
         if (code >= 300) {
-            HttpException httpException = new HttpException(code, connection.getResponseMessage());
+            HttpException httpException = new HttpException(code, this.getResponseMessage());
             try {
                 httpException.setResult(IOUtil.readStr(connection.getInputStream(), params.getCharset()));
             } catch (Throwable ignored) {
@@ -323,7 +323,7 @@ public class HttpRequest extends UriRequest {
     @Override
     public String getResponseMessage() throws IOException {
         if (connection != null) {
-            return connection.getResponseMessage();
+            return Uri.decode(connection.getResponseMessage());
         } else {
             return null;
         }

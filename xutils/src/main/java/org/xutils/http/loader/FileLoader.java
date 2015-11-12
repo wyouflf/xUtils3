@@ -1,5 +1,6 @@
 package org.xutils.http.loader;
 
+import android.net.Uri;
 import android.text.TextUtils;
 
 import org.xutils.cache.DiskCacheEntity;
@@ -292,7 +293,9 @@ public class FileLoader extends Loader<File> {
                 if (endIndex < 0) {
                     endIndex = disposition.length();
                 }
-                return disposition.substring(startIndex, endIndex);
+                if (endIndex > startIndex) {
+                    return Uri.decode(disposition.substring(startIndex, endIndex));
+                }
             }
         }
         return null;

@@ -202,9 +202,9 @@ public class MultipartBody implements ProgressBody {
 
     private static byte[] buildContentDisposition(String name, String fileName, String charset) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder("Content-Disposition: form-data");
-        result.append("; name=\"").append(name.replace("\"", "%22")).append("\"");
+        result.append("; name=\"").append(name.replace("\"", "\\\"")).append("\"");
         if (!TextUtils.isEmpty(fileName)) {
-            result.append("; filename=\"").append(fileName.replace("\"", "%22")).append("\"");
+            result.append("; filename=\"").append(fileName.replace("\"", "\\\"")).append("\"");
         }
         return result.toString().getBytes(charset);
     }

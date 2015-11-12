@@ -105,6 +105,7 @@ public class RequestParams {
             throw new IllegalStateException("uri is empty && @HttpRequest == null");
         }
 
+        // init params from entity
         initEntityParams();
 
         // build uri & cacheKey

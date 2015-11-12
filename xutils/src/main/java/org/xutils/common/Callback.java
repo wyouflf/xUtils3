@@ -1,5 +1,7 @@
 package org.xutils.common;
 
+import java.lang.reflect.Type;
+
 /**
  * Created by wyouflf on 15/6/5.
  * 通用回调接口
@@ -17,7 +19,7 @@ public interface Callback {
     }
 
     public interface TypedCallback<ResultType> extends CommonCallback<ResultType> {
-        Class<?> getResultType();
+        Type getResultType();
     }
 
     public interface CacheCallback<ResultType> extends CommonCallback<ResultType> {

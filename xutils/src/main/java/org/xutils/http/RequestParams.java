@@ -9,6 +9,7 @@ import org.xutils.common.util.LogUtil;
 import org.xutils.http.annotation.HttpRequest;
 import org.xutils.http.app.DefaultParamsBuilder;
 import org.xutils.http.app.ParamsBuilder;
+import org.xutils.http.app.RedirectHandler;
 import org.xutils.http.body.BodyEntityWrapper;
 import org.xutils.http.body.BodyParamsBody;
 import org.xutils.http.body.FileBody;
@@ -69,6 +70,7 @@ public class RequestParams {
     private boolean multipart = false; // 是否强制使用multipart表单
     private boolean cancelFast = false; // 是否可以被立即停止, true: 为请求创建新的线程, 取消时请求线程被立即中断.
     private HttpRetryHandler httpRetryHandler; // 自定义HttpRetryHandler
+    private RedirectHandler redirectHandler; // 自定义重定向接口, 默认系统自动重定向.
 
     /**
      * 使用空构造创建时必须, 必须是带有@HttpRequest注解的子类.
@@ -143,7 +145,7 @@ public class RequestParams {
         return sslSocketFactory;
     }
 
-    /*package*/ void setMethod(HttpMethod method) {
+    public void setMethod(HttpMethod method) {
         this.method = method;
     }
 
@@ -291,6 +293,19 @@ public class RequestParams {
 
     public void setHttpRetryHandler(HttpRetryHandler httpRetryHandler) {
         this.httpRetryHandler = httpRetryHandler;
+    }
+
+    public RedirectHandler getRedirectHandler() {
+        return redirectHandler;
+    }
+
+    /**
+     * 自定义重定向接口, 默认系统自动重定向.
+     *
+     * @param redirectHandler
+     */
+    public void setRedirectHandler(RedirectHandler redirectHandler) {
+        this.redirectHandler = redirectHandler;
     }
 
     public void addHeader(String name, String value) {

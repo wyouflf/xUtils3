@@ -7,10 +7,13 @@ import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ParameterizedTypeUtil;
+import org.xutils.ex.HttpException;
 import org.xutils.http.app.InterceptRequestListener;
+import org.xutils.http.app.RedirectHandler;
 import org.xutils.http.app.RequestTracker;
 import org.xutils.http.request.UriRequest;
 import org.xutils.http.request.UriRequestFactory;
+import org.xutils.x;
 
 import java.io.Closeable;
 import java.io.File;
@@ -226,7 +229,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
                 try {
                     clearRawResult();
-                    requestWorker = new RequestWorker(this.request, this.loadType);
+                    // 开始请求工作
+                    requestWorker = new RequestWorker();
                     if (params.isCancelFast()) {
                         requestWorker.start();
                         requestWorker.join();
@@ -458,14 +462,10 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
      * 创建一个Thread约耗时2毫秒, 优化?
      */
     private final class RequestWorker extends Thread {
-        private final UriRequest request;
-        private final Type loadType;
-        private Object result;
-        private Throwable ex;
+        /*private*/ Object result;
+        /*private*/ Throwable ex;
 
-        private RequestWorker(UriRequest request, Type loadType) {
-            this.request = request;
-            this.loadType = loadType;
+        private RequestWorker() {
         }
 
         public void run() {
@@ -502,8 +502,59 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 if (interceptRequestListener != null) {
                     interceptRequestListener.afterRequest(request);
                 }
+
+                if (this.ex != null) {
+                    throw this.ex;
+                }
             } catch (Throwable ex) {
                 this.ex = ex;
+                if (ex instanceof HttpException) {
+                    int errorCode = ((HttpException) ex).getCode();
+                    if (errorCode == 301 || errorCode == 302) {
+                        RedirectHandler redirectHandler = params.getRedirectHandler();
+                        if (redirectHandler != null) {
+                            try {
+                                RequestParams redirectParams = redirectHandler.getRedirectParams(request);
+                                if (redirectParams != null) {
+                                    if (redirectParams.getMethod() == null) {
+                                        redirectParams.setMethod(params.getMethod());
+                                    }
+                                    // 新任务执行时有可能会再次重定向
+                                    HttpTask<ResultType> task = new HttpTask<ResultType>(
+                                            redirectParams,
+                                            HttpTask.this,
+                                            new Callback.TypedCallback<ResultType>() {
+                                                @Override
+                                                public Type getResultType() {
+                                                    return loadType;
+                                                }
+
+                                                @Override
+                                                public void onSuccess(ResultType result) {
+                                                }
+
+                                                @Override
+                                                public void onError(Throwable ex, boolean isOnCallback) {
+                                                    RequestWorker.this.ex = ex;
+                                                }
+
+                                                @Override
+                                                public void onCancelled(CancelledException cex) {
+                                                }
+
+                                                @Override
+                                                public void onFinished() {
+                                                }
+                                            });
+                                    this.result = x.task().startSync(task);
+                                    this.ex = null;
+                                }
+                            } catch (Throwable throwable) {
+                                this.ex = ex;
+                            }
+                        }
+                    }
+                }
             } finally {
                 if (File.class == loadType) {
                     synchronized (sCurrFileLoadCount) {

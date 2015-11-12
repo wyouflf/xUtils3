@@ -114,9 +114,9 @@ public class HttpRequest extends UriRequest {
             } else {
                 connection = (HttpURLConnection) url.openConnection();
             }
-            connection.setInstanceFollowRedirects(true);
             connection.setReadTimeout(params.getConnectTimeout());
             connection.setConnectTimeout(params.getConnectTimeout());
+            connection.setInstanceFollowRedirects(params.getRedirectHandler() == null);
             if (connection instanceof HttpsURLConnection) {
                 ((HttpsURLConnection) connection).setSSLSocketFactory(params.getSslSocketFactory());
             }

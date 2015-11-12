@@ -6,6 +6,7 @@ import org.xutils.HttpManager;
 import org.xutils.common.Callback;
 import org.xutils.x;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 
 /**
@@ -117,7 +118,7 @@ public final class HttpManagerImpl implements HttpManager {
         }
 
         @Override
-        public Class<?> getResultType() {
+        public Type getResultType() {
             return resultType;
         }
 

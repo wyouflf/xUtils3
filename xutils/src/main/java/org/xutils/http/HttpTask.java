@@ -488,7 +488,11 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                     interceptRequestListener.beforeRequest(request);
                 }
 
-                this.result = request.loadResult();
+                try {
+                    this.result = request.loadResult();
+                } catch (Throwable ex) {
+                    this.ex = ex;
+                }
 
                 // intercept response
                 if (interceptRequestListener != null) {

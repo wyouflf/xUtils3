@@ -23,7 +23,7 @@ import java.util.HashSet;
  */
 public final class HttpRetryHandler {
 
-    private int maxRetryCount;
+    protected int maxRetryCount = 2;
 
     private static HashSet<Class<?>> blackList = new HashSet<Class<?>>();
 
@@ -44,22 +44,13 @@ public final class HttpRetryHandler {
     }
 
     public HttpRetryHandler() {
-        this(2);
-    }
-
-    public HttpRetryHandler(int maxRetryCount) {
-        this.maxRetryCount = maxRetryCount;
-    }
-
-    public int getMaxRetryCount() {
-        return maxRetryCount;
     }
 
     public void setMaxRetryCount(int maxRetryCount) {
         this.maxRetryCount = maxRetryCount;
     }
 
-    boolean retryRequest(Throwable ex, int count, UriRequest request) {
+    public boolean retryRequest(Throwable ex, int count, UriRequest request) {
 
         if (count > maxRetryCount || request == null) {
             LogUtil.w("The Max Retry times has been reached!");

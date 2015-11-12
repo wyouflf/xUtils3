@@ -134,7 +134,11 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         boolean retry = true;
         int retryCount = 0;
         Throwable exception = null;
-        HttpRetryHandler retryHandler = new HttpRetryHandler(this.params.getMaxRetryCount());
+        HttpRetryHandler retryHandler = this.params.getHttpRetryHandler();
+        if (retryHandler == null) {
+            retryHandler = new HttpRetryHandler();
+        }
+        retryHandler.setMaxRetryCount(this.params.getMaxRetryCount());
         request = initRequest();
 
         if (this.isCancelled()) {

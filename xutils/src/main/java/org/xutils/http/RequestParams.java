@@ -68,6 +68,7 @@ public class RequestParams {
     private String saveFilePath; // 下载文件时文件保存的路径和文件名
     private boolean multipart = false; // 是否强制使用multipart表单
     private boolean cancelFast = false; // 是否可以被立即停止, true: 为请求创建新的线程, 取消时请求线程被立即中断.
+    private HttpRetryHandler httpRetryHandler; // 自定义HttpRetryHandler
 
     /**
      * 使用空构造创建时必须, 必须是带有@HttpRequest注解的子类.
@@ -282,6 +283,14 @@ public class RequestParams {
      */
     public void setCancelFast(boolean cancelFast) {
         this.cancelFast = cancelFast;
+    }
+
+    public HttpRetryHandler getHttpRetryHandler() {
+        return httpRetryHandler;
+    }
+
+    public void setHttpRetryHandler(HttpRetryHandler httpRetryHandler) {
+        this.httpRetryHandler = httpRetryHandler;
     }
 
     public void addHeader(String name, String value) {

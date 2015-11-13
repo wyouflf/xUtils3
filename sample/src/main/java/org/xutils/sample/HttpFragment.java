@@ -113,11 +113,17 @@ public class HttpFragment extends BaseFragment {
         // 3. 在LoaderFactory注册.
     }
 
-    // 如果你只需要一个简单的版本.
+    // 上传多文件示例
     @Event(value = R.id.btn_test2)
     private void onTest2Click(View view) throws FileNotFoundException {
         RequestParams params = new RequestParams("http://192.168.0.13:8080/upload");
+        // 加到url里的参数, http://xxxx/s?wd=xUtils
         params.addQueryStringParameter("wd", "xUtils");
+        // 添加到请求body体的参数, 只有POST, PUT, PATCH, DELETE请求支持.
+        // params.addBodyParameter("wd", "xUtils");
+
+        // 使用multipart表单上传文件
+        params.setMultipart(true);
         params.addBodyParameter(
                 "file",
                 new File("/sdcard/test.jpg"),
@@ -170,6 +176,64 @@ public class HttpFragment extends BaseFragment {
     @Event(value = R.id.btn_test4)
     private void onTest4Click(View view) throws DbException {
         getActivity().startActivity(new Intent(getActivity(), DownloadActivity.class));
+    }
+
+    // 缓存示例
+    @Event(value = R.id.btn_test5)
+    private void onTest5Click(View view) throws FileNotFoundException {
+        BaiduParams params = new BaiduParams();
+        params.wd = "xUtils";
+        Callback.Cancelable cancelable
+                // 使用CacheCallback, xUtils将为该请求缓存数据.
+                = x.http().get(params, new Callback.CacheCallback<String>() {
+
+            private boolean hasError = false;
+            private String result = null;
+
+            @Override
+            public boolean onCache(String result) {
+                // 得到缓存数据
+                // * 如果信任该缓存返回 true, 将不再请求网络;
+                //   返回 false 继续请求网络, 但会在请求头中加上ETag, Last-Modified等信息,
+                //   如果服务端返回304, 则表示数据没有更新, 不继续请求数据.
+                // * 客户端会根据服务端返回的 header 中 max-age 或 expires 来确定本地缓存是否给 onCache 方法.
+                this.result = result;
+                return false;
+            }
+
+            @Override
+            public void onSuccess(String result) {
+                this.result = result;
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                hasError = true;
+                Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                if (ex instanceof HttpException) { // 网络错误
+                    HttpException httpEx = (HttpException) ex;
+                    int responseCode = httpEx.getCode();
+                    String responseMsg = httpEx.getMessage();
+                    String errorResult = httpEx.getResult();
+                    // ...
+                } else { // 其他错误
+                    // ...
+                }
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFinished() {
+                if (!hasError && result != null) {
+                    // 成功获取数据
+                    Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
 }

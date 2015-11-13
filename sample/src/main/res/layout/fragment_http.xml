@@ -34,4 +34,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="OPEN DOWNLOAD LIST" />
+
+    <Button
+        android:id="@+id/btn_test5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CACHE TEST" />
 </LinearLayout>

@@ -59,6 +59,17 @@ private void onTestBaidu1Click(View view) {
 
 ### 访问网络(更多示例参考sample项目)
 ```java
+/**
+ * 自定义实体参数类请参考:
+ * 请求注解 {@link org.xutils.http.annotation.HttpRequest}
+ * 请求注解处理模板接口 {@link org.xutils.http.app.ParamsBuilder}
+ *
+ * 需要自定义类型作为callback的泛型时, 参考:
+ * 响应注解 {@link org.xutils.http.annotation.HttpResponse}
+ * 响应注解处理模板接口 {@link org.xutils.http.app.ResponseParser}
+ *
+ * 示例: 查看 org.xutils.sample.http 包里的代码
+ */
 BaiduParams params = new BaiduParams();
 params.wd = "xUtils";
 // 有上传文件时使用multipart表单, 否则上传原始文件流.

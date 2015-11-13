@@ -63,7 +63,13 @@ public class LocalFileRequest extends UriRequest {
     }
 
     private File getFile() {
-        String filePath = queryUrl.substring(7);
+        String filePath = null;
+        if (queryUrl.startsWith("file:")) {
+            filePath = queryUrl.substring("file:".length());
+        } else {
+            filePath = queryUrl;
+        }
+        // filePath开始位置多余的"/"或被自动去掉
         return new File(filePath);
     }
 

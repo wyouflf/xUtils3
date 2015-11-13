@@ -28,7 +28,7 @@ public final class UriRequestFactory {
             } else {
                 return new AssetsRequest(params, loadType);
             }
-        } else if (uri.startsWith("file://")) {
+        } else if (uri.startsWith("file:") || uri.startsWith("/")) {
             return new LocalFileRequest(params, loadType);
         } else {
             throw new IllegalArgumentException("The url not be support: " + uri);

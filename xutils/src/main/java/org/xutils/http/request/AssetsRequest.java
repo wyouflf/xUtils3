@@ -76,7 +76,7 @@ public class AssetsRequest extends UriRequest {
     public InputStream getInputStream() throws IOException {
         if (inputStream == null) {
             if (callingClassLoader != null) {
-                String assetsPath = "assets/" + queryUrl.substring(9);
+                String assetsPath = "assets/" + queryUrl.substring("assets://".length());
                 inputStream = callingClassLoader.getResourceAsStream(assetsPath);
                 contentLength = inputStream.available();
             }

@@ -336,7 +336,7 @@ public class HttpRequest extends UriRequest {
 
         // from max-age
         String cacheControl = connection.getHeaderField("Cache-Control");
-        if (cacheControl != null) {
+        if (!TextUtils.isEmpty(cacheControl)) {
             StringTokenizer tok = new StringTokenizer(cacheControl, ",");
             while (tok.hasMoreTokens()) {
                 String token = tok.nextToken().trim().toLowerCase();

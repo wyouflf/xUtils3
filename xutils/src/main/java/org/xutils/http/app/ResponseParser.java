@@ -7,9 +7,16 @@ import java.lang.reflect.Type;
 
 /**
  * Created by wyouflf on 15/8/4.
+ * {@link org.xutils.http.annotation.HttpResponse} 注解的返回值转换模板
  */
 public interface ResponseParser {
 
+    /**
+     * 检查请求相应头等处理
+     *
+     * @param request
+     * @throws Throwable
+     */
     void checkResponse(UriRequest request) throws Throwable;
 
     /**

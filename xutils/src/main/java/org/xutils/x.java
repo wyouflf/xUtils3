@@ -9,6 +9,10 @@ import org.xutils.http.HttpManagerImpl;
 import org.xutils.image.ImageManagerImpl;
 import org.xutils.view.ViewInjectorImpl;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 
 /**
  * Created by wyouflf on 15/6/10.
@@ -73,6 +77,13 @@ public final class x {
 
         static {
             TaskControllerImpl.registerInstance();
+            // 默认信任所有https域名
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
         }
 
         public static void init(Application app) {

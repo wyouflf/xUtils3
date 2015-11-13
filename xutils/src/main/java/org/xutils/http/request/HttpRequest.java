@@ -35,6 +35,7 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Created by wyouflf on 15/7/23.
@@ -119,7 +120,10 @@ public class HttpRequest extends UriRequest {
             connection.setConnectTimeout(params.getConnectTimeout());
             connection.setInstanceFollowRedirects(params.getRedirectHandler() == null);
             if (connection instanceof HttpsURLConnection) {
-                ((HttpsURLConnection) connection).setSSLSocketFactory(params.getSslSocketFactory());
+                SSLSocketFactory sslSocketFactory = params.getSslSocketFactory();
+                if (sslSocketFactory != null) {
+                    ((HttpsURLConnection) connection).setSSLSocketFactory(sslSocketFactory);
+                }
             }
         }
 

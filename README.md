@@ -170,8 +170,16 @@ List<Parent> testList = db.selector(Parent.class).where("id", "between", new Str
 ### 绑定图片(更多示例参考sample项目)
 ```java
 x.image().bind(imageView, url, imageOptions);
-x.image().bind(imageView, "file:///sdcard/test.gif", imageOptions);
+
+// assets file
 x.image().bind(imageView, "assets://test.gif", imageOptions);
+
+// local file
+x.image().bind(imageView, new File("/sdcard/test.gif").toURI().toString(), imageOptions);
+x.image().bind(imageView, "/sdcard/test.gif", imageOptions);
+x.image().bind(imageView, "file:///sdcard/test.gif", imageOptions);
+x.image().bind(imageView, "file:/sdcard/test.gif", imageOptions);
+
 x.image().bind(imageView, url, imageOptions, new Callback.CommonCallback<Drawable>() {...});
 x.image().loadDrawable(url, imageOptions, new Callback.CommonCallback<Drawable>() {...});
 x.image().loadFile(url, imageOptions, new Callback.CommonCallback<File>() {...});

@@ -178,7 +178,9 @@ public class HttpFragment extends BaseFragment {
         getActivity().startActivity(new Intent(getActivity(), DownloadActivity.class));
     }
 
-    // 缓存示例
+    /**
+     * 缓存示例, 更复杂的例子参考 {@link org.xutils.image.ImageLoader}
+     */
     @Event(value = R.id.btn_test5)
     private void onTest5Click(View view) throws FileNotFoundException {
         BaiduParams params = new BaiduParams();

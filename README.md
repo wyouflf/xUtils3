@@ -159,6 +159,62 @@ private void onTestBaidu2Click(View view) {
     });
 }
 ````
+#### 带有缓存的请求示例:
+```java
+BaiduParams params = new BaiduParams();
+params.wd = "xUtils";
+Callback.Cancelable cancelable
+		// 使用CacheCallback, xUtils将为该请求缓存数据.
+		= x.http().get(params, new Callback.CacheCallback<String>() {
+
+	private boolean hasError = false;
+	private String result = null;
+
+	@Override
+	public boolean onCache(String result) {
+		// 得到缓存数据
+		// * 如果信任该缓存返回 true, 将不再请求网络;
+		//   返回 false 继续请求网络, 但会在请求头中加上ETag, Last-Modified等信息,
+		//   如果服务端返回304, 则表示数据没有更新, 不继续请求数据.
+		// * 客户端会根据服务端返回的 header 中 max-age 或 expires 来确定本地缓存是否给 onCache 方法.
+		this.result = result;
+		return false;
+	}
+
+	@Override
+	public void onSuccess(String result) {
+		this.result = result;
+	}
+
+	@Override
+	public void onError(Throwable ex, boolean isOnCallback) {
+		hasError = true;
+		Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+		if (ex instanceof HttpException) { // 网络错误
+			HttpException httpEx = (HttpException) ex;
+			int responseCode = httpEx.getCode();
+			String responseMsg = httpEx.getMessage();
+			String errorResult = httpEx.getResult();
+			// ...
+		} else { // 其他错误
+			// ...
+		}
+	}
+
+	@Override
+	public void onCancelled(CancelledException cex) {
+		Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+	}
+
+	@Override
+	public void onFinished() {
+		if (!hasError && result != null) {
+			// 成功获取数据
+			Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+		}
+	}
+});
+```
 
 ### 使用数据库(更多示例参考sample项目)
 ```java

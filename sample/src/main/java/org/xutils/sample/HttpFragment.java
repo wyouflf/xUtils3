@@ -74,6 +74,12 @@ public class HttpFragment extends BaseFragment {
                  * ...(可参考{@link org.xutils.image.ImageLoader}
                  * 或 示例代码中的 {@link org.xutils.sample.download.DownloadCallback})
                  *
+                 * 3. 请求过程拦截或记录日志: 参考 {@link org.xutils.http.app.RequestTracker}
+                 *
+                 * 4. 请求Header获取: 参考 {@link }
+                 *
+                 * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
+                 *
                  **/
                 new Callback.CommonCallback<String>() {
                     @Override

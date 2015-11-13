@@ -8,7 +8,6 @@ import org.xutils.http.annotation.HttpRequest;
 
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -31,8 +30,11 @@ public class DefaultParamsBuilder implements ParamsBuilder {
 
     @Override
     public String buildCacheKey(RequestParams params, String[] cacheKeys) {
-        String cacheKey = params.getUri() + "@";
+        String cacheKey = null;
         if (cacheKeys != null && cacheKeys.length > 0) {
+
+            cacheKey = params.getUri() + "?";
+
             // 添加cacheKeys对应的queryParams
             HashMap<String, String> queryParams = params.getQueryStringParams();
             if (queryParams != null) {
@@ -40,18 +42,6 @@ public class DefaultParamsBuilder implements ParamsBuilder {
                     String value = queryParams.get(key);
                     if (!TextUtils.isEmpty(value)) {
                         cacheKey += key + "=" + value + "&";
-                    }
-                }
-            }
-        } else {
-            // 添加所有queryParams
-            HashMap<String, String> queryParams = params.getQueryStringParams();
-            if (queryParams != null) {
-                for (Map.Entry<String, String> entry : queryParams.entrySet()) {
-                    String name = entry.getKey();
-                    String value = entry.getValue();
-                    if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
-                        cacheKey += name + "=" + value + "&";
                     }
                 }
             }

@@ -112,19 +112,17 @@ public class RequestParams {
         initEntityParams();
 
         // build uri & cacheKey
+        buildUri = uri;
         HttpRequest httpRequest = this.getHttpRequest();
         if (httpRequest != null) {
             builder = httpRequest.builder().newInstance();
             buildUri = builder.buildUri(httpRequest);
             builder.buildParams(this);
             builder.buildSign(this, httpRequest.signs());
-            buildCacheKey = builder.buildCacheKey(this, httpRequest.cacheKeys());
             sslSocketFactory = builder.getSSLSocketFactory();
         } else if (this.builder != null) {
-            buildUri = uri;
             builder.buildParams(this);
             builder.buildSign(this, signs);
-            buildCacheKey = builder.buildCacheKey(this, cacheKeys);
             sslSocketFactory = builder.getSSLSocketFactory();
         }
     }
@@ -134,6 +132,14 @@ public class RequestParams {
     }
 
     public String getCacheKey() {
+        if (TextUtils.isEmpty(buildCacheKey) && builder != null) {
+            HttpRequest httpRequest = this.getHttpRequest();
+            if (httpRequest != null) {
+                buildCacheKey = builder.buildCacheKey(this, httpRequest.cacheKeys());
+            } else {
+                buildCacheKey = builder.buildCacheKey(this, cacheKeys);
+            }
+        }
         return buildCacheKey;
     }
 
@@ -571,8 +577,11 @@ public class RequestParams {
         addEntityParams2Map(type.getSuperclass());
     }
 
+    private boolean invokedGetHttpRequest = false;
+
     private HttpRequest getHttpRequest() {
-        if (httpRequest == null) {
+        if (httpRequest == null && !invokedGetHttpRequest) {
+            invokedGetHttpRequest = true;
             Class<?> thisCls = this.getClass();
             if (thisCls != RequestParams.class) {
                 httpRequest = thisCls.getAnnotation(HttpRequest.class);

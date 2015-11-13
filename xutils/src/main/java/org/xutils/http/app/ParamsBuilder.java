@@ -22,7 +22,7 @@ public interface ParamsBuilder {
 
     /**
      * 根据注解的cacheKeys构建缓存的自定义key,
-     * 默认使用 url 和整个 query string 组成.
+     * 如果返回null, 默认使用 url 和整个 query string 组成.
      *
      * @param params
      * @param cacheKeys

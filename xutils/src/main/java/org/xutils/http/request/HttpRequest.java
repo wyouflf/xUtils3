@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -275,11 +276,9 @@ public class HttpRequest extends UriRequest {
     public void close() throws IOException {
         if (inputStream != null) {
             IOUtil.closeQuietly(inputStream);
-            inputStream = null;
         }
         if (connection != null) {
             connection.disconnect();
-            connection = null;
         }
     }
 
@@ -331,12 +330,43 @@ public class HttpRequest extends UriRequest {
 
     @Override
     public long getExpiration() {
-        if (connection == null) return -1;
-        long result = connection.getExpiration();
-        if (result <= 0) {
-            result = Long.MAX_VALUE;
+        if (connection == null) return -1L;
+
+        long expiration = -1L;
+
+        // from max-age
+        String cacheControl = connection.getHeaderField("Cache-Control");
+        if (cacheControl != null) {
+            StringTokenizer tok = new StringTokenizer(cacheControl, ",");
+            while (tok.hasMoreTokens()) {
+                String token = tok.nextToken().trim().toLowerCase();
+                if (token.startsWith("max-age")) {
+                    int eqIdx = token.indexOf('=');
+                    if (eqIdx > 0) {
+                        try {
+                            String value = token.substring(eqIdx + 1).trim();
+                            long seconds = Long.parseLong(value);
+                            if (seconds > 0L) {
+                                expiration = System.currentTimeMillis() + seconds * 1000L;
+                            }
+                        } catch (Throwable ex) {
+                            LogUtil.e(ex.getMessage(), ex);
+                        }
+                    }
+                    break;
+                }
+            }
         }
-        return result;
+
+        // from expires
+        if (expiration <= 0L) {
+            expiration = connection.getExpiration();
+        }
+
+        if (expiration <= 0) {
+            expiration = Long.MAX_VALUE;
+        }
+        return expiration;
     }
 
     @Override

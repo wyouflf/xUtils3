@@ -459,7 +459,7 @@ public final class DbManagerImpl implements DbManager {
         if (!table.tableIsExist()) {
             SqlInfo sqlInfo = SqlInfoBuilder.buildCreateTableSqlInfo(table);
             execNonQuery(sqlInfo);
-            String execAfterTableCreated = table.getRunOnTableCreated();
+            String execAfterTableCreated = table.getOnCreated();
             if (!TextUtils.isEmpty(execAfterTableCreated)) {
                 execNonQuery(execAfterTableCreated);
             }

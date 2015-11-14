@@ -5,11 +5,11 @@ import android.widget.TextView;
 
 import org.xutils.DbManager;
 import org.xutils.db.table.DbModel;
+import org.xutils.sample.db.Child;
+import org.xutils.sample.db.Parent;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
 import org.xutils.view.annotation.ViewInject;
-import org.xutils.sample.db.Child;
-import org.xutils.sample.db.Parent;
 import org.xutils.x;
 
 import java.io.File;
@@ -42,6 +42,13 @@ public class DbFragment extends BaseFragment {
 
     @Event(R.id.btn_test_db)
     private void onTestDbClick(View view) {
+
+        // 一对多: (本示例的代码)
+        // 自己在多的一方(child)保存另一方的(parentId), 查找的时候用parentId查parent或child.
+        // 一对一:
+        // 在任何一边保存另一边的Id并加上唯一属性: @Column(name = "parentId", property = "UNIQUE")
+        // 多对多:
+        // 再建一个关联表, 保存两边的id. 查询分两步: 先查关联表得到id, 再查对应表的属性.
 
         String temp = "";
 

@@ -18,12 +18,12 @@ compile 'org.xutils:xutils:3.0'
 
 
 #### 使用前配置
-需要的权限
+##### 需要的权限
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 ```
-#### 初始化
+##### 初始化
 ```java
 // 在application的onCreate中初始化
 @Override

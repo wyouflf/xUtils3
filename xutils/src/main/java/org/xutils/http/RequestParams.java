@@ -537,6 +537,12 @@ public class RequestParams {
                         result = new InputStreamBody((InputStream) value, contentType);
                     } else if (value instanceof byte[]) {
                         result = new InputStreamBody(new ByteArrayInputStream((byte[]) value), contentType);
+                    } else if (value instanceof String) {
+                        // invoke addBodyParameter(key, stringValue, contentType)
+                        result = new StringBody((String) value, charset);
+                        result.setContentType(contentType);
+                    } else {
+                        LogUtil.w("Some params will be ignored!");
                     }
                     break;
                 }

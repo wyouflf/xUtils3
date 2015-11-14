@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.Proxy;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -51,7 +52,7 @@ public class RequestParams {
     private HashMap<String, String> headers;
     private HashMap<String, String> queryStringParams;
     private HashMap<String, String> bodyParams;
-    private HashMap<String, Object> fileParams;
+    private LinkedHashMap<String, Object> fileParams;
     private RequestBody requestBody;
 
     // 扩展参数
@@ -383,7 +384,7 @@ public class RequestParams {
      */
     public void addBodyParameter(String name, Object value, String contentType) {
         if (this.fileParams == null) {
-            this.fileParams = new HashMap<String, Object>();
+            this.fileParams = new LinkedHashMap<String, Object>();
         }
         if (TextUtils.isEmpty(contentType)) {
             this.fileParams.put(name, value);
@@ -402,7 +403,7 @@ public class RequestParams {
      */
     public void addBodyParameter(String name, Object value, String contentType, String fileName) {
         if (this.fileParams == null) {
-            this.fileParams = new HashMap<String, Object>();
+            this.fileParams = new LinkedHashMap<String, Object>();
         }
         if (TextUtils.isEmpty(contentType) && TextUtils.isEmpty(fileName)) {
             this.fileParams.put(name, value);
@@ -613,7 +614,7 @@ public class RequestParams {
 
         if (bodyParams != null && (multipart || (fileParams != null && fileParams.size() > 0))) {
             if (this.fileParams == null) {
-                this.fileParams = new HashMap<String, Object>();
+                this.fileParams = new LinkedHashMap<String, Object>();
             }
             fileParams.putAll(bodyParams);
             bodyParams.clear();

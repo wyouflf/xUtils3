@@ -542,7 +542,7 @@ public class RequestParams {
                         result = new StringBody((String) value, charset);
                         result.setContentType(contentType);
                     } else {
-                        LogUtil.w("Some params will be ignored!");
+                        LogUtil.w("Some params will be ignored for: " + this.getUri());
                     }
                     break;
                 }

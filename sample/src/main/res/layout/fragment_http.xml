@@ -14,7 +14,7 @@
         android:id="@+id/btn_test2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TEST BAIDU 2" />
+        android:text="UPLOAD TEST" />
 
     <EditText
         android:id="@+id/et_url"

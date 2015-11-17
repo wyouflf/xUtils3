@@ -20,11 +20,11 @@ public final class DensityUtil {
     }
 
     public static int dip2px(float dpValue) {
-        return (int) (dpValue * getDensity() + 0.5f);
+        return (int) (dpValue * getDensity() + 0.5F);
     }
 
     public static int px2dip(float pxValue) {
-        return (int) (pxValue / getDensity() + 0.5f);
+        return (int) (pxValue / getDensity() + 0.5F);
     }
 
     public static int getScreenWidth() {

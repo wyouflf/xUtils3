@@ -200,7 +200,7 @@ import java.util.concurrent.Executor;
                         assert args != null;
                         Throwable throwable = (Throwable) args[0];
                         LogUtil.e(throwable.getMessage(), throwable);
-                        taskProxy.task.onError((Throwable) args[0], false);
+                        taskProxy.task.onError(throwable, false);
                         break;
                     }
                     case MSG_WHAT_ON_UPDATE: {

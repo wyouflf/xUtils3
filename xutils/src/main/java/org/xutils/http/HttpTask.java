@@ -155,6 +155,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             while (retry) {
                 try {
                     clearRawResult();
+                    LogUtil.d("load cache: " + this.request.getRequestUri());
                     rawResult = this.request.loadResultFromCache();
                     break;
                 } catch (Throwable ex) {
@@ -230,6 +231,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 try {
                     clearRawResult();
                     // 开始请求工作
+                    LogUtil.d("load: " + this.request.getRequestUri());
                     requestWorker = new RequestWorker();
                     if (params.isCancelFast()) {
                         requestWorker.start();

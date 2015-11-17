@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 
 /**
  * Created by wyouflf on 15/8/21.
+ * 图片加载参数
  */
 public class ImageOptions {
 

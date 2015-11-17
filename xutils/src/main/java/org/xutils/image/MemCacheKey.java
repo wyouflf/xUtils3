@@ -30,4 +30,9 @@ package org.xutils.image;
         result = 31 * result + options.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return url + options.toString();
+    }
 }

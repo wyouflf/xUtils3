@@ -21,18 +21,21 @@ import java.text.DecimalFormat;
  */
 public final class ProcessLock implements Closeable {
 
-    private FileLock mFileLock = null;
-    private File mFile;
-    private Closeable mStream;
+    private final String mLockName;
+    private final FileLock mFileLock;
+    private final File mFile;
+    private final Closeable mStream;
 
-    private final static long MAX_AGE = 1000 * 60; // 1min
+    private final static long MAX_AGE = 1000L * 60; // 1min
     private final static String LOCK_FILE_DIR = "process_lock";
+    private final static int PID = android.os.Process.myPid();
 
     static {
         IOUtil.deleteFileOrDir(x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE));
     }
 
-    private ProcessLock(FileLock fileLock, File file, Closeable stream) {
+    private ProcessLock(String lockName, File file, FileLock fileLock, Closeable stream) {
+        mLockName = lockName;
         mFileLock = fileLock;
         mFile = file;
         mStream = stream;
@@ -71,8 +74,8 @@ public final class ProcessLock implements Closeable {
                 if (channel != null) {
                     FileLock fileLock = channel.tryLock(0L, Long.MAX_VALUE, !writeMode);
                     if (isValid(fileLock)) {
-                        LogUtil.d("lock: " + file.getName() + ":" + android.os.Process.myPid());
-                        return new ProcessLock(fileLock, file, stream);
+                        LogUtil.d("lock: " + file.getName() + ":" + PID);
+                        return new ProcessLock(lockName, file, fileLock, stream);
                     } else {
                         release(fileLock, file, out);
                     }
@@ -145,7 +148,7 @@ public final class ProcessLock implements Closeable {
     }
 
     private static void release(FileLock fileLock, File file, Closeable stream) {
-        LogUtil.d("release: " + file.getName() + ":" + android.os.Process.myPid());
+        LogUtil.d("release: " + file.getName() + ":" + PID);
         if (fileLock != null) {
             IOUtil.closeQuietly(stream);
             IOUtil.closeQuietly(fileLock.channel());
@@ -173,6 +176,11 @@ public final class ProcessLock implements Closeable {
             hash = (255.0 * hash + bytes[i]) * 0.005;
         }
         return FORMAT.format(hash);
+    }
+
+    @Override
+    public String toString() {
+        return mLockName;
     }
 
     @Override

@@ -646,4 +646,9 @@ public class RequestParams {
             bodyParams = null;
         }
     }
+
+    @Override
+    public String toString() {
+        return getUri();
+    }
 }

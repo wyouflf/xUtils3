@@ -464,6 +464,24 @@ public final class ImageDecoder {
     }
 
     /**
+     * 压缩bitmap, 更好的支持webp.
+     *
+     * @param bitmap
+     * @param format
+     * @param quality
+     * @param out
+     * @throws IOException
+     */
+    public static void compress(Bitmap bitmap, Bitmap.CompressFormat format, int quality, OutputStream out) throws IOException {
+        if (format == Bitmap.CompressFormat.WEBP) {
+            byte[] data = WebPFactory.nativeEncodeBitmap(bitmap, quality);
+            out.write(data);
+        } else {
+            bitmap.compress(format, quality, out);
+        }
+    }
+
+    /**
      * 根据文件的修改时间和图片的属性保存缩略图
      *
      * @param file

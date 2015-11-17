@@ -23,7 +23,7 @@ public final class DownloadManager {
 
     private static DownloadManager instance;
 
-    private final static int MAX_DOWNLOAD_THREAD = 3; // 有效的值范围[1, 3]
+    private final static int MAX_DOWNLOAD_THREAD = 2; // 有效的值范围[1, 3], 设置为3时, 可能阻塞图片加载.
 
     private final DbManager db;
     private final Executor executor = new PriorityExecutor(MAX_DOWNLOAD_THREAD);

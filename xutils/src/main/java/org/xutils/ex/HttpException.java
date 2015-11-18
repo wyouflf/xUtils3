@@ -85,4 +85,9 @@ public class HttpException extends BaseException {
     public void setResult(String result) {
         this.result = result;
     }
+
+    @Override
+    public String toString() {
+        return "code: " + code + ", msg: " + getMessage() + ", result: " + result;
+    }
 }

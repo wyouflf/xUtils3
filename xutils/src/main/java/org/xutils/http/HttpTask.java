@@ -134,6 +134,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
         // 初始化请求参数
         ResultType result = null;
+        request = initRequest();
+        // retry 初始化
         boolean retry = true;
         int retryCount = 0;
         Throwable exception = null;
@@ -142,7 +144,6 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             retryHandler = new HttpRetryHandler();
         }
         retryHandler.setMaxRetryCount(this.params.getMaxRetryCount());
-        request = initRequest();
 
         if (this.isCancelled()) {
             throw new Callback.CancelledException("cancelled before request");
@@ -152,17 +153,12 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         Object cacheResult = null;
         if (cacheCallback != null && HttpMethod.permitsCache(params.getMethod())) {
             // 尝试从缓存获取结果, 并为请求头加入缓存控制参数.
-            while (retry) {
-                try {
-                    clearRawResult();
-                    LogUtil.d("load cache: " + this.request.getRequestUri());
-                    rawResult = this.request.loadResultFromCache();
-                    break;
-                } catch (Throwable ex) {
-                    LogUtil.w("load disk cache error", ex);
-                    exception = ex;
-                    retry = retryHandler.retryRequest(ex, ++retryCount, this.request);
-                }
+            try {
+                clearRawResult();
+                LogUtil.d("load cache: " + this.request.getRequestUri());
+                rawResult = this.request.loadResultFromCache();
+            } catch (Throwable ex) {
+                LogUtil.w("load disk cache error", ex);
             }
 
             if (this.isCancelled()) {

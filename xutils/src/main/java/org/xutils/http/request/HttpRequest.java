@@ -199,6 +199,7 @@ public class HttpRequest extends UriRequest {
                 httpException.setResult(IOUtil.readStr(connection.getInputStream(), params.getCharset()));
             } catch (Throwable ignored) {
             }
+            LogUtil.e(httpException.toString() + ", url: " + queryUrl);
             throw httpException;
         }
 

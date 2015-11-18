@@ -72,12 +72,17 @@ public class HttpRequest extends UriRequest {
                 String name = entry.getKey();
                 String value = entry.getValue();
                 if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
-                    queryBuilder.append(Uri.encode(name)).append("=").append(Uri.encode(value)).append("&");
+                    queryBuilder.append(
+                            Uri.encode(name, params.getCharset()))
+                            .append("=")
+                            .append(Uri.encode(value, params.getCharset()))
+                            .append("&");
                 }
             }
-            if (queryBuilder.charAt(queryBuilder.length() - 1) == '&') {
-                queryBuilder.deleteCharAt(queryBuilder.length() - 1);
-            }
+        }
+
+        if (queryBuilder.charAt(queryBuilder.length() - 1) == '&') {
+            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
         }
 
         if (queryBuilder.charAt(queryBuilder.length() - 1) == '?') {

@@ -168,7 +168,13 @@ public final class ImageDecoder {
         return false;
     }
 
-    public static Bitmap decodeBitmap(final File file, final ImageOptions options, Callback.Cancelable cancelable) throws IOException {
+    public static Bitmap decodeBitmap(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
+        // check params
+        if (file == null || !file.exists() || file.length() < 1) return null;
+        if (options == null) {
+            options = ImageOptions.DEFAULT;
+        }
+
         Bitmap result = null;
         try {
             if (cancelable != null && cancelable.isCancelled()) {
@@ -257,6 +263,12 @@ public final class ImageDecoder {
     }
 
     public static Movie decodeGif(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
+        // check params
+        if (file == null || !file.exists() || file.length() < 1) return null;
+        //if (options == null) {
+        //    options = ImageOptions.DEFAULT; // not use
+        //}
+
         InputStream in = null;
         try {
             if (cancelable != null && cancelable.isCancelled()) {

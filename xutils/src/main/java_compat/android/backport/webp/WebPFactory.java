@@ -11,8 +11,7 @@ import android.graphics.BitmapFactory;
 @SuppressWarnings("JniMissingFunction")
 public final class WebPFactory {
     static {
-        // 4.x的设备仍然不能很好的兼容webp
-        // 需要借助libwebp
+        // 部分4.x的设备仍然不能很好的兼容webp, 需要借助libwebp.
         System.loadLibrary("webpbackport");
     }
 

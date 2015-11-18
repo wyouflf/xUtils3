@@ -215,7 +215,11 @@ public final class TaskControllerImpl implements TaskController {
      */
     @Override
     public void run(Runnable runnable) {
-        TaskProxy.sDefaultExecutor.execute(runnable);
+        if (!TaskProxy.sDefaultExecutor.isBusy()) {
+            TaskProxy.sDefaultExecutor.execute(runnable);
+        } else {
+            new Thread(runnable).start();
+        }
     }
 
     @Override

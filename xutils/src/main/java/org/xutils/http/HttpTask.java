@@ -55,7 +55,6 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     private static final PriorityExecutor HTTP_EXECUTOR = new PriorityExecutor(5);
     private static final PriorityExecutor CACHE_EXECUTOR = new PriorityExecutor(5);
-    private static final PriorityExecutor CLOSE_EXECUTOR = new PriorityExecutor(5);
 
 
     public HttpTask(RequestParams params, Callback.Cancelable cancelHandler,
@@ -397,7 +396,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     @Override
     protected void cancelWorks() {
-        CLOSE_EXECUTOR.execute(new Runnable() {
+        x.task().run(new Runnable() {
             @Override
             public void run() {
                 if (requestWorker != null && params.isCancelFast()) {

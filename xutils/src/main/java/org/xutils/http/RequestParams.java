@@ -50,8 +50,8 @@ public class RequestParams {
     private HttpMethod method;
     private String bodyContent;
     private HashMap<String, String> headers;
-    private HashMap<String, String> queryStringParams;
-    private HashMap<String, String> bodyParams;
+    private LinkedHashMap<String, String> queryStringParams;
+    private LinkedHashMap<String, String> bodyParams;
     private LinkedHashMap<String, Object> fileParams;
     private RequestBody requestBody;
 
@@ -357,7 +357,7 @@ public class RequestParams {
      */
     public void addQueryStringParameter(String name, String value) {
         if (this.queryStringParams == null) {
-            this.queryStringParams = new HashMap<String, String>();
+            this.queryStringParams = new LinkedHashMap<String, String>();
         }
         this.queryStringParams.put(name, value);
     }
@@ -370,7 +370,7 @@ public class RequestParams {
      */
     public void addBodyParameter(String name, String value) {
         if (this.bodyParams == null) {
-            this.bodyParams = new HashMap<String, String>();
+            this.bodyParams = new LinkedHashMap<String, String>();
         }
         this.bodyParams.put(name, value);
     }
@@ -604,7 +604,7 @@ public class RequestParams {
                         || !TextUtils.isEmpty(bodyContent)
                         || requestBody != null)) {
             if (this.queryStringParams == null) {
-                this.queryStringParams = new HashMap<String, String>();
+                this.queryStringParams = new LinkedHashMap<String, String>();
             }
             for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
                 String key = entry.getKey();

@@ -83,10 +83,11 @@ import java.util.concurrent.atomic.AtomicLong;
         MEM_CACHE.resize(cacheSize);
     }
 
-    public ImageLoader() {
+    private ImageLoader() {
     }
 
-    public static void clearCacheFiles() {
+    /*package*/
+    static void clearCacheFiles() {
         LruDiskCache.getDiskCache(DISK_CACHE_DIR_NAME).clearCacheFiles();
     }
 
@@ -99,9 +100,10 @@ import java.util.concurrent.atomic.AtomicLong;
      * @param options
      * @param callback
      */
-    public static Cancelable doLoadDrawable(final String url,
-                                            final ImageOptions options,
-                                            final Callback.CommonCallback<Drawable> callback) {
+    /*package*/
+    static Cancelable doLoadDrawable(final String url,
+                                     final ImageOptions options,
+                                     final Callback.CommonCallback<Drawable> callback) {
         if (TextUtils.isEmpty(url)) {
             postBindArgsException(null, options, "url is null", callback);
             return null;
@@ -124,9 +126,10 @@ import java.util.concurrent.atomic.AtomicLong;
      * @param options
      * @param callback
      */
-    public static Cancelable doLoadFile(final String url,
-                                        final ImageOptions options,
-                                        final Callback.CommonCallback<File> callback) {
+    /*package*/
+    static Cancelable doLoadFile(final String url,
+                                 final ImageOptions options,
+                                 final Callback.CommonCallback<File> callback) {
         if (TextUtils.isEmpty(url)) {
             postBindArgsException(null, options, "url is null", callback);
             return null;
@@ -154,10 +157,11 @@ import java.util.concurrent.atomic.AtomicLong;
      * @param options
      * @param callback
      */
-    public static Cancelable doBind(final ImageView view,
-                                    final String url,
-                                    final ImageOptions options,
-                                    final Callback.CommonCallback<Drawable> callback) {
+    /*package*/
+    static Cancelable doBind(final ImageView view,
+                             final String url,
+                             final ImageOptions options,
+                             final Callback.CommonCallback<Drawable> callback) {
 
         // check params
         ImageOptions localOptions = options;

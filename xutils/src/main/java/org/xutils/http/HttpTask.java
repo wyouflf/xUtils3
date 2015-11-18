@@ -55,6 +55,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     private static final PriorityExecutor HTTP_EXECUTOR = new PriorityExecutor(5);
     private static final PriorityExecutor CACHE_EXECUTOR = new PriorityExecutor(5);
+    private static final PriorityExecutor CLOSE_EXECUTOR = new PriorityExecutor(5);
 
 
     public HttpTask(RequestParams params, Callback.Cancelable cancelHandler,
@@ -396,10 +397,19 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     @Override
     protected void cancelWorks() {
-        if (requestWorker != null && params.isCancelFast()) {
-            requestWorker.interrupt();
-        }
-        IOUtil.closeQuietly(request);
+        CLOSE_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (requestWorker != null && params.isCancelFast()) {
+                    try {
+                        requestWorker.interrupt();
+                    } catch (Throwable ignored) {
+                    }
+                }
+                // wtf: okhttp close the inputStream be locked by BufferedInputStream#read
+                IOUtil.closeQuietly(request);
+            }
+        });
     }
 
     @Override

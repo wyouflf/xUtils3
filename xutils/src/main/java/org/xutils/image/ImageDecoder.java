@@ -168,6 +168,15 @@ public final class ImageDecoder {
         return false;
     }
 
+    /**
+     * 转化文件为Bitmap, 更好的支持WEBP.
+     *
+     * @param file
+     * @param options
+     * @param cancelable
+     * @return
+     * @throws IOException
+     */
     public static Bitmap decodeBitmap(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
         // check params
         if (file == null || !file.exists() || file.length() < 1) return null;
@@ -235,13 +244,13 @@ public final class ImageDecoder {
                     return null;
                 }
                 if (rotateAngle != 0) {
-                    bitmap = rotate(bitmap, rotateAngle);
+                    bitmap = rotate(bitmap, rotateAngle, true);
                 }
                 if (cancelable != null && cancelable.isCancelled()) {
                     return null;
                 }
                 if (options.isCrop() && optionWith > 0 && optionHeight > 0) {
-                    bitmap = createCenterCropScaledBitmap(bitmap, optionWith, optionHeight);
+                    bitmap = cut2ScaleSize(bitmap, optionWith, optionHeight, true);
                 }
             }
 
@@ -254,11 +263,11 @@ public final class ImageDecoder {
                     return null;
                 }
                 if (options.isCircular()) {
-                    bitmap = createCircularImage(bitmap);
+                    bitmap = cut2Circular(bitmap, true);
                 } else if (options.getRadius() > 0) {
-                    bitmap = createRoundCornerImage(bitmap, options.getRadius(), options.isSquare());
+                    bitmap = cut2RoundCorner(bitmap, options.getRadius(), options.isSquare(), true);
                 } else if (options.isSquare()) {
-                    bitmap = createSquareImage(bitmap);
+                    bitmap = cut2Square(bitmap, true);
                 }
             }
 
@@ -277,6 +286,15 @@ public final class ImageDecoder {
         return result;
     }
 
+    /**
+     * 转换文件为Movie, 可用于创建GifDrawable.
+     *
+     * @param file
+     * @param options
+     * @param cancelable
+     * @return
+     * @throws IOException
+     */
     public static Movie decodeGif(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
         // check params
         if (file == null || !file.exists() || file.length() < 1) return null;
@@ -305,6 +323,15 @@ public final class ImageDecoder {
         }
     }
 
+    /**
+     * 计算压缩采样倍数
+     *
+     * @param rawWidth
+     * @param rawHeight
+     * @param maxWidth
+     * @param maxHeight
+     * @return
+     */
     public static int calculateSampleSize(final int rawWidth, final int rawHeight,
                                           final int maxWidth, final int maxHeight) {
         int sampleSize = 1;
@@ -331,7 +358,14 @@ public final class ImageDecoder {
         return sampleSize;
     }
 
-    public static Bitmap createSquareImage(Bitmap source) {
+    /**
+     * 裁剪方形图片
+     *
+     * @param source
+     * @param recycleSource 裁剪成功后销毁原图
+     * @return
+     */
+    public static Bitmap cut2Square(Bitmap source, boolean recycleSource) {
         int width = source.getWidth();
         int height = source.getHeight();
         if (width == height) {
@@ -342,7 +376,7 @@ public final class ImageDecoder {
         Bitmap result = Bitmap.createBitmap(source, (width - squareWith) / 2,
                 (height - squareWith) / 2, squareWith, squareWith);
         if (result != null) {
-            if (result != source) {
+            if (recycleSource && result != source) {
                 source.recycle();
                 source = null;
             }
@@ -352,7 +386,14 @@ public final class ImageDecoder {
         return result;
     }
 
-    public static Bitmap createCircularImage(Bitmap source) {
+    /**
+     * 裁剪圆形图片
+     *
+     * @param source
+     * @param recycleSource 裁剪成功后销毁原图
+     * @return
+     */
+    public static Bitmap cut2Circular(Bitmap source, boolean recycleSource) {
         int width = source.getWidth();
         int height = source.getHeight();
         int diameter = Math.min(width, height);
@@ -364,15 +405,26 @@ public final class ImageDecoder {
             canvas.drawCircle(diameter / 2, diameter / 2, diameter / 2, paint);
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
             canvas.drawBitmap(source, (diameter - width) / 2, (diameter - height) / 2, paint);
-            source.recycle();
-            source = null;
+            if (recycleSource) {
+                source.recycle();
+                source = null;
+            }
         } else {
             result = source;
         }
         return result;
     }
 
-    public static Bitmap createRoundCornerImage(Bitmap source, int radius, boolean isSquare) {
+    /**
+     * 裁剪圆角
+     *
+     * @param source
+     * @param radius
+     * @param isSquare
+     * @param recycleSource 裁剪成功后销毁原图
+     * @return
+     */
+    public static Bitmap cut2RoundCorner(Bitmap source, int radius, boolean isSquare, boolean recycleSource) {
         if (radius <= 0) return source;
 
         int sourceWidth = source.getWidth();
@@ -393,15 +445,26 @@ public final class ImageDecoder {
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
             canvas.drawBitmap(source,
                     (targetWidth - sourceWidth) / 2, (targetHeight - sourceHeight) / 2, paint);
-            source.recycle();
-            source = null;
+            if (recycleSource) {
+                source.recycle();
+                source = null;
+            }
         } else {
             result = source;
         }
         return result;
     }
 
-    public static Bitmap createCenterCropScaledBitmap(Bitmap source, int dstWidth, int dstHeight) {
+    /**
+     * 裁剪并缩放至指定大小
+     *
+     * @param source
+     * @param dstWidth
+     * @param dstHeight
+     * @param recycleSource 裁剪成功后销毁原图
+     * @return
+     */
+    public static Bitmap cut2ScaleSize(Bitmap source, int dstWidth, int dstHeight, boolean recycleSource) {
         final int width = source.getWidth();
         final int height = source.getHeight();
         if (width == dstWidth && height == dstHeight) {
@@ -434,7 +497,7 @@ public final class ImageDecoder {
         Bitmap result = Bitmap.createBitmap(source, l, t, r - l, b - t, m, true);
 
         if (result != null) {
-            if (result != source) {
+            if (recycleSource && result != source) {
                 source.recycle();
                 source = null;
             }
@@ -444,7 +507,15 @@ public final class ImageDecoder {
         return result;
     }
 
-    public static Bitmap rotate(Bitmap source, int angle) {
+    /**
+     * 旋转图片
+     *
+     * @param source
+     * @param angle
+     * @param recycleSource
+     * @return
+     */
+    public static Bitmap rotate(Bitmap source, int angle, boolean recycleSource) {
         Bitmap result = null;
 
         if (angle != 0) {
@@ -459,7 +530,7 @@ public final class ImageDecoder {
         }
 
         if (result != null) {
-            if (result != source) {
+            if (recycleSource && result != source) {
                 source.recycle();
                 source = null;
             }
@@ -469,6 +540,12 @@ public final class ImageDecoder {
         return result;
     }
 
+    /**
+     * 获取图片旋转角度
+     *
+     * @param filePath
+     * @return
+     */
     public static int getRotateAngle(String filePath) {
         int angle = 0;
         try {

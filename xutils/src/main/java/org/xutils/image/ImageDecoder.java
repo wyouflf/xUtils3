@@ -187,9 +187,13 @@ public final class ImageDecoder {
             bitmapOps.inPurgeable = true;
             bitmapOps.inInputShareable = true;
             BitmapFactory.decodeFile(file.getAbsolutePath(), bitmapOps);
+            bitmapOps.inJustDecodeBounds = false;
+            bitmapOps.inPreferredConfig = options.getConfig();
             int rotateAngle = 0;
             int rawWidth = bitmapOps.outWidth;
             int rawHeight = bitmapOps.outHeight;
+            int optionWith = options.getWidth();
+            int optionHeight = options.getHeight();
             if (options.isAutoRotate()) {
                 rotateAngle = getRotateAngle(file.getAbsolutePath());
                 if ((rotateAngle / 90) % 2 == 1) {
@@ -197,17 +201,18 @@ public final class ImageDecoder {
                     rawHeight = bitmapOps.outWidth;
                 }
             }
+            if (!options.isCrop() && optionWith > 0 && optionHeight > 0) {
+                if ((rotateAngle / 90) % 2 == 1) {
+                    bitmapOps.outWidth = optionHeight;
+                    bitmapOps.outHeight = optionWith;
+                } else {
+                    bitmapOps.outWidth = optionWith;
+                    bitmapOps.outHeight = optionHeight;
+                }
+            }
             bitmapOps.inSampleSize = calculateSampleSize(
                     rawWidth, rawHeight,
                     options.getMaxWidth(), options.getMaxHeight());
-            bitmapOps.inJustDecodeBounds = false;
-            bitmapOps.inPreferredConfig = options.getConfig();
-            int optionWith = options.getWidth();
-            int optionHeight = options.getHeight();
-            if (!options.isCrop() && optionWith > 0 && optionHeight > 0) {
-                bitmapOps.outWidth = optionWith;
-                bitmapOps.outHeight = optionHeight;
-            }
 
             if (cancelable != null && cancelable.isCancelled()) {
                 return null;

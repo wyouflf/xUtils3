@@ -56,6 +56,7 @@ public class ImageFragment extends BaseFragment {
                         //.setPlaceholderScaleType(ImageView.ScaleType.MATRIX)
                 .setImageScaleType(ImageView.ScaleType.CENTER_CROP)
                 .setLoadingDrawableId(R.mipmap.ic_launcher)
+                .setFailureDrawableId(R.mipmap.ic_launcher)
                 .build();
 
         imageListAdapter = new ImageListAdapter();

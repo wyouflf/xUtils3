@@ -1,6 +1,5 @@
 package org.xutils.http.loader;
 
-import android.net.Uri;
 import android.text.TextUtils;
 
 import org.xutils.cache.DiskCacheEntity;
@@ -8,6 +7,7 @@ import org.xutils.cache.DiskCacheFile;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.common.Callback;
 import org.xutils.common.util.IOUtil;
+import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ProcessLock;
 import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
@@ -20,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -294,7 +296,13 @@ public class FileLoader extends Loader<File> {
                     endIndex = disposition.length();
                 }
                 if (endIndex > startIndex) {
-                    return Uri.decode(disposition.substring(startIndex, endIndex));
+                    try {
+                        return URLDecoder.decode(
+                                disposition.substring(startIndex, endIndex),
+                                request.getParams().getCharset());
+                    } catch (UnsupportedEncodingException ex) {
+                        LogUtil.e(ex.getMessage(), ex);
+                    }
                 }
             }
         }

@@ -24,6 +24,7 @@ import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -331,7 +332,7 @@ public class HttpRequest extends UriRequest {
     @Override
     public String getResponseMessage() throws IOException {
         if (connection != null) {
-            return Uri.decode(connection.getResponseMessage());
+            return URLDecoder.decode(connection.getResponseMessage(), params.getCharset());
         } else {
             return null;
         }

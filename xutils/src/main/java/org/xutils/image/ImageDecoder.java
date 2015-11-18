@@ -58,7 +58,8 @@ public final class ImageDecoder {
     private ImageDecoder() {
     }
 
-    public static void clearCacheFiles() {
+    /*package*/
+    static void clearCacheFiles() {
         THUMB_CACHE.clearCacheFiles();
     }
 
@@ -180,7 +181,9 @@ public final class ImageDecoder {
             bitmapOps.inPurgeable = true;
             bitmapOps.inInputShareable = true;
             BitmapFactory.decodeFile(file.getAbsolutePath(), bitmapOps);
-            bitmapOps.inSampleSize = calculateInSampleSize(bitmapOps, options.getMaxWidth(), options.getMaxHeight());
+            bitmapOps.inSampleSize = calculateSampleSize(
+                    bitmapOps.outWidth, bitmapOps.outHeight,
+                    options.getMaxWidth(), options.getMaxHeight());
             bitmapOps.inJustDecodeBounds = false;
             bitmapOps.inPreferredConfig = options.getConfig();
             int optionWith = options.getWidth();
@@ -275,27 +278,26 @@ public final class ImageDecoder {
         }
     }
 
-    public static int calculateInSampleSize(BitmapFactory.Options options, int maxWidth, int maxHeight) {
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
+    public static int calculateSampleSize(final int rawWidth, final int rawHeight,
+                                          final int maxWidth, final int maxHeight) {
+        int sampleSize = 1;
 
-        if (width > maxWidth || height > maxHeight) {
-            if (width > height) {
-                inSampleSize = Math.round((float) height / (float) maxHeight);
+        if (rawWidth > maxWidth || rawHeight > maxHeight) {
+            if (rawWidth > rawHeight) {
+                sampleSize = Math.round((float) rawHeight / (float) maxHeight);
             } else {
-                inSampleSize = Math.round((float) width / (float) maxWidth);
+                sampleSize = Math.round((float) rawWidth / (float) maxWidth);
             }
 
-            final float totalPixels = width * height;
+            final float totalPixels = rawWidth * rawHeight;
 
             final float maxTotalPixels = maxWidth * maxHeight * 2;
 
-            while (totalPixels / (inSampleSize * inSampleSize) > maxTotalPixels) {
-                inSampleSize++;
+            while (totalPixels / (sampleSize * sampleSize) > maxTotalPixels) {
+                sampleSize++;
             }
         }
-        return inSampleSize;
+        return sampleSize;
     }
 
     public static Bitmap createSquareImage(Bitmap source) {

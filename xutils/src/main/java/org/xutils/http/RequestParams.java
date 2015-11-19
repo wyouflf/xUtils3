@@ -377,20 +377,20 @@ public class RequestParams {
 
     /**
      * 添加body参数
+     */
+    public void addBodyParameter(String name, File value) {
+        addBodyParameter(name, value, null, null);
+    }
+
+    /**
+     * 添加body参数
      *
      * @param name        参数名
      * @param value       可以是String, File, InputStream 或 byte[]
      * @param contentType 可为null
      */
     public void addBodyParameter(String name, Object value, String contentType) {
-        if (this.fileParams == null) {
-            this.fileParams = new LinkedHashMap<String, Object>();
-        }
-        if (TextUtils.isEmpty(contentType)) {
-            this.fileParams.put(name, value);
-        } else {
-            this.fileParams.put(name, new BodyEntityWrapper<Object>(value, contentType));
-        }
+        addBodyParameter(name, value, contentType, null);
     }
 
     /**

@@ -11,9 +11,12 @@ import java.io.FileOutputStream;
 
 public class FileUtil {
 
+    private FileUtil() {
+    }
+
     public static File getCacheDir(String dirName) {
         File result;
-        if (isExistsSdcard()) {
+        if (existsSdcard()) {
             File cacheDir = x.app().getExternalCacheDir();
             if (cacheDir == null) {
                 result = new File(Environment.getExternalStorageDirectory(),
@@ -47,7 +50,7 @@ public class FileUtil {
      * @return byte 单位 kb
      */
     public static long getDiskAvailableSize() {
-        if (!isExistsSdcard()) return 0;
+        if (!existsSdcard()) return 0;
         File path = Environment.getExternalStorageDirectory(); // 取得sdcard文件路径
         StatFs stat = new StatFs(path.getPath());
         long blockSize = stat.getBlockSize();
@@ -57,7 +60,7 @@ public class FileUtil {
         // (availableBlocks * blockSize)/1024 /1024 MIB单位
     }
 
-    public static Boolean isExistsSdcard() {
+    public static Boolean existsSdcard() {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
 
@@ -92,20 +95,22 @@ public class FileUtil {
 
         File toFile = new File(toPath);
         IOUtil.deleteFileOrDir(toFile);
-        toFile.getParentFile().mkdirs();
-        FileInputStream in = null;
-        FileOutputStream out = null;
-        try {
-            in = new FileInputStream(from);
-            out = new FileOutputStream(toFile);
-            IOUtil.copy(in, out);
-            result = true;
-        } catch (Throwable ex) {
-            LogUtil.d(ex.getMessage(), ex);
-            result = false;
-        } finally {
-            IOUtil.closeQuietly(in);
-            IOUtil.closeQuietly(out);
+        File toDir = toFile.getParentFile();
+        if (toDir.exists() || toDir.mkdirs()) {
+            FileInputStream in = null;
+            FileOutputStream out = null;
+            try {
+                in = new FileInputStream(from);
+                out = new FileOutputStream(toFile);
+                IOUtil.copy(in, out);
+                result = true;
+            } catch (Throwable ex) {
+                LogUtil.d(ex.getMessage(), ex);
+                result = false;
+            } finally {
+                IOUtil.closeQuietly(in);
+                IOUtil.closeQuietly(out);
+            }
         }
         return result;
     }

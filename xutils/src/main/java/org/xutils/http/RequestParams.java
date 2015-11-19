@@ -465,12 +465,24 @@ public class RequestParams {
             for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+                if (!TextUtils.isEmpty(key) && value != null) {
                     result.put(key, value);
                 }
             }
         }
         return result;
+    }
+
+    public String getStringParameter(String name) {
+        if (TextUtils.isEmpty(name)) {
+            return bodyContent;
+        } else if (queryStringParams != null && queryStringParams.containsKey(name)) {
+            return queryStringParams.get(name);
+        } else if (bodyParams != null && bodyParams.containsKey(name)) {
+            return bodyParams.get(name);
+        } else {
+            return null;
+        }
     }
 
     public void clearParams() {
@@ -496,17 +508,6 @@ public class RequestParams {
         }
         if (fileParams != null) {
             fileParams.remove(name);
-        }
-    }
-
-    public String getStringParameter(String key) {
-        if (queryStringParams != null && queryStringParams.containsKey(key)) {
-            return queryStringParams.get(key);
-        } else if (bodyParams != null && bodyParams.containsKey(key)) {
-            Object value = bodyParams.get(key);
-            return value == null ? null : value.toString();
-        } else {
-            return null;
         }
     }
 
@@ -609,7 +610,7 @@ public class RequestParams {
             for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+                if (!TextUtils.isEmpty(key) && value != null) {
                     queryStringParams.put(key, value);
                 }
             }
@@ -632,7 +633,7 @@ public class RequestParams {
             for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+                if (!TextUtils.isEmpty(key) && value != null) {
                     try {
                         jsonObject.put(key, value);
                     } catch (JSONException ex) {

@@ -77,7 +77,7 @@ public class HttpRequest extends UriRequest {
             for (Map.Entry<String, String> entry : queryParams.entrySet()) {
                 String name = entry.getKey();
                 String value = entry.getValue();
-                if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
+                if (!TextUtils.isEmpty(name) && value != null) {
                     queryBuilder.append(
                             Uri.encode(name, params.getCharset()))
                             .append("=")

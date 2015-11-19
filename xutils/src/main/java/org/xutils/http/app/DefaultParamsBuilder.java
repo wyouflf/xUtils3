@@ -1,7 +1,5 @@
 package org.xutils.http.app;
 
-import android.text.TextUtils;
-
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.http.annotation.HttpRequest;
@@ -54,7 +52,7 @@ public class DefaultParamsBuilder implements ParamsBuilder {
             if (queryParams != null) {
                 for (String key : cacheKeys) {
                     String value = queryParams.get(key);
-                    if (!TextUtils.isEmpty(value)) {
+                    if (value != null) {
                         cacheKey += key + "=" + value + "&";
                     }
                 }

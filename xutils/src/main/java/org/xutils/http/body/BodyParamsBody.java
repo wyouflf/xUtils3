@@ -25,7 +25,7 @@ public class BodyParamsBody implements RequestBody {
             for (Map.Entry<String, String> kv : params.entrySet()) {
                 String name = kv.getKey();
                 String value = kv.getValue();
-                if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
+                if (!TextUtils.isEmpty(name) && value != null) {
                     if (contentSb.length() > 0) {
                         contentSb.append("&");
                     }

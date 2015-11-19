@@ -19,6 +19,7 @@ import org.xutils.http.cookie.DbCookieStore;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
@@ -52,6 +53,10 @@ public class HttpRequest extends UriRequest {
     // cookie manager
     private static final CookieManager COOKIE_MANAGER =
             new CookieManager(DbCookieStore.INSTANCE, CookiePolicy.ACCEPT_ALL);
+
+    static {
+        CookieHandler.setDefault(COOKIE_MANAGER);
+    }
 
     /*package*/ HttpRequest(RequestParams params, Type loadType) throws Throwable {
         super(params, loadType);
@@ -134,18 +139,6 @@ public class HttpRequest extends UriRequest {
         }
 
         {// add headers
-
-            try {
-                Map<String, List<String>> singleMap =
-                        COOKIE_MANAGER.get(url.toURI(), new HashMap<String, List<String>>(0));
-                List<String> cookies = singleMap.get("Cookie");
-                if (cookies != null) {
-                    connection.setRequestProperty("Cookie", TextUtils.join(";", cookies));
-                }
-            } catch (Throwable ex) {
-                LogUtil.e(ex.getMessage(), ex);
-            }
-
             HashMap<String, String> headers = params.getHeaders();
             if (headers != null) {
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
@@ -156,7 +149,6 @@ public class HttpRequest extends UriRequest {
                     }
                 }
             }
-
         }
 
         { // write body
@@ -201,17 +193,6 @@ public class HttpRequest extends UriRequest {
             }
             LogUtil.e(httpException.toString() + ", url: " + queryUrl);
             throw httpException;
-        }
-
-        { // save cookies
-            try {
-                Map<String, List<String>> headers = connection.getHeaderFields();
-                if (headers != null) {
-                    COOKIE_MANAGER.put(url.toURI(), headers);
-                }
-            } catch (Throwable ex) {
-                LogUtil.e(ex.getMessage(), ex);
-            }
         }
 
         isLoading = true;

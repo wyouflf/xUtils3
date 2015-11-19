@@ -183,6 +183,9 @@ public final class ImageDecoder {
         if (options == null) {
             options = ImageOptions.DEFAULT;
         }
+        if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
+            options.optimizeMaxSize(null);
+        }
 
         Bitmap result = null;
         try {
@@ -300,6 +303,9 @@ public final class ImageDecoder {
         if (file == null || !file.exists() || file.length() < 1) return null;
         //if (options == null) {
         //    options = ImageOptions.DEFAULT; // not use
+        //}
+        //if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
+        //    options.optimizeMaxSize(null);
         //}
 
         InputStream in = null;

@@ -245,7 +245,7 @@ public class FileLoader extends Loader<File> {
             result = this.load(request.getInputStream());
         } catch (HttpException httpException) {
             if (httpException.getCode() == 416) {
-                if (saveFilePath != null) {
+                if (!TextUtils.isEmpty(saveFilePath)) {
                     result = new File(saveFilePath);
                 } else {
                     result = LruDiskCache.getDiskCache(params.getCacheDirName()).getDiskCacheFile(request.getCacheKey());
@@ -275,7 +275,7 @@ public class FileLoader extends Loader<File> {
         diskCacheFile = LruDiskCache.getDiskCache(params.getCacheDirName()).createDiskCacheFile(entity);
 
         if (diskCacheFile != null) {
-            saveFilePath = diskCacheFile.getPath();
+            saveFilePath = diskCacheFile.getAbsolutePath();
             // diskCacheFile is a temp path, diskCacheFile.commit() return the dest file.
             tempSaveFilePath = saveFilePath;
             isAutoRename = false;

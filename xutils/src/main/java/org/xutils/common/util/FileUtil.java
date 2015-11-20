@@ -52,7 +52,7 @@ public class FileUtil {
     public static long getDiskAvailableSize() {
         if (!existsSdcard()) return 0;
         File path = Environment.getExternalStorageDirectory(); // 取得sdcard文件路径
-        StatFs stat = new StatFs(path.getPath());
+        StatFs stat = new StatFs(path.getAbsolutePath());
         long blockSize = stat.getBlockSize();
         long availableBlocks = stat.getAvailableBlocks();
         return availableBlocks * blockSize;

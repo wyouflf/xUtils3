@@ -403,8 +403,8 @@ import java.util.concurrent.atomic.AtomicLong;
     @Override
     public void onError(Throwable ex, boolean isOnCallback) {
         stopped = true;
-        LogUtil.e(key.url, ex);
         if (!validView4Callback(false)) return;
+        LogUtil.e(key.url, ex);
 
         if (ex instanceof CacheLockedException) {
             doBind(viewRef.get(), key.url, options, callback);

@@ -62,13 +62,16 @@ public final class LruDiskCache {
         deleteNoIndexFiles();
     }
 
-    public void setMaxSize(long maxSize) {
-        long diskFreeSize = FileUtil.getDiskAvailableSize();
-        if (diskFreeSize > maxSize) {
-            diskCacheSize = maxSize;
-        } else {
-            diskCacheSize = diskFreeSize;
+    public LruDiskCache setMaxSize(long maxSize) {
+        if (maxSize > 0L) {
+            long diskFreeSize = FileUtil.getDiskAvailableSize();
+            if (diskFreeSize > maxSize) {
+                diskCacheSize = maxSize;
+            } else {
+                diskCacheSize = diskFreeSize;
+            }
         }
+        return this;
     }
 
     public DiskCacheEntity get(String key) {

@@ -231,7 +231,9 @@ public class HttpRequest extends UriRequest {
     @Override
     public Object loadResultFromCache() throws Throwable {
         isLoading = true;
-        DiskCacheEntity cacheEntity = LruDiskCache.getDiskCache(params.getCacheDirName()).get(this.getCacheKey());
+        DiskCacheEntity cacheEntity = LruDiskCache.getDiskCache(params.getCacheDirName())
+                .setMaxSize(params.getCacheSize())
+                .get(this.getCacheKey());
 
         if (cacheEntity != null) {
             if (HttpMethod.permitsCache(params.getMethod())) {

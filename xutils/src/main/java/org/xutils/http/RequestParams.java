@@ -59,6 +59,7 @@ public class RequestParams {
     private Proxy proxy; // 代理
     private String charset = "UTF-8";
     private String cacheDirName; // 缓存文件夹名称
+    private long cacheSize; // 缓存文件夹大小
     private boolean asJsonContent = false; // 用json形式的bodyParams上传
     private HttpRequest httpRequest; // 注解参数
     private Executor executor; // 自定义线程池
@@ -89,7 +90,7 @@ public class RequestParams {
 
     /**
      * @param uri       不可为空
-     * @param builder   不可为空
+     * @param builder
      * @param signs
      * @param cacheKeys
      */
@@ -202,6 +203,14 @@ public class RequestParams {
 
     public void setCacheDirName(String cacheDirName) {
         this.cacheDirName = cacheDirName;
+    }
+
+    public long getCacheSize() {
+        return cacheSize;
+    }
+
+    public void setCacheSize(long cacheSize) {
+        this.cacheSize = cacheSize;
     }
 
     public Executor getExecutor() {

@@ -32,7 +32,7 @@ import java.util.Map;
 public final class TableEntity<T> {
 
     private final DbManager db;
-    private final String tableName;
+    private final String name;
     private final String onCreated;
     private ColumnEntity id;
     private Class<T> entityType;
@@ -54,7 +54,7 @@ public final class TableEntity<T> {
         this.constructor = entityType.getConstructor();
         this.constructor.setAccessible(true);
         Table table = entityType.getAnnotation(Table.class);
-        this.tableName = table.name();
+        this.name = table.name();
         this.onCreated = table.onCreated();
         this.columnMap = TableUtils.findColumnMap(entityType);
 
@@ -97,7 +97,7 @@ public final class TableEntity<T> {
             for (Map.Entry<String, TableEntity<?>> entry : tableMap.entrySet()) {
                 TableEntity table = entry.getValue();
                 if (table != null) {
-                    if (table.getTableName().equals(tableName) && table.getDb() == db) {
+                    if (table.getName().equals(tableName) && table.getDb() == db) {
                         key = entry.getKey();
                         break;
                     }
@@ -114,7 +114,7 @@ public final class TableEntity<T> {
             return true;
         }
 
-        Cursor cursor = db.execQuery("SELECT COUNT(*) AS c FROM sqlite_master WHERE type='table' AND name='" + tableName + "'");
+        Cursor cursor = db.execQuery("SELECT COUNT(*) AS c FROM sqlite_master WHERE type='table' AND name='" + name + "'");
         if (cursor != null) {
             try {
                 if (cursor.moveToNext()) {
@@ -138,8 +138,8 @@ public final class TableEntity<T> {
         return db;
     }
 
-    public String getTableName() {
-        return tableName;
+    public String getName() {
+        return name;
     }
 
     public Class<T> getEntityType() {
@@ -170,6 +170,6 @@ public final class TableEntity<T> {
 
     @Override
     public String toString() {
-        return tableName;
+        return name;
     }
 }

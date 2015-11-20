@@ -193,7 +193,7 @@ public final class DbModelSelector {
                 result.append("*");
             }
         }
-        result.append(" FROM ").append("\"").append(selector.getTable().getTableName()).append("\"");
+        result.append(" FROM ").append("\"").append(selector.getTable().getName()).append("\"");
         WhereBuilder whereBuilder = selector.getWhereBuilder();
         if (whereBuilder != null && whereBuilder.getWhereItemSize() > 0) {
             result.append(" WHERE ").append(whereBuilder.toString());

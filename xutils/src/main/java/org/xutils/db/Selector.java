@@ -184,7 +184,7 @@ public final class Selector<T> {
     public long count() throws DbException {
         if (!table.tableIsExist()) return 0;
 
-        DbModelSelector dmSelector = this.select("count(\"" + table.getId().getColumnName() + "\") as count");
+        DbModelSelector dmSelector = this.select("count(\"" + table.getId().getName() + "\") as count");
         DbModel firstModel = dmSelector.findFirst();
         if (firstModel != null) {
             return firstModel.getLong("count");
@@ -197,7 +197,7 @@ public final class Selector<T> {
         StringBuilder result = new StringBuilder();
         result.append("SELECT ");
         result.append("*");
-        result.append(" FROM ").append("\"").append(table.getTableName()).append("\"");
+        result.append(" FROM ").append("\"").append(table.getName()).append("\"");
         if (whereBuilder != null && whereBuilder.getWhereItemSize() > 0) {
             result.append(" WHERE ").append(whereBuilder.toString());
         }

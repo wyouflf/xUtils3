@@ -50,8 +50,8 @@ import java.util.LinkedHashMap;
                 if (columnAnn != null) {
                     if (ColumnConverterFactory.isSupportColumnConverter(field.getType())) {
                         ColumnEntity column = new ColumnEntity(entityType, field, columnAnn);
-                        if (!columnMap.containsKey(column.getColumnName())) {
-                            columnMap.put(column.getColumnName(), column);
+                        if (!columnMap.containsKey(column.getName())) {
+                            columnMap.put(column.getName(), column);
                         }
                     }
                 }

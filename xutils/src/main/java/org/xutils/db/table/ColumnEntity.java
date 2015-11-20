@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
 
 public final class ColumnEntity {
 
-    protected final String columnName;
+    protected final String name;
     private final String property;
     private final boolean isId;
     private final boolean isAutoId;
@@ -43,7 +43,7 @@ public final class ColumnEntity {
         field.setAccessible(true);
 
         this.columnField = field;
-        this.columnName = column.name();
+        this.name = column.name();
         this.property = column.property();
         this.isId = column.isId();
 
@@ -131,8 +131,8 @@ public final class ColumnEntity {
         return fieldValue;
     }
 
-    public String getColumnName() {
-        return columnName;
+    public String getName() {
+        return name;
     }
 
     public String getProperty() {
@@ -161,6 +161,6 @@ public final class ColumnEntity {
 
     @Override
     public String toString() {
-        return columnName;
+        return name;
     }
 }

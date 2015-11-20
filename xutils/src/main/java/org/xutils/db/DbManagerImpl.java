@@ -322,7 +322,7 @@ public final class DbManagerImpl implements DbManager {
         TableEntity<T> table = TableEntity.get(this, entityType);
         if (!table.tableIsExist()) return null;
 
-        Selector selector = Selector.from(table).where(table.getId().getColumnName(), "=", idValue);
+        Selector selector = Selector.from(table).where(table.getId().getName(), "=", idValue);
 
         String sql = selector.limit(1).toString();
         Cursor cursor = execQuery(sql);
@@ -424,7 +424,7 @@ public final class DbManagerImpl implements DbManager {
         ColumnEntity id = table.getId();
         if (id.isAutoId()) {
             execNonQuery(SqlInfoBuilder.buildInsertSqlInfo(table, entity));
-            long idValue = getLastAutoIncrementId(table.getTableName());
+            long idValue = getLastAutoIncrementId(table.getName());
             if (idValue == -1) {
                 return false;
             }
@@ -471,7 +471,7 @@ public final class DbManagerImpl implements DbManager {
     public void dropTable(Class<?> entityType) throws DbException {
         TableEntity<?> table = TableEntity.get(this, entityType);
         if (!table.tableIsExist()) return;
-        execNonQuery("DROP TABLE \"" + table.getTableName() + "\"");
+        execNonQuery("DROP TABLE \"" + table.getName() + "\"");
         TableEntity.remove(this, entityType);
     }
 
@@ -484,8 +484,8 @@ public final class DbManagerImpl implements DbManager {
             ColumnEntity col = table.getColumnMap().get(column);
             if (col != null) {
                 StringBuilder builder = new StringBuilder();
-                builder.append("ALTER TABLE ").append("\"").append(table.getTableName()).append("\"").
-                        append(" ADD COLUMN ").append("\"").append(col.getColumnName()).append("\"").
+                builder.append("ALTER TABLE ").append("\"").append(table.getName()).append("\"").
+                        append(" ADD COLUMN ").append("\"").append(col.getName()).append("\"").
                         append(" ").append(col.getColumnDbType()).
                         append(" ").append(col.getProperty());
                 execNonQuery(builder.toString());

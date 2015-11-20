@@ -24,7 +24,7 @@ public class BigImageActivity extends BaseActivity {
                 // 默认自动适应大小
                 // .setSize(...)
                 .setIgnoreGif(false)
-                .setImageScaleType(ImageView.ScaleType.MATRIX).build();
+                .setImageScaleType(ImageView.ScaleType.CENTER).build();
 
         x.image().bind(iv_big_img, getIntent().getStringExtra("url"), imageOptions);
 

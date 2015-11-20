@@ -51,6 +51,7 @@ public class ImageFragment extends BaseFragment {
         imageOptions = new ImageOptions.Builder()
                 .setSize(DensityUtil.dip2px(120), DensityUtil.dip2px(120))
                 .setRadius(DensityUtil.dip2px(5))
+                        // 如果ImageView的大小不是定义为wrap_content, 不要crop.
                 .setCrop(true)
                         // 加载中或错误图片的ScaleType
                         //.setPlaceholderScaleType(ImageView.ScaleType.MATRIX)

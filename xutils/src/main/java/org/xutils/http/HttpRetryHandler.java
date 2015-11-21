@@ -12,7 +12,6 @@ import java.net.MalformedURLException;
 import java.net.NoRouteToHostException;
 import java.net.PortUnreachableException;
 import java.net.ProtocolException;
-import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.HashSet;
@@ -38,7 +37,6 @@ public final class HttpRetryHandler {
         blackList.add(NullPointerException.class);
         blackList.add(FileNotFoundException.class);
         blackList.add(JSONException.class);
-        blackList.add(SocketTimeoutException.class);
         blackList.add(UnknownHostException.class);
         blackList.add(IllegalArgumentException.class);
     }

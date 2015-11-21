@@ -72,6 +72,7 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
     @Override
     public final void cancel() {
         if (!this.isCancelled) {
+            cancelWorks();
             this.isCancelled = true;
             this.state = State.CANCELLED;
             if (cancelHandler != null && !cancelHandler.isCancelled()) {
@@ -79,8 +80,9 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
             }
             if (taskProxy != null) {
                 taskProxy.onCancelled(new Callback.CancelledException("cancelled by user"));
+            } else if (this instanceof TaskProxy) {
+                this.onCancelled(new Callback.CancelledException("cancelled by user"));
             }
-            cancelWorks();
         }
     }
 

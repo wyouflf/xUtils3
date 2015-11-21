@@ -154,19 +154,7 @@ public class FileLoader extends Loader<File> {
             IOUtil.closeQuietly(bos);
         }
 
-        // 处理[下载逻辑2.b](见文件头doc)
-        if (isAutoRename && targetFile.exists() && !TextUtils.isEmpty(responseFileName)) {
-            File newFile = new File(targetFile.getParent(), responseFileName);
-            while (newFile.exists()) {
-                newFile = new File(targetFile.getParent(), System.currentTimeMillis() + responseFileName);
-            }
-            return targetFile.renameTo(newFile) ? newFile : targetFile;
-        } else if (!saveFilePath.equals(tempSaveFilePath)) {
-            File newFile = new File(saveFilePath);
-            return targetFile.renameTo(newFile) ? newFile : targetFile;
-        } else {
-            return targetFile;
-        }
+        return autoRename(targetFile);
     }
 
     @Override
@@ -221,7 +209,7 @@ public class FileLoader extends Loader<File> {
                 throw new Callback.CancelledException("download stopped!");
             }
 
-            request.sendRequest();
+            request.sendRequest(); // may be throw an HttpException
 
             contentLength = request.getContentLength();
             if (isAutoRename) {
@@ -245,14 +233,14 @@ public class FileLoader extends Loader<File> {
             result = this.load(request.getInputStream());
         } catch (HttpException httpException) {
             if (httpException.getCode() == 416) {
-                if (!TextUtils.isEmpty(saveFilePath)) {
-                    result = new File(saveFilePath);
+                if (diskCacheFile != null) {
+                    result = diskCacheFile.commit();
                 } else {
-                    result = LruDiskCache.getDiskCache(params.getCacheDirName()).getDiskCacheFile(request.getCacheKey());
+                    result = new File(tempSaveFilePath);
                 }
                 // 从缓存获取文件, 不rename和断点, 直接退出.
                 if (result != null && result.exists()) {
-                    return result;
+                    result = autoRename(result);
                 } else {
                     IOUtil.deleteFileOrDir(result);
                     throw new IllegalStateException("cache file not found" + request.getCacheKey());
@@ -281,6 +269,22 @@ public class FileLoader extends Loader<File> {
             isAutoRename = false;
         } else {
             throw new IOException("create cache file error:" + request.getCacheKey());
+        }
+    }
+
+    // 处理[下载逻辑2.b](见文件头doc)
+    private File autoRename(File loadedFile) {
+        if (isAutoRename && loadedFile.exists() && !TextUtils.isEmpty(responseFileName)) {
+            File newFile = new File(loadedFile.getParent(), responseFileName);
+            while (newFile.exists()) {
+                newFile = new File(loadedFile.getParent(), System.currentTimeMillis() + responseFileName);
+            }
+            return loadedFile.renameTo(newFile) ? newFile : loadedFile;
+        } else if (!saveFilePath.equals(tempSaveFilePath)) {
+            File newFile = new File(saveFilePath);
+            return loadedFile.renameTo(newFile) ? newFile : loadedFile;
+        } else {
+            return loadedFile;
         }
     }
 

@@ -74,8 +74,11 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
         if (!this.isCancelled) {
             this.isCancelled = true;
             this.state = State.CANCELLED;
-            if (cancelHandler != null) {
+            if (cancelHandler != null && !cancelHandler.isCancelled()) {
                 cancelHandler.cancel();
+            }
+            if (taskProxy != null) {
+                taskProxy.onCancelled(new Callback.CancelledException("cancelled by user"));
             }
             cancelWorks();
         }

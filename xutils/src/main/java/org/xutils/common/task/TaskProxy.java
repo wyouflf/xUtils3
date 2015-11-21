@@ -22,6 +22,7 @@ import java.util.concurrent.Executor;
 
     private final AbsTask<ResultType> task;
     private final Executor executor;
+    private volatile boolean callOnCanceled = false;
 
     /*package*/ TaskProxy(AbsTask<ResultType> task) {
         super(task);
@@ -46,7 +47,7 @@ import java.util.concurrent.Executor;
                     public void run() {
                         try {
                             // 等待过程中取消
-                            if (TaskProxy.this.isCancelled()) {
+                            if (callOnCanceled || TaskProxy.this.isCancelled()) {
                                 throw new Callback.CancelledException("");
                             }
 
@@ -208,6 +209,8 @@ import java.util.concurrent.Executor;
                         break;
                     }
                     case MSG_WHAT_ON_CANCEL: {
+                        if (taskProxy.callOnCanceled) return;
+                        taskProxy.callOnCanceled = true;
                         assert args != null;
                         taskProxy.task.onCancelled((org.xutils.common.Callback.CancelledException) args[0]);
                         break;

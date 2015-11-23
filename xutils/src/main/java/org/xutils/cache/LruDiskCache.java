@@ -102,7 +102,10 @@ public final class LruDiskCache {
     }
 
     public void put(DiskCacheEntity entity) {
-        if (!available || entity == null || TextUtils.isEmpty(entity.getTextContent())) {
+        if (!available
+                || entity == null
+                || TextUtils.isEmpty(entity.getTextContent())
+                || entity.getExpires() < System.currentTimeMillis()) {
             return;
         }
 

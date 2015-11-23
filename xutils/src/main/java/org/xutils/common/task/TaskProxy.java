@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
     private final AbsTask<ResultType> task;
     private final Executor executor;
     private volatile boolean callOnCanceled = false;
+    private volatile boolean callOnFinished = false;
 
     /*package*/ TaskProxy(AbsTask<ResultType> task) {
         super(task);
@@ -216,6 +217,8 @@ import java.util.concurrent.Executor;
                         break;
                     }
                     case MSG_WHAT_ON_FINISHED: {
+                        if (taskProxy.callOnFinished) return;
+                        taskProxy.callOnFinished = true;
                         taskProxy.task.onFinished();
                         break;
                     }

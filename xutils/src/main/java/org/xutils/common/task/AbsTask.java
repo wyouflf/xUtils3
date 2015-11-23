@@ -80,8 +80,10 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
             }
             if (taskProxy != null) {
                 taskProxy.onCancelled(new Callback.CancelledException("cancelled by user"));
+                taskProxy.onFinished();
             } else if (this instanceof TaskProxy) {
                 this.onCancelled(new Callback.CancelledException("cancelled by user"));
+                this.onFinished();
             }
         }
     }

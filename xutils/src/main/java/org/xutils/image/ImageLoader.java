@@ -347,12 +347,14 @@ import java.util.concurrent.atomic.AtomicLong;
     public Drawable prepare(File rawData) {
         if (!validView4Callback(true)) return null;
 
-        if (prepareCallback != null) {
-            return prepareCallback.prepare(rawData);
-        }
-
         try {
-            Drawable result = ImageDecoder.decodeFileWithLock(rawData, options, this);
+            Drawable result = null;
+            if (prepareCallback != null) {
+                result = prepareCallback.prepare(rawData);
+            }
+            if (result == null) {
+                result = ImageDecoder.decodeFileWithLock(rawData, options, this);
+            }
             if (result != null) {
                 if (result instanceof ReusableDrawable) {
                     ((ReusableDrawable) result).setMemCacheKey(key);

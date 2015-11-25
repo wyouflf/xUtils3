@@ -33,7 +33,7 @@ public enum HttpMethod {
     }
 
     public static boolean permitsCache(HttpMethod method) {
-        return method == GET;
+        return method == GET || method == POST;
     }
 
     public static boolean permitsRequestBody(HttpMethod method) {

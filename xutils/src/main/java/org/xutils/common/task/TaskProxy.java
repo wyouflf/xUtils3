@@ -39,7 +39,6 @@ import java.util.concurrent.Executor;
 
     @Override
     protected final ResultType doBackground() throws Throwable {
-        this.setStateInner(State.WAITING);
         this.onWaiting();
         PriorityRunnable runnable = new PriorityRunnable(
                 task.getPriority(),
@@ -53,7 +52,6 @@ import java.util.concurrent.Executor;
                             }
 
                             // start running
-                            TaskProxy.this.setStateInner(State.STARTED);
                             TaskProxy.this.onStarted();
 
                             if (TaskProxy.this.isCancelled()) { // 开始时取消
@@ -70,13 +68,10 @@ import java.util.concurrent.Executor;
                             }
 
                             // 执行成功
-                            TaskProxy.this.setStateInner(State.SUCCESS);
                             TaskProxy.this.onSuccess(task.getResult());
                         } catch (Callback.CancelledException cex) {
-                            TaskProxy.this.setStateInner(State.CANCELLED);
                             TaskProxy.this.onCancelled(cex);
                         } catch (Throwable ex) {
-                            TaskProxy.this.setStateInner(State.ERROR);
                             TaskProxy.this.onError(ex, false);
                         }
 
@@ -90,21 +85,25 @@ import java.util.concurrent.Executor;
 
     @Override
     protected void onWaiting() {
+        this.setState(State.WAITING);
         sHandler.obtainMessage(MSG_WHAT_ON_WAITING, this).sendToTarget();
     }
 
     @Override
     protected void onStarted() {
+        this.setState(State.STARTED);
         sHandler.obtainMessage(MSG_WHAT_ON_START, this).sendToTarget();
     }
 
     @Override
     protected void onSuccess(ResultType result) {
+        this.setState(State.SUCCESS);
         sHandler.obtainMessage(MSG_WHAT_ON_SUCCESS, this).sendToTarget();
     }
 
     @Override
     protected void onError(Throwable ex, boolean isCallbackError) {
+        this.setState(State.ERROR);
         sHandler.obtainMessage(MSG_WHAT_ON_ERROR, new ArgsObj(this, ex)).sendToTarget();
     }
 
@@ -116,6 +115,7 @@ import java.util.concurrent.Executor;
 
     @Override
     protected void onCancelled(Callback.CancelledException cex) {
+        this.setState(State.CANCELLED);
         sHandler.obtainMessage(MSG_WHAT_ON_CANCEL, new ArgsObj(this, cex)).sendToTarget();
     }
 
@@ -124,8 +124,9 @@ import java.util.concurrent.Executor;
         sHandler.obtainMessage(MSG_WHAT_ON_FINISHED, this).sendToTarget();
     }
 
-    private void setStateInner(State state) {
-        this.setState(state);
+    @Override
+    /*package*/ final void setState(State state) {
+        super.setState(state);
         this.task.setState(state);
     }
 
@@ -227,7 +228,7 @@ import java.util.concurrent.Executor;
                     }
                 }
             } catch (Throwable ex) {
-                taskProxy.setStateInner(State.ERROR);
+                taskProxy.setState(State.ERROR);
                 if (msg.what != MSG_WHAT_ON_ERROR) {
                     taskProxy.task.onError(ex, true);
                 } else if (x.isDebug()) {

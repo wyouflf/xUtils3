@@ -70,11 +70,9 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
     }
 
     @Override
-    public final void cancel() {
+    public final synchronized void cancel() {
         if (!this.isCancelled) {
             cancelWorks();
-            this.isCancelled = true;
-            this.state = State.CANCELLED;
             if (cancelHandler != null && !cancelHandler.isCancelled()) {
                 cancelHandler.cancel();
             }
@@ -87,6 +85,7 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
                     this.onFinished();
                 }
             }
+            this.isCancelled = true;
         }
     }
 
@@ -109,23 +108,18 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
     }
 
     /*package*/
+    void setState(State state) {
+        this.state = state;
+    }
+
+    /*package*/
     final void setTaskProxy(TaskProxy taskProxy) {
         this.taskProxy = taskProxy;
     }
 
     /*package*/
-    final void setState(State state) {
-        this.state = state;
-    }
-
-    /*package*/
     final void setResult(ResultType result) {
         this.result = result;
-    }
-
-    /*package*/
-    final Callback.Cancelable getCancelHandler() {
-        return cancelHandler;
     }
 
     public enum State {

@@ -45,7 +45,7 @@ public final class DbManagerImpl implements DbManager {
     /**
      * key: dbName
      */
-    private static HashMap<String, DbManagerImpl> daoMap = new HashMap<String, DbManagerImpl>();
+    private static HashMap<DaoConfig, DbManagerImpl> daoMap = new HashMap<DaoConfig, DbManagerImpl>();
 
     private SQLiteDatabase database;
     private DaoConfig daoConfig;
@@ -66,10 +66,10 @@ public final class DbManagerImpl implements DbManager {
             daoConfig = new DaoConfig();
         }
 
-        DbManagerImpl dao = daoMap.get(daoConfig.getDbName());
+        DbManagerImpl dao = daoMap.get(daoConfig);
         if (dao == null) {
             dao = new DbManagerImpl(daoConfig);
-            daoMap.put(daoConfig.getDbName(), dao);
+            daoMap.put(daoConfig, dao);
         } else {
             dao.daoConfig = daoConfig;
         }
@@ -522,9 +522,8 @@ public final class DbManagerImpl implements DbManager {
 
     @Override
     public void close() throws IOException {
-        String dbName = this.daoConfig.getDbName();
-        if (daoMap.containsKey(dbName)) {
-            daoMap.remove(dbName);
+        if (daoMap.containsKey(daoConfig)) {
+            daoMap.remove(daoConfig);
             this.database.close();
         }
     }

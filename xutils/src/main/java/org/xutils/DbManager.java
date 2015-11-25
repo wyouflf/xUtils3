@@ -192,5 +192,27 @@ public interface DbManager extends Closeable {
             return dbDir;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            DaoConfig daoConfig = (DaoConfig) o;
+
+            if (!dbName.equals(daoConfig.dbName)) return false;
+            return dbDir == null ? daoConfig.dbDir == null : dbDir.equals(daoConfig.dbDir);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = dbName.hashCode();
+            result = 31 * result + (dbDir != null ? dbDir.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(dbDir) + "/" + dbName;
+        }
     }
 }

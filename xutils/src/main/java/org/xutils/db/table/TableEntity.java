@@ -72,7 +72,7 @@ public final class TableEntity<T> {
 
     @SuppressWarnings("unchecked")
     public static synchronized <T> TableEntity<T> get(DbManager db, Class<T> entityType) throws DbException {
-        String tableKey = db.getDaoConfig().getDbName() + "#" + entityType.getName();
+        String tableKey = db.getDaoConfig().toString() + "#" + entityType.getName();
         TableEntity<T> table = (TableEntity<T>) tableMap.get(tableKey);
         if (table == null) {
             try {
@@ -87,7 +87,7 @@ public final class TableEntity<T> {
     }
 
     public static synchronized void remove(DbManager db, Class<?> entityType) {
-        String tableKey = db.getDaoConfig().getDbName() + "#" + entityType.getName();
+        String tableKey = db.getDaoConfig().toString() + "#" + entityType.getName();
         tableMap.remove(tableKey);
     }
 

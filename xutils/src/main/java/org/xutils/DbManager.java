@@ -192,5 +192,9 @@ public interface DbManager extends Closeable {
             return dbDir;
         }
 
+        @Override
+        public String toString() {
+            return String.valueOf(dbDir) + "/" + dbName;
+        }
     }
 }

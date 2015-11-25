@@ -66,10 +66,10 @@ public final class DbManagerImpl implements DbManager {
             daoConfig = new DaoConfig();
         }
 
-        DbManagerImpl dao = daoMap.get(daoConfig.getDbName());
+        DbManagerImpl dao = daoMap.get(daoConfig.toString());
         if (dao == null) {
             dao = new DbManagerImpl(daoConfig);
-            daoMap.put(daoConfig.getDbName(), dao);
+            daoMap.put(daoConfig.toString(), dao);
         } else {
             dao.daoConfig = daoConfig;
         }

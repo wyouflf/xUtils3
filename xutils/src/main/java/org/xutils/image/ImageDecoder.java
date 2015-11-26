@@ -178,13 +178,14 @@ public final class ImageDecoder {
      * @throws IOException
      */
     public static Bitmap decodeBitmap(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
-        // check params
-        if (file == null || !file.exists() || file.length() < 1) return null;
-        if (options == null) {
-            options = ImageOptions.DEFAULT;
-        }
-        if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
-            options.optimizeMaxSize(null);
+        {// check params
+            if (file == null || !file.exists() || file.length() < 1) return null;
+            if (options == null) {
+                options = ImageOptions.DEFAULT;
+            }
+            if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
+                options.optimizeMaxSize(null);
+            }
         }
 
         Bitmap result = null;
@@ -299,14 +300,15 @@ public final class ImageDecoder {
      * @throws IOException
      */
     public static Movie decodeGif(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
-        // check params
-        if (file == null || !file.exists() || file.length() < 1) return null;
-        //if (options == null) {
-        //    options = ImageOptions.DEFAULT; // not use
-        //}
-        //if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
-        //    options.optimizeMaxSize(null);
-        //}
+        {// check params
+            if (file == null || !file.exists() || file.length() < 1) return null;
+            /*if (options == null) {
+                options = ImageOptions.DEFAULT; // not use
+            }
+            if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
+                options.optimizeMaxSize(null);
+            }*/
+        }
 
         InputStream in = null;
         try {

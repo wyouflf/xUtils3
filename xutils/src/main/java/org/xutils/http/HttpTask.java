@@ -215,6 +215,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         // 发起请求
         retry = true;
         while (retry) {
+            retry = false;
 
             try {
                 if (this.isCancelled()) {
@@ -262,8 +263,6 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 if (cacheCallback != null && HttpMethod.permitsCache(params.getMethod())) {
                     this.request.save2Cache();
                 }
-
-                retry = false;
 
                 if (this.isCancelled()) {
                     throw new Callback.CancelledException("cancelled after request");

@@ -41,7 +41,6 @@ import java.util.Date;
 public class FileLoader extends Loader<File> {
 
     private static final int CHECK_SIZE = 512;
-    private static final int LOCK_WAIT = 1000 * 3; // 3s
 
     private String tempSaveFilePath;
     private String saveFilePath;
@@ -184,7 +183,7 @@ public class FileLoader extends Loader<File> {
             }
 
             // 等待, 若不能下载则取消此次下载.
-            processLock = ProcessLock.tryLock(saveFilePath + "_lock", true, LOCK_WAIT);
+            processLock = ProcessLock.tryLock(saveFilePath + "_lock", true);
             if (processLock == null || !processLock.isValid()) {
                 throw new FileLockedException("download exists: " + saveFilePath);
             }

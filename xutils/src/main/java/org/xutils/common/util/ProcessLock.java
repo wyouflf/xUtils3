@@ -46,7 +46,7 @@ public final class ProcessLock implements Closeable {
      * @param writeMode 是否写入模式(支持读并发).
      * @return null 或 进程锁, 如果锁已经被占用, 返回null.
      */
-    public static ProcessLock tryLock(String lockName, boolean writeMode) {
+    public static synchronized ProcessLock tryLock(String lockName, boolean writeMode) {
         FileInputStream in = null;
         FileOutputStream out = null;
         Closeable stream = null;

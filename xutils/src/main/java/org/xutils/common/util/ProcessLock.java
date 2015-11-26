@@ -17,7 +17,6 @@ import java.text.DecimalFormat;
 
 /**
  * 进程间锁, 仅在同一个应用中有效.
- * 一个锁的最大有效期时为1min.
  */
 public final class ProcessLock implements Closeable {
 
@@ -26,7 +25,6 @@ public final class ProcessLock implements Closeable {
     private final File mFile;
     private final Closeable mStream;
 
-    private final static long MAX_AGE = 1000L * 60; // 1min
     private final static String LOCK_FILE_DIR = "process_lock";
     private final static int PID = android.os.Process.myPid();
 
@@ -55,12 +53,6 @@ public final class ProcessLock implements Closeable {
         FileChannel channel = null;
         try {
             File file = new File(x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE), customHash(lockName));
-            if (file.exists()) {
-                if (file.lastModified() + MAX_AGE < System.currentTimeMillis()) {
-                    IOUtil.deleteFileOrDir(file);
-                }
-                return null;
-            }
             if (file.exists() || file.createNewFile()) {
                 if (writeMode) {
                     out = new FileOutputStream(file, false);

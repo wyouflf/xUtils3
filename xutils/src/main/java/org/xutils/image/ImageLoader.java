@@ -218,8 +218,8 @@ import java.util.concurrent.atomic.AtomicLong;
                     ((ProgressCallback) callback).onWaiting();
                 }
                 // hit mem cache
-                view.setImageDrawable(drawable);
                 view.setScaleType(localOptions.getImageScaleType());
+                view.setImageDrawable(drawable);
                 trustMemCache = true;
                 if (callback instanceof CacheCallback) {
                     trustMemCache = ((CacheCallback<Drawable>) callback).onCache(drawable);
@@ -283,8 +283,8 @@ import java.util.concurrent.atomic.AtomicLong;
         Drawable loadingDrawable = null;
         if (options.isForceLoadingDrawable()) {
             loadingDrawable = options.getLoadingDrawable(view);
-            view.setImageDrawable(new AsyncDrawable(this, loadingDrawable));
             view.setScaleType(options.getPlaceholderScaleType());
+            view.setImageDrawable(new AsyncDrawable(this, loadingDrawable));
         } else {
             loadingDrawable = view.getDrawable();
             view.setImageDrawable(new AsyncDrawable(this, loadingDrawable));
@@ -473,6 +473,7 @@ import java.util.concurrent.atomic.AtomicLong;
     private synchronized void setSuccessDrawable4Callback(final Drawable drawable) {
         final ImageView view = viewRef.get();
         if (view != null) {
+            view.setScaleType(options.getImageScaleType());
             if (drawable instanceof GifDrawable) {
                 view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             }
@@ -483,7 +484,6 @@ import java.util.concurrent.atomic.AtomicLong;
             } else {
                 view.setImageDrawable(drawable);
             }
-            view.setScaleType(options.getImageScaleType());
         }
     }
 
@@ -491,8 +491,8 @@ import java.util.concurrent.atomic.AtomicLong;
         final ImageView view = viewRef.get();
         if (view != null) {
             Drawable drawable = options.getFailureDrawable(view);
-            view.setImageDrawable(drawable);
             view.setScaleType(options.getPlaceholderScaleType());
+            view.setImageDrawable(drawable);
         }
     }
 
@@ -507,8 +507,8 @@ import java.util.concurrent.atomic.AtomicLong;
                         ((ProgressCallback) callback).onWaiting();
                     }
                     if (view != null && options != null) {
-                        view.setImageDrawable(options.getFailureDrawable(view));
                         view.setScaleType(options.getPlaceholderScaleType());
+                        view.setImageDrawable(options.getFailureDrawable(view));
                     }
                     if (callback != null) {
                         callback.onError(new IllegalArgumentException(exMsg), false);

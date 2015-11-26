@@ -9,6 +9,7 @@ import org.xutils.common.Callback;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ProcessLock;
+import org.xutils.ex.FileLockedException;
 import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
 import org.xutils.http.request.UriRequest;
@@ -185,7 +186,7 @@ public class FileLoader extends Loader<File> {
             // 等待, 若不能下载则取消此次下载.
             processLock = ProcessLock.tryLock(saveFilePath + "_lock", true, LOCK_WAIT);
             if (processLock == null || !processLock.isValid()) {
-                throw new Callback.CancelledException("download exists: " + saveFilePath);
+                throw new FileLockedException("download exists: " + saveFilePath);
             }
 
             params = request.getParams();

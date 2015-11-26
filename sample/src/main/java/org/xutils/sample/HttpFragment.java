@@ -181,7 +181,7 @@ public class HttpFragment extends BaseFragment {
     // 添加到下载列表
     @Event(value = R.id.btn_test3)
     private void onTest3Click(View view) throws DbException {
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 5; i++) {
             String url = et_url.getText().toString();
             String label = i + "xUtils_" + System.nanoTime();
             DownloadService.getDownloadManager().startDownload(

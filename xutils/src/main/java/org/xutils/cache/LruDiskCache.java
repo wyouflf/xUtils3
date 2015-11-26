@@ -12,8 +12,8 @@ import org.xutils.common.util.MD5;
 import org.xutils.common.util.ProcessLock;
 import org.xutils.config.DbConfigs;
 import org.xutils.db.sqlite.WhereBuilder;
-import org.xutils.ex.FileLockedException;
 import org.xutils.ex.DbException;
+import org.xutils.ex.FileLockedException;
 import org.xutils.x;
 
 import java.io.File;
@@ -154,7 +154,7 @@ public final class LruDiskCache {
 
         entity.setPath(new File(this.cacheDir, MD5.md5(entity.getKey())).getAbsolutePath());
         String tempFilePath = entity.getPath() + TEMP_FILE_SUFFIX;
-        ProcessLock processLock = ProcessLock.tryLock(tempFilePath, true, LOCK_WAIT);
+        ProcessLock processLock = ProcessLock.tryLock(tempFilePath, true);
         if (processLock != null && processLock.isValid()) {
             result = new DiskCacheFile(entity, tempFilePath, processLock);
             if (!result.getParentFile().exists()) {

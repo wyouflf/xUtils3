@@ -113,6 +113,16 @@ public final class ImageDecoder {
                     }
                     if (bitmap == null) {
                         bitmap = decodeBitmap(file, options, cancelable);
+                        // save to thumb cache
+                        if (options.isCompress()) {
+                            final Bitmap finalBitmap = bitmap;
+                            THUMB_CACHE_EXECUTOR.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    saveThumbCache(file, options, finalBitmap);
+                                }
+                            });
+                        }
                     }
                 } finally {
                     bitmapDecodeWorker.decrementAndGet();
@@ -123,16 +133,6 @@ public final class ImageDecoder {
             }
             if (bitmap != null) {
                 result = new ReusableBitmapDrawable(x.app().getResources(), bitmap);
-                // save to thumb cache
-                if (options.isCompress()) {
-                    final Bitmap finalBitmap = bitmap;
-                    THUMB_CACHE_EXECUTOR.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            saveThumbCache(file, options, finalBitmap);
-                        }
-                    });
-                }
             }
         }
         return result;

@@ -40,7 +40,7 @@ import java.util.Map;
     @Override
     public Map<String, Object> load(final InputStream in) throws Throwable {
         resultStr = IOUtil.readStr(in, charset);
-        return getMapForJson(resultStr);
+        return json2Map(resultStr);
     }
 
     @Override
@@ -54,7 +54,7 @@ import java.util.Map;
         if (cacheEntity != null) {
             String text = cacheEntity.getTextContent();
             if (!TextUtils.isEmpty(text)) {
-                return getMapForJson(text);
+                return json2Map(text);
             }
         }
 
@@ -66,7 +66,7 @@ import java.util.Map;
         saveStringCache(request, resultStr);
     }
 
-    private static Map<String, Object> getMapForJson(String jsonStr) throws Throwable {
+    private static Map<String, Object> json2Map(String jsonStr) throws Throwable {
         JSONObject jsonObject = new JSONObject(jsonStr);
         Map<String, Object> valueMap = new HashMap<String, Object>();
         Iterator<String> keysItr = jsonObject.keys();

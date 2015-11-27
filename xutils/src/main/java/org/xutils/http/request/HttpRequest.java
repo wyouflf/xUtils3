@@ -188,7 +188,7 @@ public class HttpRequest extends UriRequest {
         if (code >= 300) {
             HttpException httpException = new HttpException(code, this.getResponseMessage());
             try {
-                httpException.setResult(IOUtil.readStr(connection.getInputStream(), params.getCharset()));
+                httpException.setResult(IOUtil.readStr(connection.getErrorStream(), params.getCharset()));
             } catch (Throwable ignored) {
             }
             LogUtil.e(httpException.toString() + ", url: " + queryUrl);

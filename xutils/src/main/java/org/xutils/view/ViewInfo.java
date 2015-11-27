@@ -6,25 +6,24 @@ package org.xutils.view;
  * Time: 下午11:25
  */
 /*package*/ final class ViewInfo {
-    public Object value;
+    public int value;
     public int parentId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ViewInfo)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        ViewInfo that = (ViewInfo) o;
+        ViewInfo viewInfo = (ViewInfo) o;
 
-        if (parentId != that.parentId) return false;
-        if (value == null) return (null == that.value);
+        if (value != viewInfo.value) return false;
+        return parentId == viewInfo.parentId;
 
-        return value.equals(that.value);
     }
 
     @Override
     public int hashCode() {
-        int result = value.hashCode();
+        int result = value;
         result = 31 * result + parentId;
         return result;
     }

@@ -29,7 +29,7 @@ import android.view.View;
     }
 
     public View findViewByInfo(ViewInfo info) {
-        return findViewById((Integer) info.value, info.parentId);
+        return findViewById(info.value, info.parentId);
     }
 
     public View findViewById(int id, int pid) {

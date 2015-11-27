@@ -71,40 +71,46 @@ public final class TableEntity<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public static synchronized <T> TableEntity<T> get(DbManager db, Class<T> entityType) throws DbException {
-        String tableKey = db.getDaoConfig().toString() + "#" + entityType.getName();
-        TableEntity<T> table = (TableEntity<T>) tableMap.get(tableKey);
-        if (table == null) {
-            try {
-                table = new TableEntity<T>(db, entityType);
-            } catch (Throwable ex) {
-                throw new DbException(ex);
+    public static <T> TableEntity<T> get(DbManager db, Class<T> entityType) throws DbException {
+        synchronized (tableMap) {
+            String tableKey = generateTableKey(db, entityType);
+            TableEntity<T> table = (TableEntity<T>) tableMap.get(tableKey);
+            if (table == null) {
+                try {
+                    table = new TableEntity<T>(db, entityType);
+                } catch (Throwable ex) {
+                    throw new DbException(ex);
+                }
+                tableMap.put(tableKey, table);
             }
-            tableMap.put(tableKey, table);
+
+            return table;
         }
-
-        return table;
     }
 
-    public static synchronized void remove(DbManager db, Class<?> entityType) {
-        String tableKey = db.getDaoConfig().toString() + "#" + entityType.getName();
-        tableMap.remove(tableKey);
+    public static void remove(DbManager db, Class<?> entityType) {
+        synchronized (tableMap) {
+            String tableKey = generateTableKey(db, entityType);
+            tableMap.remove(tableKey);
+        }
     }
 
-    public static synchronized void remove(DbManager db, String tableName) {
-        if (tableMap.size() > 0) {
-            String key = null;
-            for (Map.Entry<String, TableEntity<?>> entry : tableMap.entrySet()) {
-                TableEntity table = entry.getValue();
-                if (table != null) {
-                    if (table.getName().equals(tableName) && table.getDb() == db) {
-                        key = entry.getKey();
-                        break;
+    public static void remove(DbManager db, String tableName) {
+        synchronized (tableMap) {
+            if (tableMap.size() > 0) {
+                String key = null;
+                for (Map.Entry<String, TableEntity<?>> entry : tableMap.entrySet()) {
+                    TableEntity table = entry.getValue();
+                    if (table != null) {
+                        if (table.getName().equals(tableName) && table.getDb() == db) {
+                            key = entry.getKey();
+                            break;
+                        }
                     }
                 }
-            }
-            if (!TextUtils.isEmpty(key)) {
-                tableMap.remove(key);
+                if (!TextUtils.isEmpty(key)) {
+                    tableMap.remove(key);
+                }
             }
         }
     }
@@ -166,6 +172,10 @@ public final class TableEntity<T> {
 
     public void setCheckedDatabase(boolean checkedDatabase) {
         this.checkedDatabase = checkedDatabase;
+    }
+
+    private static String generateTableKey(DbManager db, Class<?> entityType) {
+        return db.getDaoConfig().toString() + "#" + entityType.getName();
     }
 
     @Override

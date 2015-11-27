@@ -188,7 +188,7 @@ public class HttpRequest extends UriRequest {
         if (code >= 300) {
             HttpException httpException = new HttpException(code, this.getResponseMessage());
             try {
-                httpException.setResult(IOUtil.readStr(connection.getErrorStream(), params.getCharset()));
+                httpException.setResult(IOUtil.readStr(this.getInputStream(), params.getCharset()));
             } catch (Throwable ignored) {
             }
             LogUtil.e(httpException.toString() + ", url: " + queryUrl);
@@ -261,7 +261,8 @@ public class HttpRequest extends UriRequest {
     @Override
     public InputStream getInputStream() throws IOException {
         if (connection != null && inputStream == null) {
-            inputStream = connection.getInputStream();
+            inputStream = connection.getResponseCode() >= 400 ?
+                    connection.getErrorStream() : connection.getInputStream();
         }
         return inputStream;
     }

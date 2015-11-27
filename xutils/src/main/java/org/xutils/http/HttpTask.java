@@ -377,8 +377,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         if (tracker != null) {
             tracker.onFinished(request);
         }
-        clearRawResult();
-        IOUtil.closeQuietly(request);
+        closeRequest();
         callback.onFinished();
     }
 
@@ -391,9 +390,14 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     @Override
     protected void cancelWorks() {
+        closeRequest();
+    }
+
+    private void closeRequest() {
         x.task().run(new Runnable() {
             @Override
             public void run() {
+                clearRawResult();
                 if (requestWorker != null && params.isCancelFast()) {
                     try {
                         requestWorker.interrupt();

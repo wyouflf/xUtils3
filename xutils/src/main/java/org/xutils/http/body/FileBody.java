@@ -15,10 +15,6 @@ public class FileBody extends InputStreamBody {
     private File file;
     private String contentType;
 
-    public FileBody(BodyEntityWrapper<File> wrapper) throws IOException {
-        this(wrapper.getObject(), wrapper.getContentType());
-    }
-
     public FileBody(File file) throws IOException {
         this(file, null);
     }

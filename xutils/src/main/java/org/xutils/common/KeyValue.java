@@ -13,16 +13,18 @@
  * limitations under the License.
  */
 
-package org.xutils.db.sqlite;
+package org.xutils.common;
 
-import org.xutils.db.table.ColumnUtils;
-
-public final class KeyValue {
+public class KeyValue {
     public final String key;
     public final Object value;
 
     public KeyValue(String key, Object value) {
         this.key = key;
-        this.value = ColumnUtils.convert2DbValueIfNeeded(value);
+        this.value = value;
+    }
+
+    public String getValueStr() {
+        return value == null ? null : value.toString();
     }
 }

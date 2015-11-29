@@ -8,6 +8,8 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 
+import org.xutils.common.util.LogUtil;
+
 public class GifDrawable extends Drawable implements Runnable, Animatable {
     private Movie movie;
     private int byteCount = 0;
@@ -38,11 +40,15 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
 
     @Override
     public void draw(Canvas canvas) {
-        int ms = (int) (SystemClock.uptimeMillis() - begin) % duration;
-        movie.setTime(ms);
-        movie.draw(canvas, 0, 0);
-        if (duration > 0) {
-            start();
+        try {
+            int ms = (int) (SystemClock.uptimeMillis() - begin) % duration;
+            movie.setTime(ms);
+            movie.draw(canvas, 0, 0);
+            if (duration > 0) {
+                start();
+            }
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
         }
     }
 

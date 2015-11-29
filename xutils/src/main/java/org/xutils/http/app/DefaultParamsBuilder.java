@@ -5,7 +5,6 @@ import org.xutils.http.RequestParams;
 import org.xutils.http.annotation.HttpRequest;
 
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -48,13 +47,10 @@ public class DefaultParamsBuilder implements ParamsBuilder {
             cacheKey = params.getUri() + "?";
 
             // 添加cacheKeys对应的queryParams
-            HashMap<String, String> queryParams = params.getQueryStringParams();
-            if (queryParams != null) {
-                for (String key : cacheKeys) {
-                    String value = queryParams.get(key);
-                    if (value != null) {
-                        cacheKey += key + "=" + value + "&";
-                    }
+            for (String key : cacheKeys) {
+                String value = params.getStringParameter(key);
+                if (value != null) {
+                    cacheKey += key + "=" + value + "&";
                 }
             }
         }

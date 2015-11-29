@@ -4,29 +4,30 @@ import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.common.KeyValue;
 import org.xutils.common.task.Priority;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.annotation.HttpRequest;
 import org.xutils.http.app.DefaultParamsBuilder;
 import org.xutils.http.app.ParamsBuilder;
 import org.xutils.http.app.RedirectHandler;
-import org.xutils.http.body.BodyEntityWrapper;
-import org.xutils.http.body.BodyParamsBody;
+import org.xutils.http.body.BodyItemWrapper;
 import org.xutils.http.body.FileBody;
 import org.xutils.http.body.InputStreamBody;
 import org.xutils.http.body.MultipartBody;
 import org.xutils.http.body.RequestBody;
 import org.xutils.http.body.StringBody;
+import org.xutils.http.body.UrlEncodedParamsBody;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.Proxy;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 import javax.net.ssl.SSLSocketFactory;
@@ -49,11 +50,11 @@ public class RequestParams {
     // 请求体内容
     private HttpMethod method;
     private String bodyContent;
-    private HashMap<String, String> headers;
-    private LinkedHashMap<String, String> queryStringParams;
-    private LinkedHashMap<String, String> bodyParams;
-    private LinkedHashMap<String, Object> fileParams;
     private RequestBody requestBody;
+    private final LinkedList<Header> headers = new LinkedList<Header>();
+    private final LinkedList<KeyValue> queryStringParams = new LinkedList<KeyValue>();
+    private final LinkedList<KeyValue> bodyParams = new LinkedList<KeyValue>();
+    private final LinkedList<KeyValue> fileParams = new LinkedList<KeyValue>();
 
     // 扩展参数
     private Proxy proxy; // 代理
@@ -324,11 +325,24 @@ public class RequestParams {
         this.redirectHandler = redirectHandler;
     }
 
+    /**
+     * 覆盖header
+     *
+     * @param name
+     * @param value
+     */
+    public void setHeader(String name, String value) {
+        this.headers.add(new Header(name, value, true));
+    }
+
+    /**
+     * 添加header
+     *
+     * @param name
+     * @param value
+     */
     public void addHeader(String name, String value) {
-        if (this.headers == null) {
-            this.headers = new HashMap<String, String>();
-        }
-        this.headers.put(name, value);
+        this.headers.add(new Header(name, value, false));
     }
 
     /**
@@ -339,6 +353,7 @@ public class RequestParams {
      */
     public void addParameter(String name, Object value) {
         if (value == null) return;
+
         if (method == null || HttpMethod.permitsRequestBody(method)) {
             if (!TextUtils.isEmpty(name)) {
                 if (value instanceof File
@@ -348,7 +363,7 @@ public class RequestParams {
                 } else {
                     this.addBodyParameter(name, value.toString());
                 }
-            } else if (TextUtils.isEmpty(name)) {
+            } else {
                 this.setBodyContent(value.toString());
             }
         } else {
@@ -365,10 +380,7 @@ public class RequestParams {
      * @param value
      */
     public void addQueryStringParameter(String name, String value) {
-        if (this.queryStringParams == null) {
-            this.queryStringParams = new LinkedHashMap<String, String>();
-        }
-        this.queryStringParams.put(name, value);
+        this.queryStringParams.add(new KeyValue(name, value));
     }
 
     /**
@@ -378,10 +390,7 @@ public class RequestParams {
      * @param value
      */
     public void addBodyParameter(String name, String value) {
-        if (this.bodyParams == null) {
-            this.bodyParams = new LinkedHashMap<String, String>();
-        }
-        this.bodyParams.put(name, value);
+        this.bodyParams.add(new KeyValue(name, value));
     }
 
     /**
@@ -411,13 +420,10 @@ public class RequestParams {
      * @param fileName    服务端看到的文件名
      */
     public void addBodyParameter(String name, Object value, String contentType, String fileName) {
-        if (this.fileParams == null) {
-            this.fileParams = new LinkedHashMap<String, Object>();
-        }
         if (TextUtils.isEmpty(contentType) && TextUtils.isEmpty(fileName)) {
-            this.fileParams.put(name, value);
+            this.fileParams.add(new KeyValue(name, value));
         } else {
-            this.fileParams.put(name, new BodyEntityWrapper<Object>(value, contentType, fileName));
+            this.fileParams.add(new KeyValue(name, new BodyItemWrapper(value, contentType, fileName)));
         }
     }
 
@@ -447,76 +453,65 @@ public class RequestParams {
         return bodyContent;
     }
 
-    public HashMap<String, String> getHeaders() {
+    public LinkedList<Header> getHeaders() {
         return headers;
     }
 
-    public HashMap<String, String> getQueryStringParams() {
+    public LinkedList<KeyValue> getQueryStringParams() {
         checkBodyParams();
         return queryStringParams;
     }
 
-    public HashMap<String, String> getBodyParams() {
+    public LinkedList<KeyValue> getBodyParams() {
         checkBodyParams();
         return bodyParams;
     }
 
-    public HashMap<String, Object> getFileParams() {
+    public LinkedList<KeyValue> getFileParams() {
         return fileParams;
     }
 
-    public HashMap<String, String> getStringParams() {
-        HashMap<String, String> result = new HashMap<String, String>();
-        if (queryStringParams != null) {
-            result.putAll(queryStringParams);
-        }
-        if (bodyParams != null) {
-            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && value != null) {
-                    result.put(key, value);
-                }
-            }
-        }
+    public LinkedList<KeyValue> getStringParams() {
+        LinkedList<KeyValue> result = new LinkedList<KeyValue>();
+        result.addAll(queryStringParams);
+        result.addAll(bodyParams);
         return result;
     }
 
     public String getStringParameter(String name) {
-        if (TextUtils.isEmpty(name)) {
-            return bodyContent;
-        } else if (queryStringParams != null && queryStringParams.containsKey(name)) {
-            return queryStringParams.get(name);
-        } else if (bodyParams != null && bodyParams.containsKey(name)) {
-            return bodyParams.get(name);
-        } else {
-            return null;
+        for (KeyValue kv : queryStringParams) {
+            if (name == null && kv.key == null) {
+                return kv.getValueStr();
+            } else if (name != null && name.equals(kv.key)) {
+                return kv.getValueStr();
+            }
         }
+        for (KeyValue kv : bodyParams) {
+            if (name == null && kv.key == null) {
+                return kv.getValueStr();
+            } else if (name != null && name.equals(kv.key)) {
+                return kv.getValueStr();
+            }
+        }
+        return null;
     }
 
     public void clearParams() {
-        if (queryStringParams != null) {
-            queryStringParams.clear();
-        }
-        if (bodyParams != null) {
-            bodyParams.clear();
-        }
-        if (fileParams != null) {
-            fileParams.clear();
-        }
+        queryStringParams.clear();
+        bodyParams.clear();
+        fileParams.clear();
         bodyContent = null;
         requestBody = null;
     }
 
     public void removeParameter(String name) {
-        if (queryStringParams != null) {
-            queryStringParams.remove(name);
-        }
-        if (bodyParams != null) {
-            bodyParams.remove(name);
-        }
-        if (fileParams != null) {
-            fileParams.remove(name);
+        if (!TextUtils.isEmpty(name)) {
+            KeyValue kv = new KeyValue(name, null);
+            queryStringParams.remove(kv);
+            bodyParams.remove(kv);
+            fileParams.remove(kv);
+        } else {
+            bodyContent = null;
         }
     }
 
@@ -532,13 +527,14 @@ public class RequestParams {
         RequestBody result = null;
         if (!TextUtils.isEmpty(bodyContent)) {
             result = new StringBody(bodyContent, charset);
-        } else if (multipart || (fileParams != null && fileParams.size() > 0)) {
+        } else if (multipart || fileParams.size() > 0) {
             if (!multipart && fileParams.size() == 1) {
-                for (Object value : fileParams.values()) {
+                for (KeyValue kv : fileParams) {
                     String contentType = null;
-                    if (value instanceof BodyEntityWrapper) {
-                        BodyEntityWrapper wrapper = (BodyEntityWrapper) value;
-                        value = wrapper.getObject();
+                    Object value = kv.value;
+                    if (value instanceof BodyItemWrapper) {
+                        BodyItemWrapper wrapper = (BodyItemWrapper) value;
+                        value = wrapper.getValue();
                         contentType = wrapper.getContentType();
                     }
                     if (value instanceof File) {
@@ -561,7 +557,7 @@ public class RequestParams {
                 result = new MultipartBody(fileParams, charset);
             }
         } else if (bodyParams != null && bodyParams.size() > 0) {
-            result = new BodyParamsBody(bodyParams, charset);
+            result = new UrlEncodedParamsBody(bodyParams, charset);
         }
 
         return result;
@@ -581,9 +577,21 @@ public class RequestParams {
             for (Field field : fields) {
                 field.setAccessible(true);
                 try {
+                    String name = field.getName();
                     Object value = field.get(this);
                     if (value != null) {
-                        this.addParameter(field.getName(), value);
+                        if (value instanceof List) {
+                            for (Object item : (List) value) {
+                                this.addParameter(name, item);
+                            }
+                        } else if (value.getClass().isArray()) {
+                            int len = Array.getLength(value);
+                            for (int i = 0; i < len; i++) {
+                                this.addParameter(name, Array.get(value, i));
+                            }
+                        } else {
+                            this.addParameter(name, value);
+                        }
                     }
                 } catch (IllegalAccessException ex) {
                     LogUtil.e(ex.getMessage(), ex);
@@ -609,39 +617,24 @@ public class RequestParams {
     }
 
     private void checkBodyParams() {
-        if (bodyParams != null &&
+        if (!bodyParams.isEmpty() &&
                 (!HttpMethod.permitsRequestBody(method)
                         || !TextUtils.isEmpty(bodyContent)
                         || requestBody != null)) {
-            if (this.queryStringParams == null) {
-                this.queryStringParams = new LinkedHashMap<String, String>();
-            }
-            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (!TextUtils.isEmpty(key) && value != null) {
-                    queryStringParams.put(key, value);
-                }
-            }
-
+            queryStringParams.addAll(bodyParams);
             bodyParams.clear();
-            bodyParams = null;
         }
 
-        if (bodyParams != null && (multipart || (fileParams != null && fileParams.size() > 0))) {
-            if (this.fileParams == null) {
-                this.fileParams = new LinkedHashMap<String, Object>();
-            }
-            fileParams.putAll(bodyParams);
+        if (!bodyParams.isEmpty() && (multipart || fileParams.size() > 0)) {
+            fileParams.addAll(bodyParams);
             bodyParams.clear();
-            bodyParams = null;
         }
 
-        if (asJsonContent && bodyParams != null && !bodyParams.isEmpty()) {
+        if (asJsonContent && !bodyParams.isEmpty()) {
             JSONObject jsonObject = new JSONObject();
-            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
+            for (KeyValue kv : bodyParams) {
+                String key = kv.key;
+                Object value = kv.value;
                 if (!TextUtils.isEmpty(key) && value != null) {
                     try {
                         jsonObject.put(key, value);
@@ -653,12 +646,20 @@ public class RequestParams {
 
             setBodyContent(jsonObject.toString());
             bodyParams.clear();
-            bodyParams = null;
         }
     }
 
     @Override
     public String toString() {
         return getUri();
+    }
+
+    public final static class Header extends KeyValue {
+        public final boolean setHeader;
+
+        public Header(String key, String value, boolean setHeader) {
+            super(key, value);
+            this.setHeader = setHeader;
+        }
     }
 }

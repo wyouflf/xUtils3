@@ -4,6 +4,7 @@ package org.xutils.http.body;
 import android.text.TextUtils;
 
 import org.xutils.common.Callback;
+import org.xutils.common.KeyValue;
 import org.xutils.common.util.IOUtil;
 import org.xutils.http.ProgressHandler;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -29,11 +30,11 @@ public class MultipartBody implements ProgressBody {
     private String contentType; // multipart/subtype; boundary=xxx...
     private String charset = "UTF-8";
 
-    private Map<String, Object> multipartParams;
+    private LinkedList<KeyValue> multipartParams;
     private long total = 0;
     private long current = 0;
 
-    public MultipartBody(Map<String, Object> multipartParams, String charset) {
+    public MultipartBody(LinkedList<KeyValue> multipartParams, String charset) {
         if (!TextUtils.isEmpty(charset)) {
             this.charset = charset;
         }
@@ -92,9 +93,9 @@ public class MultipartBody implements ProgressBody {
             throw new Callback.CancelledException("upload stopped!");
         }
 
-        for (Map.Entry<String, Object> kv : multipartParams.entrySet()) {
-            String name = kv.getKey();
-            Object value = kv.getValue();
+        for (KeyValue kv : multipartParams) {
+            String name = kv.key;
+            Object value = kv.value;
             if (!TextUtils.isEmpty(name) && value != null) {
                 writeEntry(out, name, value);
             }
@@ -120,9 +121,9 @@ public class MultipartBody implements ProgressBody {
 
         String fileName = "";
         String contentType = null;
-        if (value instanceof BodyEntityWrapper) {
-            BodyEntityWrapper wrapper = (BodyEntityWrapper) value;
-            value = wrapper.getObject();
+        if (value instanceof BodyItemWrapper) {
+            BodyItemWrapper wrapper = (BodyItemWrapper) value;
+            value = wrapper.getValue();
             fileName = wrapper.getFileName();
             contentType = wrapper.getContentType();
         }

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
+import org.xutils.common.KeyValue;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.ex.HttpException;
@@ -29,7 +30,7 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -72,11 +73,11 @@ public class HttpRequest extends UriRequest {
         } else if (!uri.endsWith("?")) {
             queryBuilder.append("&");
         }
-        HashMap<String, String> queryParams = params.getQueryStringParams();
+        LinkedList<KeyValue> queryParams = params.getQueryStringParams();
         if (queryParams != null) {
-            for (Map.Entry<String, String> entry : queryParams.entrySet()) {
-                String name = entry.getKey();
-                String value = entry.getValue();
+            for (KeyValue kv : queryParams) {
+                String name = kv.key;
+                String value = kv.getValueStr();
                 if (!TextUtils.isEmpty(name) && value != null) {
                     queryBuilder.append(
                             Uri.encode(name, params.getCharset()))
@@ -139,13 +140,17 @@ public class HttpRequest extends UriRequest {
         }
 
         {// add headers
-            HashMap<String, String> headers = params.getHeaders();
+            LinkedList<RequestParams.Header> headers = params.getHeaders();
             if (headers != null) {
-                for (Map.Entry<String, String> entry : headers.entrySet()) {
-                    String name = entry.getKey();
-                    String value = entry.getValue();
+                for (RequestParams.Header header : headers) {
+                    String name = header.key;
+                    String value = header.getValueStr();
                     if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
-                        connection.setRequestProperty(name, value);
+                        if (header.setHeader) {
+                            connection.setRequestProperty(name, value);
+                        } else {
+                            connection.addRequestProperty(name, value);
+                        }
                     }
                 }
             }

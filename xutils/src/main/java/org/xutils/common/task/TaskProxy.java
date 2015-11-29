@@ -202,7 +202,7 @@ import java.util.concurrent.Executor;
                     case MSG_WHAT_ON_ERROR: {
                         assert args != null;
                         Throwable throwable = (Throwable) args[0];
-                        LogUtil.e(throwable.getMessage(), throwable);
+                        LogUtil.d(throwable.getMessage(), throwable);
                         taskProxy.task.onError(throwable, false);
                         break;
                     }

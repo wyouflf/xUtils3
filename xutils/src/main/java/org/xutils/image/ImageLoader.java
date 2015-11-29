@@ -406,13 +406,14 @@ import java.util.concurrent.atomic.AtomicLong;
     public void onError(Throwable ex, boolean isOnCallback) {
         stopped = true;
         if (!validView4Callback(false)) return;
-        LogUtil.e(key.url, ex);
 
         if (ex instanceof FileLockedException) {
+            LogUtil.d("ImageFileLocked: " + key.url);
             doBind(viewRef.get(), key.url, options, callback);
             return;
         }
 
+        LogUtil.e(key.url, ex);
         setErrorDrawable4Callback();
         if (callback != null) {
             callback.onError(ex, isOnCallback);

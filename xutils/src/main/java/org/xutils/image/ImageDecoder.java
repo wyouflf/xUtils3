@@ -114,7 +114,7 @@ public final class ImageDecoder {
                     if (bitmap == null) {
                         bitmap = decodeBitmap(file, options, cancelable);
                         // save to thumb cache
-                        if (options.isCompress()) {
+                        if (bitmap != null && options.isCompress()) {
                             final Bitmap finalBitmap = bitmap;
                             THUMB_CACHE_EXECUTOR.execute(new Runnable() {
                                 @Override

@@ -291,16 +291,14 @@ public final class LruDiskCache {
         try {
             WhereBuilder whereBuilder = WhereBuilder.b("expires", "<", System.currentTimeMillis());
             List<DiskCacheEntity> rmList = cacheDb.selector(DiskCacheEntity.class).where(whereBuilder).findAll();
+            // delete db entities
+            cacheDb.delete(DiskCacheEntity.class, whereBuilder);
             if (rmList != null && rmList.size() > 0) {
                 // delete cache files
                 for (DiskCacheEntity entity : rmList) {
                     String path = entity.getPath();
                     if (!TextUtils.isEmpty(path)) {
-                        if (deleteFileWithLock(path)
-                                && deleteFileWithLock(path + TEMP_FILE_SUFFIX)) {
-                            // delete db entity
-                            cacheDb.delete(entity);
-                        }
+                        deleteFileWithLock(path);
                     }
                 }
             }

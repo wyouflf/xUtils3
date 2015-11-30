@@ -51,6 +51,7 @@ public final class ProcessLock implements Closeable {
     public static ProcessLock tryLock(final String lockName, final boolean writeMode) {
         synchronized (LOCK_MAP) {
 
+            // android对文件锁共享支持的不好, 暂时全部互斥.
             if (LOCK_MAP.containsKey(lockName)) {
                 return null;
             }

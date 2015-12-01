@@ -367,7 +367,7 @@ public class HttpRequest extends UriRequest {
         }
 
         if (expiration <= 0) {
-            expiration = System.currentTimeMillis();
+            expiration = Long.MAX_VALUE;
         }
         return expiration;
     }

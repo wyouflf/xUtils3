@@ -363,7 +363,7 @@ public class HttpRequest extends UriRequest {
         }
 
         if (expiration <= 0) {
-            expiration = params.getCacheMaxAge();
+            expiration = System.currentTimeMillis() + params.getCacheMaxAge();
         }
 
         if (expiration <= 0) {

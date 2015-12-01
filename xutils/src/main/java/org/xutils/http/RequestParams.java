@@ -38,7 +38,8 @@ import javax.net.ssl.SSLSocketFactory;
  */
 public class RequestParams {
 
-    // 外部参数
+    // 注解及其扩展参数
+    private HttpRequest httpRequest;
     private final String uri;
     private final String[] signs;
     private final String[] cacheKeys;
@@ -61,8 +62,8 @@ public class RequestParams {
     private String charset = "UTF-8";
     private String cacheDirName; // 缓存文件夹名称
     private long cacheSize; // 缓存文件夹大小
+    private long cacheMaxAge; // 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
     private boolean asJsonContent = false; // 用json形式的bodyParams上传
-    private HttpRequest httpRequest; // 注解参数
     private Executor executor; // 自定义线程池
     private Priority priority = Priority.DEFAULT; // 请求优先级
     private int connectTimeout = 1000 * 15; // 连接超时时间
@@ -214,10 +215,38 @@ public class RequestParams {
         this.cacheSize = cacheSize;
     }
 
+    /**
+     * 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
+     *
+     * @return
+     */
+    public long getCacheMaxAge() {
+        return cacheMaxAge;
+    }
+
+    /**
+     * 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
+     *
+     * @param cacheMaxAge
+     */
+    public void setCacheMaxAge(long cacheMaxAge) {
+        this.cacheMaxAge = cacheMaxAge;
+    }
+
+    /**
+     * 自定义线程池
+     *
+     * @return
+     */
     public Executor getExecutor() {
         return executor;
     }
 
+    /**
+     * 自定义线程池
+     *
+     * @param executor
+     */
     public void setExecutor(Executor executor) {
         this.executor = executor;
     }

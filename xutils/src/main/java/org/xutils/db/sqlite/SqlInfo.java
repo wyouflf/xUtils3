@@ -23,7 +23,7 @@ import org.xutils.db.converter.ColumnConverter;
 import org.xutils.db.converter.ColumnConverterFactory;
 import org.xutils.db.table.ColumnUtils;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class SqlInfo {
@@ -48,7 +48,7 @@ public final class SqlInfo {
 
     public void addBindArg(KeyValue kv) {
         if (bindArgs == null) {
-            bindArgs = new LinkedList<KeyValue>();
+            bindArgs = new ArrayList<KeyValue>();
         }
         bindArgs.add(kv);
     }

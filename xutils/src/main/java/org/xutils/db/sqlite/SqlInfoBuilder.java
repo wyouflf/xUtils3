@@ -20,10 +20,10 @@ import org.xutils.db.table.ColumnEntity;
 import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -264,7 +264,7 @@ public final class SqlInfoBuilder {
 
     public static List<KeyValue> entity2KeyValueList(TableEntity<?> table, Object entity) {
 
-        List<KeyValue> keyValueList = new LinkedList<KeyValue>();
+        List<KeyValue> keyValueList = new ArrayList<KeyValue>();
 
         Collection<ColumnEntity> columns = table.getColumnMap().values();
         for (ColumnEntity column : columns) {

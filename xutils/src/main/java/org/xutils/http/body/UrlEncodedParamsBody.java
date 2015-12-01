@@ -7,7 +7,7 @@ import org.xutils.common.KeyValue;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Author: wyouflf
@@ -18,7 +18,7 @@ public class UrlEncodedParamsBody implements RequestBody {
     private byte[] content;
     private String charset = "UTF-8";
 
-    public UrlEncodedParamsBody(LinkedList<KeyValue> params, String charset) throws IOException {
+    public UrlEncodedParamsBody(List<KeyValue> params, String charset) throws IOException {
         if (!TextUtils.isEmpty(charset)) {
             this.charset = charset;
         }

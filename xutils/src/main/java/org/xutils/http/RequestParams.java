@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.Proxy;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -51,10 +51,10 @@ public class RequestParams {
     private HttpMethod method;
     private String bodyContent;
     private RequestBody requestBody;
-    private final LinkedList<Header> headers = new LinkedList<Header>();
-    private final LinkedList<KeyValue> queryStringParams = new LinkedList<KeyValue>();
-    private final LinkedList<KeyValue> bodyParams = new LinkedList<KeyValue>();
-    private final LinkedList<KeyValue> fileParams = new LinkedList<KeyValue>();
+    private final List<Header> headers = new ArrayList<Header>();
+    private final List<KeyValue> queryStringParams = new ArrayList<KeyValue>();
+    private final List<KeyValue> bodyParams = new ArrayList<KeyValue>();
+    private final List<KeyValue> fileParams = new ArrayList<KeyValue>();
 
     // 扩展参数
     private Proxy proxy; // 代理
@@ -453,26 +453,26 @@ public class RequestParams {
         return bodyContent;
     }
 
-    public LinkedList<Header> getHeaders() {
+    public List<Header> getHeaders() {
         return headers;
     }
 
-    public LinkedList<KeyValue> getQueryStringParams() {
+    public List<KeyValue> getQueryStringParams() {
         checkBodyParams();
         return queryStringParams;
     }
 
-    public LinkedList<KeyValue> getBodyParams() {
+    public List<KeyValue> getBodyParams() {
         checkBodyParams();
         return bodyParams;
     }
 
-    public LinkedList<KeyValue> getFileParams() {
+    public List<KeyValue> getFileParams() {
         return fileParams;
     }
 
-    public LinkedList<KeyValue> getStringParams() {
-        LinkedList<KeyValue> result = new LinkedList<KeyValue>();
+    public List<KeyValue> getStringParams() {
+        List<KeyValue> result = new ArrayList<KeyValue>();
         result.addAll(queryStringParams);
         result.addAll(bodyParams);
         return result;

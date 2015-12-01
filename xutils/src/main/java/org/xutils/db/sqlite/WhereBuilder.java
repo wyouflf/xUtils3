@@ -21,8 +21,8 @@ import org.xutils.db.converter.ColumnConverterFactory;
 import org.xutils.db.table.ColumnUtils;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -35,7 +35,7 @@ public class WhereBuilder {
     private final List<String> whereItems;
 
     private WhereBuilder() {
-        this.whereItems = new LinkedList<String>();
+        this.whereItems = new ArrayList<String>();
     }
 
     /**
@@ -169,7 +169,7 @@ public class WhereBuilder {
                 if (value instanceof Iterable) {
                     items = (Iterable<?>) value;
                 } else if (value.getClass().isArray()) {
-                    List<Object> arrayList = new LinkedList<Object>();
+                    List<Object> arrayList = new ArrayList<Object>();
                     int len = Array.getLength(value);
                     for (int i = 0; i < len; i++) {
                         arrayList.add(Array.get(value, i));
@@ -202,7 +202,7 @@ public class WhereBuilder {
                 if (value instanceof Iterable) {
                     items = (Iterable<?>) value;
                 } else if (value.getClass().isArray()) {
-                    List<Object> arrayList = new LinkedList<Object>();
+                    List<Object> arrayList = new ArrayList<Object>();
                     int len = Array.getLength(value);
                     for (int i = 0; i < len; i++) {
                         arrayList.add(Array.get(value, i));

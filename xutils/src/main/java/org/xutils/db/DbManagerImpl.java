@@ -34,8 +34,8 @@ import org.xutils.x;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 public final class DbManagerImpl implements DbManager {
@@ -374,7 +374,7 @@ public final class DbManagerImpl implements DbManager {
 
     @Override
     public List<DbModel> findDbModelAll(SqlInfo sqlInfo) throws DbException {
-        List<DbModel> dbModelList = new LinkedList<DbModel>();
+        List<DbModel> dbModelList = new ArrayList<DbModel>();
 
         Cursor cursor = execQuery(sqlInfo);
         if (cursor != null) {

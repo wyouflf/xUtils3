@@ -30,7 +30,6 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -73,7 +72,7 @@ public class HttpRequest extends UriRequest {
         } else if (!uri.endsWith("?")) {
             queryBuilder.append("&");
         }
-        LinkedList<KeyValue> queryParams = params.getQueryStringParams();
+        List<KeyValue> queryParams = params.getQueryStringParams();
         if (queryParams != null) {
             for (KeyValue kv : queryParams) {
                 String name = kv.key;
@@ -140,7 +139,7 @@ public class HttpRequest extends UriRequest {
         }
 
         {// add headers
-            LinkedList<RequestParams.Header> headers = params.getHeaders();
+            List<RequestParams.Header> headers = params.getHeaders();
             if (headers != null) {
                 for (RequestParams.Header header : headers) {
                     String name = header.key;

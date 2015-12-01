@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -30,11 +30,11 @@ public class MultipartBody implements ProgressBody {
     private String contentType; // multipart/subtype; boundary=xxx...
     private String charset = "UTF-8";
 
-    private LinkedList<KeyValue> multipartParams;
+    private List<KeyValue> multipartParams;
     private long total = 0;
     private long current = 0;
 
-    public MultipartBody(LinkedList<KeyValue> multipartParams, String charset) {
+    public MultipartBody(List<KeyValue> multipartParams, String charset) {
         if (!TextUtils.isEmpty(charset)) {
             this.charset = charset;
         }

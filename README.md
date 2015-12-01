@@ -183,6 +183,8 @@ private void onTestBaidu2Click(View view) {
 ```java
 BaiduParams params = new BaiduParams();
 params.wd = "xUtils";
+// 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
+params.setCacheMaxAge(1000 * 60);
 Callback.Cancelable cancelable
 		// 使用CacheCallback, xUtils将为该请求缓存数据.
 		= x.http().get(params, new Callback.CacheCallback<String>() {

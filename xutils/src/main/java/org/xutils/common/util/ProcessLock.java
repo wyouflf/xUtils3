@@ -153,17 +153,21 @@ public final class ProcessLock implements Closeable {
 
     private static void release(String lockName, FileLock fileLock, File file, Closeable stream) {
         synchronized (LOCK_MAP) {
-            LogUtil.d("release: " + file.getName() + ":" + PID);
             if (fileLock != null) {
-                IOUtil.closeQuietly(stream);
-                IOUtil.closeQuietly(fileLock.channel());
                 try {
                     fileLock.release();
+                    LogUtil.d("released: " + file.getName() + ":" + PID);
                 } catch (Throwable ignored) {
+                } finally {
+                    IOUtil.closeQuietly(stream);
+                    IOUtil.closeQuietly(fileLock.channel());
+                    ProcessLock lock = LOCK_MAP.get(lockName);
+                    if (lock == null || lock.mFileLock == fileLock) {
+                        IOUtil.deleteFileOrDir(file);
+                        LOCK_MAP.remove(lockName);
+                    }
                 }
             }
-            IOUtil.deleteFileOrDir(file);
-            LOCK_MAP.remove(lockName);
         }
     }
 

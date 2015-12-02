@@ -235,9 +235,26 @@ public enum DbCookieStore implements CookieStore {
         return true;
     }
 
+    private volatile boolean fistDeleteExpiry = true;
+
     private void deleteExpiryCookies() {
         try {
-            db.delete(CookieEntity.class, WhereBuilder.b("expiry", "<", System.currentTimeMillis()));
+            if (fistDeleteExpiry) {
+                fistDeleteExpiry = false;
+                deleteDefaultExpiryCookies();
+            }
+
+            db.delete(CookieEntity.class, WhereBuilder
+                    .b("expiry", "<", System.currentTimeMillis())
+                    .and("expiry", "!=", -1L));
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
+        }
+    }
+
+    private void deleteDefaultExpiryCookies() {
+        try {
+            db.delete(CookieEntity.class, WhereBuilder.b("expiry", "=", -1L));
         } catch (Throwable ex) {
             LogUtil.e(ex.getMessage(), ex);
         }

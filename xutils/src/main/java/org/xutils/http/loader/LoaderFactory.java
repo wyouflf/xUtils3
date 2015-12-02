@@ -54,10 +54,10 @@ public final class LoaderFactory {
             result = new ObjectLoader(type);
         } else {
             result = result.newInstance();
-            RequestTracker tracker = trackerHashMap.get(type);
-            result.setResponseTracker(tracker == null ? defaultTracker : tracker);
         }
         result.setParams(params);
+        RequestTracker tracker = trackerHashMap.get(type);
+        result.setResponseTracker(tracker == null ? defaultTracker : tracker);
         return result;
     }
 

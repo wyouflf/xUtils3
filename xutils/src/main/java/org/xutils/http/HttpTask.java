@@ -8,6 +8,7 @@ import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ParameterizedTypeUtil;
 import org.xutils.ex.HttpException;
+import org.xutils.http.app.HttpRetryHandler;
 import org.xutils.http.app.InterceptRequestListener;
 import org.xutils.http.app.RedirectHandler;
 import org.xutils.http.app.RequestTracker;

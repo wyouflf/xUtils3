@@ -10,6 +10,7 @@ import org.xutils.common.task.Priority;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.annotation.HttpRequest;
 import org.xutils.http.app.DefaultParamsBuilder;
+import org.xutils.http.app.HttpRetryHandler;
 import org.xutils.http.app.ParamsBuilder;
 import org.xutils.http.app.RedirectHandler;
 import org.xutils.http.body.BodyItemWrapper;

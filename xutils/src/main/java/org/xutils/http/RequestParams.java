@@ -2,6 +2,7 @@ package org.xutils.http;
 
 import android.text.TextUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.common.KeyValue;
@@ -27,6 +28,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.Proxy;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -393,11 +395,11 @@ public class RequestParams {
                     this.bodyParams.add(new KeyValue(name, value));
                 }
             } else {
-                this.setBodyContent(value.toString());
+                this.bodyContent = value.toString();
             }
         } else {
             if (!TextUtils.isEmpty(name)) {
-                this.addQueryStringParameter(name, value.toString());
+                this.queryStringParams.add(new KeyValue(name, value));
             }
         }
     }
@@ -409,7 +411,9 @@ public class RequestParams {
      * @param value
      */
     public void addQueryStringParameter(String name, String value) {
-        this.queryStringParams.add(new KeyValue(name, value));
+        if (!TextUtils.isEmpty(name)) {
+            this.queryStringParams.add(new KeyValue(name, value));
+        }
     }
 
     /**
@@ -419,7 +423,11 @@ public class RequestParams {
      * @param value
      */
     public void addBodyParameter(String name, String value) {
-        this.bodyParams.add(new KeyValue(name, value));
+        if (!TextUtils.isEmpty(name)) {
+            this.bodyParams.add(new KeyValue(name, value));
+        } else {
+            this.bodyContent = value;
+        }
     }
 
     /**
@@ -479,6 +487,7 @@ public class RequestParams {
     }
 
     public String getBodyContent() {
+        checkBodyParams();
         return bodyContent;
     }
 
@@ -497,6 +506,7 @@ public class RequestParams {
     }
 
     public List<KeyValue> getFileParams() {
+        checkBodyParams();
         return fileParams;
     }
 
@@ -561,10 +571,29 @@ public class RequestParams {
 
     public void removeParameter(String name) {
         if (!TextUtils.isEmpty(name)) {
-            KeyValue kv = new KeyValue(name, null);
-            queryStringParams.remove(kv);
-            bodyParams.remove(kv);
-            fileParams.remove(kv);
+            Iterator<KeyValue> it = queryStringParams.iterator();
+            while (it.hasNext()) {
+                KeyValue bkv = it.next();
+                if (name.equals(bkv.key)) {
+                    it.remove();
+                }
+            }
+
+            it = bodyParams.iterator();
+            while (it.hasNext()) {
+                KeyValue bkv = it.next();
+                if (name.equals(bkv.key)) {
+                    it.remove();
+                }
+            }
+
+            it = fileParams.iterator();
+            while (it.hasNext()) {
+                KeyValue bkv = it.next();
+                if (name.equals(bkv.key)) {
+                    it.remove();
+                }
+            }
         } else {
             bodyContent = null;
         }
@@ -688,14 +717,30 @@ public class RequestParams {
         if (asJsonContent && !bodyParams.isEmpty()) {
             JSONObject jsonObject = new JSONObject();
             for (KeyValue kv : bodyParams) {
-                String key = kv.key;
-                Object value = kv.value;
-                if (!TextUtils.isEmpty(key) && value != null) {
-                    try {
-                        jsonObject.put(key, value);
-                    } catch (JSONException ex) {
-                        throw new RuntimeException(ex);
+                final String key = kv.key;
+                if (TextUtils.isEmpty(key)) continue;
+
+                // 参数是否是数组参数
+                JSONArray jsonArray = new JSONArray();
+                Iterator<KeyValue> it = bodyParams.iterator();
+                while (it.hasNext()) {
+                    KeyValue bkv = it.next();
+                    if (key.equals(bkv.key)) {
+                        jsonArray.put(bkv.value);
+                        it.remove();
                     }
+                }
+
+                try {
+                    if (jsonArray.length() > 1) {
+                        jsonObject.put(key, jsonArray);
+                    } else {
+                        if (kv.value != null) {
+                            jsonObject.put(key, kv.value);
+                        }
+                    }
+                } catch (JSONException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
 

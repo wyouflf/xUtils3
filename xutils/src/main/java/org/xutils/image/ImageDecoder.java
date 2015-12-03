@@ -78,7 +78,7 @@ public final class ImageDecoder {
                                        final Callback.Cancelable cancelable) throws IOException {
         if (file == null || !file.exists() || file.length() < 1) return null;
         if (cancelable != null && cancelable.isCancelled()) {
-            return null;
+            throw new Callback.CancelledException("cancelled during decode image");
         }
 
         Drawable result = null;
@@ -93,19 +93,21 @@ public final class ImageDecoder {
         } else {
             Bitmap bitmap = null;
             { // decode with lock
-                while (bitmapDecodeWorker.get() >= BITMAP_DECODE_MAX_WORKER
-                        && (cancelable == null || !cancelable.isCancelled())) {
-                    synchronized (bitmapDecodeLock) {
-                        try {
-                            bitmapDecodeLock.wait();
-                        } catch (Throwable ignored) {
+                try {
+                    while (bitmapDecodeWorker.get() >= BITMAP_DECODE_MAX_WORKER
+                            && (cancelable == null || !cancelable.isCancelled())) {
+                        synchronized (bitmapDecodeLock) {
+                            try {
+                                bitmapDecodeLock.wait();
+                            } catch (Throwable ignored) {
+                            }
                         }
                     }
-                }
-                if (cancelable != null && cancelable.isCancelled()) {
-                    return null;
-                }
-                try {
+
+                    if (cancelable != null && cancelable.isCancelled()) {
+                        throw new Callback.CancelledException("cancelled during decode image");
+                    }
+
                     bitmapDecodeWorker.incrementAndGet();
                     // get from thumb cache
                     if (options.isCompress()) {
@@ -191,7 +193,7 @@ public final class ImageDecoder {
         Bitmap result = null;
         try {
             if (cancelable != null && cancelable.isCancelled()) {
-                return null;
+                throw new Callback.CancelledException("cancelled during decode image");
             }
 
             // prepare bitmap options
@@ -228,7 +230,7 @@ public final class ImageDecoder {
                     options.getMaxWidth(), options.getMaxHeight());
 
             if (cancelable != null && cancelable.isCancelled()) {
-                return null;
+                throw new Callback.CancelledException("cancelled during decode image");
             }
 
             // decode file
@@ -245,13 +247,13 @@ public final class ImageDecoder {
 
             { // 旋转和缩放处理
                 if (cancelable != null && cancelable.isCancelled()) {
-                    return null;
+                    throw new Callback.CancelledException("cancelled during decode image");
                 }
                 if (rotateAngle != 0) {
                     bitmap = rotate(bitmap, rotateAngle, true);
                 }
                 if (cancelable != null && cancelable.isCancelled()) {
-                    return null;
+                    throw new Callback.CancelledException("cancelled during decode image");
                 }
                 if (options.isCrop() && optionWith > 0 && optionHeight > 0) {
                     bitmap = cut2ScaleSize(bitmap, optionWith, optionHeight, true);
@@ -264,7 +266,7 @@ public final class ImageDecoder {
 
             { // 圆角和方块处理
                 if (cancelable != null && cancelable.isCancelled()) {
-                    return null;
+                    throw new Callback.CancelledException("cancelled during decode image");
                 }
                 if (options.isCircular()) {
                     bitmap = cut2Circular(bitmap, true);
@@ -313,7 +315,7 @@ public final class ImageDecoder {
         InputStream in = null;
         try {
             if (cancelable != null && cancelable.isCancelled()) {
-                return null;
+                throw new Callback.CancelledException("cancelled during decode image");
             }
             in = new BufferedInputStream(new FileInputStream(file));
             Movie movie = Movie.decodeStream(in);

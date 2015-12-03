@@ -251,6 +251,11 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 }
 
                 if (prepareCallback != null) {
+
+                    if (this.isCancelled()) {
+                        throw new Callback.CancelledException("cancelled before request");
+                    }
+
                     try {
                         result = (ResultType) prepareCallback.prepare(rawResult);
                     } finally {
@@ -486,7 +491,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                             && !HttpTask.this.isCancelled()) {
                         synchronized (sCurrFileLoadCount) {
                             try {
-                                sCurrFileLoadCount.wait();
+                                sCurrFileLoadCount.wait(100);
                             } catch (Throwable ignored) {
                             }
                         }

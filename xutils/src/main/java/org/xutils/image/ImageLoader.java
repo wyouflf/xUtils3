@@ -319,7 +319,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
     @Override
     public boolean isCancelled() {
-        return stopped;
+        return stopped || !validView4Callback(false);
     }
 
     @Override

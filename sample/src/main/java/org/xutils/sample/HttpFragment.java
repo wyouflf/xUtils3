@@ -11,6 +11,7 @@ import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
 import org.xutils.sample.download.DownloadService;
 import org.xutils.sample.http.BaiduParams;
+import org.xutils.sample.http.BaiduResponse;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
 import org.xutils.view.annotation.ViewInject;
@@ -76,6 +77,14 @@ public class HttpFragment extends BaseFragment {
                  * 如示例代码{@link org.xutils.sample.http.BaiduResponse}, 可直接使用BaiduResponse作为
                  * callback的泛型.
                  *
+                 * @HttpResponse 注解 和 ResponseParser接口仅适合做json, xml等文本类型数据的解析,
+                 * 如果需要其他数据类型的解析可参考:
+                 * {@link org.xutils.http.loader.LoaderFactory}
+                 * 和 {@link org.xutils.common.Callback.PrepareCallback}.
+                 * LoaderFactory提供PrepareCallback第一个泛型参数类型的自动转换,
+                 * 第二个泛型参数需要在prepare方法中实现.
+                 * (LoaderFactory中已经默认提供了部分常用类型的转换实现, 其他类型需要自己注册.)
+                 *
                  * 2. callback的组合:
                  * 可以用基类或接口组合个种类的Callback, 见{@link org.xutils.common.Callback}.
                  * 例如:
@@ -93,10 +102,10 @@ public class HttpFragment extends BaseFragment {
                  * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
                  *
                  **/
-                new Callback.CommonCallback<String>() {
+                new Callback.CommonCallback<BaiduResponse>() {
                     @Override
-                    public void onSuccess(String result) {
-                        Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+                    public void onSuccess(BaiduResponse result) {
+                        Toast.makeText(x.app(), result.getTest(), Toast.LENGTH_LONG).show();
                     }
 
                     @Override

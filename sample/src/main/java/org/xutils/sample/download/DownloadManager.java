@@ -126,9 +126,10 @@ public final class DownloadManager {
         callback.setCancelable(cancelable);
         callbackMap.put(downloadInfo, callback);
 
-        if (!downloadInfoList.contains(downloadInfo)) {
-            downloadInfoList.add(downloadInfo);
+        if (downloadInfoList.contains(downloadInfo)) {
+            downloadInfoList.remove(downloadInfo);
         }
+        downloadInfoList.add(downloadInfo);
     }
 
     public void stopDownload(int index) {

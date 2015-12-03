@@ -388,9 +388,9 @@ public class RequestParams {
                 if (value instanceof File
                         || value instanceof InputStream
                         || value instanceof byte[]) {
-                    this.addBodyParameter(name, value, null);
+                    this.fileParams.add(new KeyValue(name, value));
                 } else {
-                    this.addBodyParameter(name, value.toString());
+                    this.bodyParams.add(new KeyValue(name, value));
                 }
             } else {
                 this.setBodyContent(value.toString());
@@ -523,6 +523,32 @@ public class RequestParams {
             }
         }
         return null;
+    }
+
+    public List<KeyValue> getParams(String name) {
+        List<KeyValue> result = new ArrayList<KeyValue>();
+        for (KeyValue kv : queryStringParams) {
+            if (name == null && kv.key == null) {
+                result.add(kv);
+            } else if (name != null && name.equals(kv.key)) {
+                result.add(kv);
+            }
+        }
+        for (KeyValue kv : bodyParams) {
+            if (name == null && kv.key == null) {
+                result.add(kv);
+            } else if (name != null && name.equals(kv.key)) {
+                result.add(kv);
+            }
+        }
+        for (KeyValue kv : fileParams) {
+            if (name == null && kv.key == null) {
+                result.add(kv);
+            } else if (name != null && name.equals(kv.key)) {
+                result.add(kv);
+            }
+        }
+        return result;
     }
 
     public void clearParams() {

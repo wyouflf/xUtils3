@@ -53,7 +53,15 @@ public final class ProcessLock implements Closeable {
 
             // android对文件锁共享支持的不好, 暂时全部互斥.
             if (LOCK_MAP.containsKey(lockName)) {
-                return null;
+                ProcessLock lock = LOCK_MAP.get(lockName);
+                if (lock == null) {
+                    LOCK_MAP.remove(lockName);
+                } else if (lock.isValid()) {
+                    return null;
+                } else {
+                    LOCK_MAP.remove(lockName);
+                    lock.release();
+                }
             }
 
             FileInputStream in = null;
@@ -75,7 +83,7 @@ public final class ProcessLock implements Closeable {
                     if (channel != null) {
                         FileLock fileLock = channel.tryLock(0L, Long.MAX_VALUE, !writeMode);
                         if (isValid(fileLock)) {
-                            LogUtil.d("lock: " + file.getName() + ":" + PID);
+                            LogUtil.d("lock: " + lockName + ":" + PID);
                             ProcessLock processLock = new ProcessLock(lockName, file, fileLock, stream);
                             LOCK_MAP.put(lockName, processLock);
                             return processLock;
@@ -156,18 +164,15 @@ public final class ProcessLock implements Closeable {
             if (fileLock != null) {
                 try {
                     fileLock.release();
-                    LogUtil.d("released: " + file.getName() + ":" + PID);
+                    LogUtil.d("released: " + lockName + ":" + PID);
                 } catch (Throwable ignored) {
                 } finally {
-                    IOUtil.closeQuietly(stream);
                     IOUtil.closeQuietly(fileLock.channel());
-                    ProcessLock lock = LOCK_MAP.get(lockName);
-                    if (lock == null || lock.mFileLock == fileLock) {
-                        IOUtil.deleteFileOrDir(file);
-                        LOCK_MAP.remove(lockName);
-                    }
                 }
             }
+
+            IOUtil.closeQuietly(stream);
+            IOUtil.deleteFileOrDir(file);
         }
     }
 

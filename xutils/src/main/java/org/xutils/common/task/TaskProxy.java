@@ -73,10 +73,9 @@ import java.util.concurrent.Executor;
                             TaskProxy.this.onCancelled(cex);
                         } catch (Throwable ex) {
                             TaskProxy.this.onError(ex, false);
+                        } finally {
+                            TaskProxy.this.onFinished();
                         }
-
-                        // finished
-                        TaskProxy.this.onFinished();
                     }
                 });
         this.executor.execute(runnable);

@@ -338,7 +338,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
     @Override
     public void onLoading(long total, long current, boolean isDownloading) {
-        if (progressCallback != null && validView4Callback(true) /*防止过频繁校验*/) {
+        if (validView4Callback(true) && progressCallback != null) {
             progressCallback.onLoading(total, current, isDownloading);
         }
     }
@@ -453,13 +453,22 @@ import java.util.concurrent.atomic.AtomicLong;
             Drawable otherDrawable = view.getDrawable();
             if (otherDrawable instanceof AsyncDrawable) {
                 ImageLoader otherLoader = ((AsyncDrawable) otherDrawable).getImageLoader();
-                if (otherLoader != null && otherLoader != this) {
-                    if (this.seq > otherLoader.seq) {
-                        otherLoader.cancel();
-                        return true;
+                if (otherLoader != null) {
+                    if (otherLoader == this) {
+                        if (view.getVisibility() != View.VISIBLE) {
+                            otherLoader.cancel();
+                            return false;
+                        } else {
+                            return true;
+                        }
                     } else {
-                        this.cancel();
-                        return false;
+                        if (this.seq > otherLoader.seq) {
+                            otherLoader.cancel();
+                            return true;
+                        } else {
+                            this.cancel();
+                            return false;
+                        }
                     }
                 }
             } else if (forceValidAsyncDrawable) {

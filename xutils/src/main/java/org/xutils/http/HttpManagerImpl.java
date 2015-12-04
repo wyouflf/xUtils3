@@ -35,6 +35,16 @@ public final class HttpManagerImpl implements HttpManager {
 
     @Override
     public <T> Callback.Cancelable get(RequestParams entity, Callback.CommonCallback<T> callback) {
+        return request(HttpMethod.GET, entity, callback);
+    }
+
+    @Override
+    public <T> Callback.Cancelable post(RequestParams entity, Callback.CommonCallback<T> callback) {
+        return request(HttpMethod.POST, entity, callback);
+    }
+
+    @Override
+    public <T> Callback.Cancelable request(HttpMethod method, RequestParams entity, Callback.CommonCallback<T> callback) {
         final String saveFilePath = entity.getSaveFilePath();
         if (!TextUtils.isEmpty(saveFilePath)) {
             HttpTask<?> task = DOWNLOAD_TASK.get(saveFilePath);
@@ -43,7 +53,7 @@ public final class HttpManagerImpl implements HttpManager {
                 task = null;
             }
         }
-        entity.setMethod(HttpMethod.GET);
+        entity.setMethod(method);
         Callback.Cancelable cancelable = null;
         if (callback instanceof Callback.Cancelable) {
             cancelable = (Callback.Cancelable) callback;
@@ -69,26 +79,6 @@ public final class HttpManagerImpl implements HttpManager {
             task = new HttpTask<T>(entity, cancelable, callback);
         }
         return x.task().start(task);
-    }
-
-    @Override
-    public <T> Callback.Cancelable post(RequestParams entity, Callback.CommonCallback<T> callback) {
-        return request(HttpMethod.POST, entity, callback);
-    }
-
-    @Override
-    public <T> Callback.Cancelable request(HttpMethod method, RequestParams entity, Callback.CommonCallback<T> callback) {
-        if (method == HttpMethod.GET) {
-            return get(entity, callback);
-        } else {
-            entity.setMethod(method);
-            Callback.Cancelable cancelable = null;
-            if (callback instanceof Callback.Cancelable) {
-                cancelable = (Callback.Cancelable) callback;
-            }
-            HttpTask<T> task = new HttpTask<T>(entity, cancelable, callback);
-            return x.task().start(task);
-        }
     }
 
     @Override

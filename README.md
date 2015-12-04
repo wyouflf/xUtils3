@@ -285,6 +285,7 @@ jclassRef = jniEnv->FindClass(...);
 jclass temp = jniEnv->FindClass(...);
 jclassRef = (jclass)jniEnv->NewGlobalRef(temp);
 jniEnv->DeleteLocalRef(temp);
+// 其他jni代码修改见: http://my.oschina.net/u/1171837/blog/533153
 ```
 
 ----

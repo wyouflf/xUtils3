@@ -49,6 +49,7 @@ public class HttpRequest extends UriRequest {
     private boolean isLoading = false;
     private InputStream inputStream = null;
     private HttpURLConnection connection = null;
+    private int responseCode = 0;
 
     // cookie manager
     private static final CookieManager COOKIE_MANAGER =
@@ -188,9 +189,9 @@ public class HttpRequest extends UriRequest {
         }
 
         // check response code
-        int code = connection.getResponseCode();
-        if (code >= 300) {
-            HttpException httpException = new HttpException(code, this.getResponseMessage());
+        responseCode = connection.getResponseCode();
+        if (responseCode >= 300) {
+            HttpException httpException = new HttpException(responseCode, this.getResponseMessage());
             try {
                 httpException.setResult(IOUtil.readStr(this.getInputStream(), params.getCharset()));
             } catch (Throwable ignored) {
@@ -308,7 +309,7 @@ public class HttpRequest extends UriRequest {
     @Override
     public int getResponseCode() throws IOException {
         if (connection != null) {
-            return connection.getResponseCode();
+            return responseCode;
         } else {
             if (this.getInputStream() != null) {
                 return 200;

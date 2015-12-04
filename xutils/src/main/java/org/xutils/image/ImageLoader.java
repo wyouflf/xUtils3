@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicLong;
     private final long seq = SEQ_SEEK.incrementAndGet();
 
     private volatile boolean stopped = false;
+    private volatile boolean cancelled = false;
     private Callback.Cancelable cancelable;
     private Callback.CommonCallback<Drawable> callback;
     private Callback.PrepareCallback<File, Drawable> prepareCallback;
@@ -315,6 +316,7 @@ import java.util.concurrent.atomic.AtomicLong;
     @Override
     public void cancel() {
         stopped = true;
+        cancelled = true;
         if (cancelable != null) {
             cancelable.cancel();
         }
@@ -322,7 +324,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
     @Override
     public boolean isCancelled() {
-        return stopped || !validView4Callback(false);
+        return cancelled || !validView4Callback(false);
     }
 
     @Override

@@ -147,14 +147,12 @@ import java.util.HashSet;
             if (handler != null) {
 
                 String eventMethod = method.getName();
-
-                if (methodMap.size() == 1) {
+                method = methodMap.get(eventMethod);
+                if (method == null && methodMap.size() == 1) {
                     for (Method v : methodMap.values()) {
                         method = v;
                         break;
                     }
-                } else {
-                    method = methodMap.get(eventMethod);
                 }
 
                 if (method != null) {

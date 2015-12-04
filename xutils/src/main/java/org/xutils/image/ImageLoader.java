@@ -204,14 +204,17 @@ import java.util.concurrent.atomic.AtomicLong;
         }
 
         // load from Memory Cache
-        Drawable drawable = MEM_CACHE.get(key);
-        if (drawable instanceof BitmapDrawable) {
-            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-            if (bitmap == null || bitmap.isRecycled()) {
-                drawable = null;
+        Drawable memDrawable = null;
+        if (localOptions.isUseMemCache()) {
+            memDrawable = MEM_CACHE.get(key);
+            if (memDrawable instanceof BitmapDrawable) {
+                Bitmap bitmap = ((BitmapDrawable) memDrawable).getBitmap();
+                if (bitmap == null || bitmap.isRecycled()) {
+                    memDrawable = null;
+                }
             }
         }
-        if (drawable != null) { // has mem cache
+        if (memDrawable != null) { // has mem cache
             boolean trustMemCache = false;
             try {
                 if (callback instanceof ProgressCallback) {
@@ -219,17 +222,17 @@ import java.util.concurrent.atomic.AtomicLong;
                 }
                 // hit mem cache
                 view.setScaleType(localOptions.getImageScaleType());
-                view.setImageDrawable(drawable);
+                view.setImageDrawable(memDrawable);
                 trustMemCache = true;
                 if (callback instanceof CacheCallback) {
-                    trustMemCache = ((CacheCallback<Drawable>) callback).onCache(drawable);
+                    trustMemCache = ((CacheCallback<Drawable>) callback).onCache(memDrawable);
                     if (!trustMemCache) {
                         // not trust the cache
                         // load from Network or DiskCache
                         return new ImageLoader().doLoad(view, url, localOptions, callback);
                     }
                 } else if (callback != null) {
-                    callback.onSuccess(drawable);
+                    callback.onSuccess(memDrawable);
                 }
             } catch (Throwable ex) {
                 LogUtil.e(ex.getMessage(), ex);

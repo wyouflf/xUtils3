@@ -53,6 +53,7 @@ public class ImageOptions {
     // end region ############ display options
 
     // extends
+    private boolean useMemCache = true;
     private ParamsBuilder paramsBuilder;
 
     protected ImageOptions() {
@@ -212,6 +213,10 @@ public class ImageOptions {
 
     public boolean isForceLoadingDrawable() {
         return forceLoadingDrawable;
+    }
+
+    public boolean isUseMemCache() {
+        return useMemCache;
     }
 
     public ParamsBuilder getParamsBuilder() {
@@ -393,6 +398,11 @@ public class ImageOptions {
 
         public Builder setForceLoadingDrawable(boolean forceLoadingDrawable) {
             options.forceLoadingDrawable = forceLoadingDrawable;
+            return this;
+        }
+
+        public Builder setUseMemCache(boolean useMemCache) {
+            options.useMemCache = useMemCache;
             return this;
         }
 

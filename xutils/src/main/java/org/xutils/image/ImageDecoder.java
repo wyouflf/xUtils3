@@ -88,7 +88,7 @@ public final class ImageDecoder {
                 movie = decodeGif(file, options, cancelable);
             }
             if (movie != null) {
-                result = new ReusableGifDrawable(movie, (int) file.length());
+                result = new GifDrawable(movie, (int) file.length());
             }
         } else {
             Bitmap bitmap = null;

@@ -12,19 +12,16 @@ import org.xutils.common.util.LogUtil;
 
 public class GifDrawable extends Drawable implements Runnable, Animatable {
     private Movie movie;
-    private int byteCount = 0;
+    private int byteCount;
 
-    private long begin = SystemClock.uptimeMillis();
+    private volatile boolean running;
     private int duration;
-    private boolean running;
+    private long begin = SystemClock.uptimeMillis();
 
     public GifDrawable(Movie movie, int byteCount) {
         this.movie = movie;
         this.byteCount = byteCount;
         this.duration = movie.duration();
-        if (this.duration == 0) {
-            this.duration = 100;
-        }
     }
 
     public Movie getMovie() {
@@ -41,7 +38,7 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
     @Override
     public void draw(Canvas canvas) {
         try {
-            int ms = (int) (SystemClock.uptimeMillis() - begin) % duration;
+            int ms = duration > 0 ? (int) (SystemClock.uptimeMillis() - begin) % duration : 0;
             movie.setTime(ms);
             movie.draw(canvas, 0, 0);
             if (duration > 0) {

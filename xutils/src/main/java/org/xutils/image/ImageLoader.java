@@ -198,7 +198,7 @@ import java.util.concurrent.atomic.AtomicLong;
                 }
             }
         } else if (oldDrawable instanceof ReusableDrawable) {
-            MemCacheKey oldKey = ((ReusableBitmapDrawable) oldDrawable).getMemCacheKey();
+            MemCacheKey oldKey = ((ReusableDrawable) oldDrawable).getMemCacheKey();
             if (oldKey != null && oldKey.equals(key)) {
                 MEM_CACHE.put(key, oldDrawable);
             }
@@ -363,8 +363,8 @@ import java.util.concurrent.atomic.AtomicLong;
             if (result != null) {
                 if (result instanceof ReusableDrawable) {
                     ((ReusableDrawable) result).setMemCacheKey(key);
+                    MEM_CACHE.put(key, result);
                 }
-                MEM_CACHE.put(key, result);
             }
             return result;
         } catch (IOException ex) {

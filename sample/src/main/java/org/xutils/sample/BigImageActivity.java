@@ -24,6 +24,8 @@ public class BigImageActivity extends BaseActivity {
                 // 默认自动适应大小
                 // .setSize(...)
                 .setIgnoreGif(false)
+                        // 如果使用本地文件url, 添加这个设置可以在本地文件更新后刷新立即生效.
+                        //.setUseMemCache(false)
                 .setImageScaleType(ImageView.ScaleType.CENTER).build();
 
         x.image().bind(iv_big_img, getIntent().getStringExtra("url"), imageOptions);
@@ -33,7 +35,7 @@ public class BigImageActivity extends BaseActivity {
 
         // local file
         //x.image().bind(iv_big_img, new File("/sdcard/test.gif").toURI().toString(), imageOptions);
-        //x.image().bind(iv_big_img, "/sdcard/test.gif", imageOptions);
+        //x.image().bind(iv_big_img, "/sdcard/test.jpg", imageOptions);
         //x.image().bind(iv_big_img, "file:///sdcard/test.gif", imageOptions);
         //x.image().bind(iv_big_img, "file:/sdcard/test.gif", imageOptions);
     }

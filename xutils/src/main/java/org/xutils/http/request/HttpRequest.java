@@ -243,11 +243,11 @@ public class HttpRequest extends UriRequest {
             if (HttpMethod.permitsCache(params.getMethod())) {
                 Date lastModified = cacheEntity.getLastModify();
                 if (lastModified.getTime() > 0) {
-                    params.addHeader("If-Modified-Since", toGMTString(lastModified));
+                    params.setHeader("If-Modified-Since", toGMTString(lastModified));
                 }
                 String eTag = cacheEntity.getEtag();
                 if (!TextUtils.isEmpty(eTag)) {
-                    params.addHeader("If-None-Match", eTag);
+                    params.setHeader("If-None-Match", eTag);
                 }
             }
             return loader.loadFromCache(cacheEntity);
@@ -258,8 +258,8 @@ public class HttpRequest extends UriRequest {
 
     @Override
     public void clearCacheHeader() {
-        params.addHeader("If-Modified-Since", null);
-        params.addHeader("If-None-Match", null);
+        params.setHeader("If-Modified-Since", null);
+        params.setHeader("If-None-Match", null);
     }
 
     @Override

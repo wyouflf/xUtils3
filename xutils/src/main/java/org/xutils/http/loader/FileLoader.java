@@ -202,7 +202,7 @@ public class FileLoader extends Loader<File> {
                     }
                 }
                 // retry 时需要覆盖RANGE参数
-                params.addHeader("RANGE", "bytes=" + range + "-");
+                params.setHeader("RANGE", "bytes=" + range + "-");
             }
 
             if (progressHandler != null && !progressHandler.updateProgress(0, 0, false)) {

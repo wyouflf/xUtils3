@@ -364,7 +364,9 @@ public class RequestParams {
      * @param value
      */
     public void setHeader(String name, String value) {
-        this.headers.add(new Header(name, value, true));
+        Header header = new Header(name, value, true);
+        this.headers.remove(header);
+        this.headers.add(header);
     }
 
     /**

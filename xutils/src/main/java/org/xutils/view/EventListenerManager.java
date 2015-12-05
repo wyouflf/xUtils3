@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /*package*/ final class EventListenerManager {
 
@@ -149,8 +150,10 @@ import java.util.HashSet;
                 String eventMethod = method.getName();
                 method = methodMap.get(eventMethod);
                 if (method == null && methodMap.size() == 1) {
-                    for (Method v : methodMap.values()) {
-                        method = v;
+                    for (Map.Entry<String, Method> entry : methodMap.entrySet()) {
+                        if (TextUtils.isEmpty(entry.getKey())) {
+                            method = entry.getValue();
+                        }
                         break;
                     }
                 }

@@ -175,6 +175,8 @@ import java.util.Map;
                         throw new RuntimeException("invoke method error:" +
                                 handler.getClass().getName() + "#" + eventMethod, ex);
                     }
+                } else {
+                    LogUtil.w("method not impl: " + eventMethod + "(" + handler.getClass().getSimpleName() + ")");
                 }
             }
             return null;

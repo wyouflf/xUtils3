@@ -448,6 +448,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 total = current;
             }
             if (forceUpdateUI) {
+                lastUpdateTime = System.currentTimeMillis();
                 this.update(FLAG_PROGRESS, total, current, request.isLoading());
             } else {
                 long currTime = System.currentTimeMillis();

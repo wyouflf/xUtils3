@@ -60,6 +60,8 @@ import java.util.concurrent.atomic.AtomicLong;
     private final static int MEM_CACHE_MIN_SIZE = 1024 * 1024 * 4; // 4M
     private final static LruCache<MemCacheKey, Drawable> MEM_CACHE =
             new LruCache<MemCacheKey, Drawable>(MEM_CACHE_MIN_SIZE) {
+                private boolean deepClear = false;
+
                 @Override
                 protected int sizeOf(MemCacheKey key, Drawable value) {
                     if (value instanceof BitmapDrawable) {
@@ -69,6 +71,23 @@ import java.util.concurrent.atomic.AtomicLong;
                         return ((GifDrawable) value).getByteCount();
                     }
                     return super.sizeOf(key, value);
+                }
+
+                @Override
+                public void trimToSize(int maxSize) {
+                    if (maxSize < 0) {
+                        deepClear = true;
+                    }
+                    super.trimToSize(maxSize);
+                    deepClear = false;
+                }
+
+                @Override
+                protected void entryRemoved(boolean evicted, MemCacheKey key, Drawable oldValue, Drawable newValue) {
+                    super.entryRemoved(evicted, key, oldValue, newValue);
+                    if (evicted && deepClear && oldValue instanceof ReusableDrawable) {
+                        ((ReusableDrawable) oldValue).setMemCacheKey(null);
+                    }
                 }
             };
 

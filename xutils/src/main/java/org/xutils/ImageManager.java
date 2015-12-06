@@ -26,5 +26,7 @@ public interface ImageManager {
 
     Callback.Cancelable loadFile(String url, ImageOptions options, Callback.CommonCallback<File> callback);
 
+    void clearMemCache();
+
     void clearCacheFiles();
 }

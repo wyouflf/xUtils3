@@ -88,6 +88,11 @@ import java.util.concurrent.atomic.AtomicLong;
     }
 
     /*package*/
+    static void clearMemCache() {
+        MEM_CACHE.evictAll();
+    }
+
+    /*package*/
     static void clearCacheFiles() {
         LruDiskCache.getDiskCache(DISK_CACHE_DIR_NAME).clearCacheFiles();
     }

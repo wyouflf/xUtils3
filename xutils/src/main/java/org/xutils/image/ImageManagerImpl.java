@@ -84,6 +84,11 @@ public final class ImageManagerImpl implements ImageManager {
     }
 
     @Override
+    public void clearMemCache() {
+        ImageLoader.clearMemCache();
+    }
+
+    @Override
     public void clearCacheFiles() {
         ImageLoader.clearCacheFiles();
         ImageDecoder.clearCacheFiles();

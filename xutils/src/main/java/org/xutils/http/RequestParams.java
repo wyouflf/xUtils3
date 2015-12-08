@@ -29,8 +29,11 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.Proxy;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 import javax.net.ssl.SSLSocketFactory;
@@ -395,14 +398,36 @@ public class RequestParams {
                         || value instanceof byte[]) {
                     this.fileParams.add(new KeyValue(name, value));
                 } else {
-                    this.bodyParams.add(new KeyValue(name, value));
+                    if (value instanceof List) {
+                        for (Object item : (List) value) {
+                            this.bodyParams.add(new ArrayItem(name, item));
+                        }
+                    } else if (value.getClass().isArray()) {
+                        int len = Array.getLength(value);
+                        for (int i = 0; i < len; i++) {
+                            this.bodyParams.add(new ArrayItem(name, Array.get(value, i)));
+                        }
+                    } else {
+                        this.bodyParams.add(new KeyValue(name, value));
+                    }
                 }
             } else {
                 this.bodyContent = value.toString();
             }
         } else {
             if (!TextUtils.isEmpty(name)) {
-                this.queryStringParams.add(new KeyValue(name, value));
+                if (value instanceof List) {
+                    for (Object item : (List) value) {
+                        this.queryStringParams.add(new ArrayItem(name, item));
+                    }
+                } else if (value.getClass().isArray()) {
+                    int len = Array.getLength(value);
+                    for (int i = 0; i < len; i++) {
+                        this.queryStringParams.add(new ArrayItem(name, Array.get(value, i)));
+                    }
+                } else {
+                    this.queryStringParams.add(new KeyValue(name, value));
+                }
             }
         }
     }
@@ -667,18 +692,7 @@ public class RequestParams {
                     String name = field.getName();
                     Object value = field.get(this);
                     if (value != null) {
-                        if (value instanceof List) {
-                            for (Object item : (List) value) {
-                                this.addParameter(name, item);
-                            }
-                        } else if (value.getClass().isArray()) {
-                            int len = Array.getLength(value);
-                            for (int i = 0; i < len; i++) {
-                                this.addParameter(name, Array.get(value, i));
-                            }
-                        } else {
-                            this.addParameter(name, value);
-                        }
+                        this.addParameter(name, value);
                     }
                 } catch (IllegalAccessException ex) {
                     LogUtil.e(ex.getMessage(), ex);
@@ -718,43 +732,65 @@ public class RequestParams {
         }
 
         if (asJsonContent && !bodyParams.isEmpty()) {
-            JSONObject jsonObject = new JSONObject();
-            for (KeyValue kv : bodyParams) {
-                final String key = kv.key;
-                if (TextUtils.isEmpty(key)) continue;
-
-                // 参数是否是数组参数
-                JSONArray jsonArray = new JSONArray();
-                Iterator<KeyValue> it = bodyParams.iterator();
-                while (it.hasNext()) {
-                    KeyValue bkv = it.next();
-                    if (key.equals(bkv.key)) {
-                        jsonArray.put(bkv.value);
-                        it.remove();
-                    }
+            try {
+                JSONObject jsonObject = null;
+                if (!TextUtils.isEmpty(bodyContent)) {
+                    jsonObject = new JSONObject(bodyContent);
+                } else {
+                    jsonObject = new JSONObject();
                 }
-
-                try {
-                    if (jsonArray.length() > 1) {
-                        jsonObject.put(key, jsonArray);
-                    } else {
-                        if (kv.value != null) {
-                            jsonObject.put(key, kv.value);
-                        }
-                    }
-                } catch (JSONException ex) {
-                    throw new RuntimeException(ex);
-                }
+                params2Json(jsonObject, bodyParams);
+                bodyContent = jsonObject.toString();
+                bodyParams.clear();
+            } catch (JSONException ex) {
+                throw new RuntimeException(ex);
             }
+        }
+    }
 
-            setBodyContent(jsonObject.toString());
-            bodyParams.clear();
+    private void params2Json(final JSONObject jsonObject, final List<KeyValue> paramList) throws JSONException {
+        HashSet<String> arraySet = new HashSet<String>(paramList.size());
+        LinkedHashMap<String, JSONArray> tempData = new LinkedHashMap<String, JSONArray>(paramList.size());
+        for (int i = 0; i < paramList.size(); i++) {
+            KeyValue kv = paramList.get(i);
+            final String key = kv.key;
+            if (TextUtils.isEmpty(key)) continue;
+
+            JSONArray ja = null;
+            if (tempData.containsKey(key)) {
+                ja = tempData.get(key);
+            } else {
+                ja = new JSONArray();
+                tempData.put(key, ja);
+            }
+            ja.put(kv.value);
+
+            if (kv instanceof ArrayItem) {
+                arraySet.add(key);
+            }
+        }
+
+        for (Map.Entry<String, JSONArray> entry : tempData.entrySet()) {
+            String key = entry.getKey();
+            JSONArray ja = entry.getValue();
+            if (ja.length() > 1 || arraySet.contains(key)) {
+                jsonObject.put(key, ja);
+            } else {
+                Object value = ja.get(0);
+                jsonObject.put(key, value);
+            }
         }
     }
 
     @Override
     public String toString() {
         return getUri();
+    }
+
+    public final static class ArrayItem extends KeyValue {
+        public ArrayItem(String key, Object value) {
+            super(key, value);
+        }
     }
 
     public final static class Header extends KeyValue {

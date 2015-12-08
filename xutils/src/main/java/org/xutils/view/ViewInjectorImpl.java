@@ -39,6 +39,12 @@ public final class ViewInjectorImpl implements ViewInjector {
     static {
         IGNORED.add(Object.class);
         IGNORED.add(Activity.class);
+        IGNORED.add(android.app.Fragment.class);
+        try {
+            IGNORED.add(Class.forName("android.support.v4.app.Fragment"));
+            IGNORED.add(Class.forName("android.support.v4.app.FragmentActivity"));
+        } catch (Throwable ignored) {
+        }
     }
 
     private static final Object lock = new Object();
@@ -138,13 +144,11 @@ public final class ViewInjectorImpl implements ViewInjector {
             for (Field field : fields) {
 
                 Class<?> fieldType = field.getType();
-                if ( // 不注入静态字段
-                        Modifier.isStatic(field.getModifiers()) ||
-                                // 不注入final字段
-                                Modifier.isFinal(field.getModifiers()) ||
-                                // 仅注入view字段
-                                (!fieldType.isInterface() &&
-                                        !View.class.isAssignableFrom(fieldType))) {
+                if (
+                /* 不注入静态字段 */     Modifier.isStatic(field.getModifiers()) ||
+                /* 不注入final字段 */    Modifier.isFinal(field.getModifiers()) ||
+                /* 不注入基本类型字段 */  fieldType.isPrimitive() ||
+                /* 不注入数组类型字段 */  fieldType.isArray()) {
                     continue;
                 }
 

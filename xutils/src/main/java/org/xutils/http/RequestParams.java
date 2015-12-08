@@ -129,11 +129,15 @@ public class RequestParams {
             buildUri = builder.buildUri(httpRequest);
             builder.buildParams(this);
             builder.buildSign(this, httpRequest.signs());
-            sslSocketFactory = builder.getSSLSocketFactory();
+            if (sslSocketFactory == null) {
+                sslSocketFactory = builder.getSSLSocketFactory();
+            }
         } else if (this.builder != null) {
             builder.buildParams(this);
             builder.buildSign(this, signs);
-            sslSocketFactory = builder.getSSLSocketFactory();
+            if (sslSocketFactory == null) {
+                sslSocketFactory = builder.getSSLSocketFactory();
+            }
         }
     }
 

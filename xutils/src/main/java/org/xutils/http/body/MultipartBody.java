@@ -214,7 +214,7 @@ public class MultipartBody implements ProgressBody {
         StringBuilder result = new StringBuilder("Content-Type: ");
         if (TextUtils.isEmpty(contentType)) {
             if (value instanceof String) {
-                contentType = "text/plain; charset:" + charset;
+                contentType = "text/plain; charset=" + charset;
             } else {
                 contentType = "application/octet-stream";
             }

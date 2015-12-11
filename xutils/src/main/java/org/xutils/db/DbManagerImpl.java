@@ -568,7 +568,13 @@ public final class DbManagerImpl implements DbManager {
         } catch (Throwable e) {
             throw new DbException(e);
         } finally {
-            IOUtil.closeQuietly(statement);
+            if (statement != null) {
+                try {
+                    statement.releaseReference();
+                } catch (Throwable ex) {
+                    LogUtil.e(ex.getMessage(), ex);
+                }
+            }
         }
     }
 

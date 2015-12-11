@@ -236,7 +236,7 @@ public final class ImageDecoder {
             // decode file
             Bitmap bitmap = null;
             if (isWebP(file)) {
-                bitmap = WebPFactory.nativeDecodeFile(file.getAbsolutePath(), bitmapOps);
+                bitmap = WebPFactory.decodeFile(file.getAbsolutePath(), bitmapOps);
             }
             if (bitmap == null) {
                 bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), bitmapOps);
@@ -594,7 +594,7 @@ public final class ImageDecoder {
      */
     public static void compress(Bitmap bitmap, Bitmap.CompressFormat format, int quality, OutputStream out) throws IOException {
         if (format == Bitmap.CompressFormat.WEBP) {
-            byte[] data = WebPFactory.nativeEncodeBitmap(bitmap, quality);
+            byte[] data = WebPFactory.encodeBitmap(bitmap, quality);
             out.write(data);
         } else {
             bitmap.compress(format, quality, out);
@@ -609,6 +609,8 @@ public final class ImageDecoder {
      * @param thumbBitmap
      */
     private static void saveThumbCache(File file, ImageOptions options, Bitmap thumbBitmap) {
+        if (!WebPFactory.available()) return;
+
         DiskCacheEntity entity = new DiskCacheEntity();
         entity.setKey(
                 file.getAbsolutePath() + "@" + file.lastModified() + options.toString());
@@ -618,7 +620,7 @@ public final class ImageDecoder {
             cacheFile = THUMB_CACHE.createDiskCacheFile(entity);
             if (cacheFile != null) {
                 out = new FileOutputStream(cacheFile);
-                byte[] encoded = WebPFactory.nativeEncodeBitmap(thumbBitmap, 80);
+                byte[] encoded = WebPFactory.encodeBitmap(thumbBitmap, 80);
                 out.write(encoded);
                 out.flush();
                 cacheFile = cacheFile.commit();
@@ -640,6 +642,8 @@ public final class ImageDecoder {
      * @return
      */
     private static Bitmap getThumbCache(File file, ImageOptions options) {
+        if (!WebPFactory.available()) return null;
+
         DiskCacheFile cacheFile = null;
         try {
             cacheFile = THUMB_CACHE.getDiskCacheFile(
@@ -650,7 +654,7 @@ public final class ImageDecoder {
                 bitmapOps.inPurgeable = true;
                 bitmapOps.inInputShareable = true;
                 bitmapOps.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                return WebPFactory.nativeDecodeFile(cacheFile.getAbsolutePath(), bitmapOps);
+                return WebPFactory.decodeFile(cacheFile.getAbsolutePath(), bitmapOps);
             }
         } catch (Throwable ex) {
             LogUtil.w(ex.getMessage(), ex);

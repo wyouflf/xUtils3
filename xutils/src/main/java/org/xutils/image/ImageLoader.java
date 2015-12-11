@@ -165,6 +165,7 @@ import java.util.concurrent.atomic.AtomicLong;
         params.setConnectTimeout(1000 * 8);
         params.setPriority(Priority.BG_LOW);
         params.setExecutor(EXECUTOR);
+        params.setUseCookie(false);
         if (options != null) {
             ImageOptions.ParamsBuilder paramsBuilder = options.getParamsBuilder();
             if (paramsBuilder != null) {
@@ -325,6 +326,7 @@ import java.util.concurrent.atomic.AtomicLong;
         params.setPriority(Priority.BG_LOW);
         params.setExecutor(EXECUTOR);
         params.setCancelFast(true);
+        params.setUseCookie(false);
         ImageOptions.ParamsBuilder paramsBuilder = options.getParamsBuilder();
         if (paramsBuilder != null) {
             params = paramsBuilder.buildParams(params, options);

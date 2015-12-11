@@ -66,6 +66,7 @@ public class RequestParams {
     // 扩展参数
     private Proxy proxy; // 代理
     private String charset = "UTF-8";
+    private boolean useCookie = true; // 是否在请求过程中启用cookie
     private String cacheDirName; // 缓存文件夹名称
     private long cacheSize; // 缓存文件夹大小
     private long cacheMaxAge; // 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
@@ -181,6 +182,24 @@ public class RequestParams {
 
     public String getCharset() {
         return charset;
+    }
+
+    /**
+     * 是否在请求过程中启用cookie, 默认true.
+     *
+     * @return
+     */
+    public boolean isUseCookie() {
+        return useCookie;
+    }
+
+    /**
+     * 是否在请求过程中启用cookie, 默认true.
+     *
+     * @param useCookie
+     */
+    public void setUseCookie(boolean useCookie) {
+        this.useCookie = useCookie;
     }
 
     public Proxy getProxy() {

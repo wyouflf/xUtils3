@@ -15,7 +15,7 @@
 
 package org.xutils.db.sqlite;
 
-import org.xutils.common.KeyValue;
+import org.xutils.common.util.KeyValue;
 import org.xutils.db.table.ColumnEntity;
 import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;

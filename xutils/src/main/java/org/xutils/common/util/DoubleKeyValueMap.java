@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.xutils.view;
+package org.xutils.common.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,9 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 13-6-19
  * Time: PM 1:18
  */
-/*package*/ class DoubleKeyValueMap<K1, K2, V> {
+public class DoubleKeyValueMap<K1, K2, V> {
 
-    private ConcurrentHashMap<K1, ConcurrentHashMap<K2, V>> k1_k2V_map;
+    private final ConcurrentHashMap<K1, ConcurrentHashMap<K2, V>> k1_k2V_map;
 
     public DoubleKeyValueMap() {
         this.k1_k2V_map = new ConcurrentHashMap<K1, ConcurrentHashMap<K2, V>>();
@@ -114,6 +114,9 @@ import java.util.concurrent.ConcurrentHashMap;
         ConcurrentHashMap<K2, V> k2_v = k1_k2V_map.get(key1);
         if (k2_v != null) {
             k2_v.remove(key2);
+        }
+        if (k2_v == null || k2_v.isEmpty()) {
+            k1_k2V_map.remove(key1);
         }
     }
 

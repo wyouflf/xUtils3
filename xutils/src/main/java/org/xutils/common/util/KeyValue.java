@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.xutils.common;
+package org.xutils.common.util;
 
 public class KeyValue {
     public final String key;

@@ -18,6 +18,7 @@ package org.xutils.view;
 import android.text.TextUtils;
 import android.view.View;
 
+import org.xutils.common.util.DoubleKeyValueMap;
 import org.xutils.common.util.LogUtil;
 import org.xutils.view.annotation.Event;
 

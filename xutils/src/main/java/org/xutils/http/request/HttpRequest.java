@@ -7,8 +7,8 @@ import android.text.TextUtils;
 
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
-import org.xutils.common.KeyValue;
 import org.xutils.common.util.IOUtil;
+import org.xutils.common.util.KeyValue;
 import org.xutils.common.util.LogUtil;
 import org.xutils.ex.HttpException;
 import org.xutils.http.HttpMethod;

@@ -3,7 +3,7 @@ package org.xutils.http.body;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import org.xutils.common.KeyValue;
+import org.xutils.common.util.KeyValue;
 
 import java.io.IOException;
 import java.io.OutputStream;

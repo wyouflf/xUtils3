@@ -8,6 +8,7 @@ import org.xutils.db.Selector;
 import org.xutils.db.sqlite.SqlInfo;
 import org.xutils.db.sqlite.WhereBuilder;
 import org.xutils.db.table.DbModel;
+import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;
 
 import java.io.Closeable;
@@ -135,18 +136,23 @@ public interface DbManager extends Closeable {
         public void onUpgrade(DbManager db, int oldVersion, int newVersion);
     }
 
+    public interface TableCreateListener {
+        public void onTableCreate(DbManager db, TableEntity<?> table);
+    }
+
     public static class DaoConfig {
+        private File dbDir;
         private String dbName = "xUtils.db"; // default db name
         private int dbVersion = 1;
         private boolean allowTransaction = true;
         private DbUpgradeListener dbUpgradeListener;
-        private File dbDir;
+        private TableCreateListener tableCreateListener;
 
         public DaoConfig() {
         }
 
-        public DaoConfig setDbVersion(int dbVersion) {
-            this.dbVersion = dbVersion;
+        public DaoConfig setDbDir(File dbDir) {
+            this.dbDir = dbDir;
             return this;
         }
 
@@ -157,19 +163,32 @@ public interface DbManager extends Closeable {
             return this;
         }
 
-        public DaoConfig setDbUpgradeListener(DbUpgradeListener dbUpgradeListener) {
-            this.dbUpgradeListener = dbUpgradeListener;
-            return this;
-        }
-
-        public DaoConfig setDbDir(File dbDir) {
-            this.dbDir = dbDir;
+        public DaoConfig setDbVersion(int dbVersion) {
+            this.dbVersion = dbVersion;
             return this;
         }
 
         public DaoConfig setAllowTransaction(boolean allowTransaction) {
             this.allowTransaction = allowTransaction;
             return this;
+        }
+
+        public DaoConfig setDbUpgradeListener(DbUpgradeListener dbUpgradeListener) {
+            this.dbUpgradeListener = dbUpgradeListener;
+            return this;
+        }
+
+        public DaoConfig setTableCreateListener(TableCreateListener tableCreateListener) {
+            this.tableCreateListener = tableCreateListener;
+            return this;
+        }
+
+        public File getDbDir() {
+            return dbDir;
+        }
+
+        public String getDbName() {
+            return dbName;
         }
 
         public int getDbVersion() {
@@ -180,16 +199,12 @@ public interface DbManager extends Closeable {
             return allowTransaction;
         }
 
-        public String getDbName() {
-            return dbName;
-        }
-
         public DbUpgradeListener getDbUpgradeListener() {
             return dbUpgradeListener;
         }
 
-        public File getDbDir() {
-            return dbDir;
+        public TableCreateListener getTableCreateListener() {
+            return tableCreateListener;
         }
 
         @Override

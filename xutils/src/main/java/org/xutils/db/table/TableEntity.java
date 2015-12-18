@@ -164,7 +164,7 @@ public final class TableEntity<T> {
         return columnMap;
     }
 
-    private boolean checkedDatabase;
+    private volatile boolean checkedDatabase;
 
     public boolean isCheckedDatabase() {
         return checkedDatabase;

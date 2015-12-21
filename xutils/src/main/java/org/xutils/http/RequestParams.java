@@ -543,26 +543,27 @@ public class RequestParams {
     }
 
     public List<Header> getHeaders() {
-        return headers;
+        return new ArrayList<Header>(headers);
     }
 
     public List<KeyValue> getQueryStringParams() {
         checkBodyParams();
-        return queryStringParams;
+        return new ArrayList<KeyValue>(queryStringParams);
     }
 
     public List<KeyValue> getBodyParams() {
         checkBodyParams();
-        return bodyParams;
+        return new ArrayList<KeyValue>(bodyParams);
     }
 
     public List<KeyValue> getFileParams() {
         checkBodyParams();
-        return fileParams;
+        return new ArrayList<KeyValue>(fileParams);
     }
 
     public List<KeyValue> getStringParams() {
-        List<KeyValue> result = new ArrayList<KeyValue>();
+        List<KeyValue> result = new ArrayList<KeyValue>(
+                queryStringParams.size() + bodyParams.size());
         result.addAll(queryStringParams);
         result.addAll(bodyParams);
         return result;

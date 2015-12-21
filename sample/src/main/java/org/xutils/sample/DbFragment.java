@@ -26,7 +26,7 @@ public class DbFragment extends BaseFragment {
     DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
             .setDbName("test")
             .setDbDir(new File("/sdcard"))
-            .setDbVersion(1)
+            .setDbVersion(2)
             .setDbUpgradeListener(new DbManager.DbUpgradeListener() {
                 @Override
                 public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
@@ -57,13 +57,13 @@ public class DbFragment extends BaseFragment {
             DbManager db = x.getDb(daoConfig);
 
             Child child = new Child();
-            child.name = "child's name";
+            child.setName("child's name");
 
             Parent test = db.selector(Parent.class).where("id", "in", new int[]{1, 3, 6}).findFirst();
             // long count = db.selector(Parent.class).where("id", "in", new int[]{1, 3, 6}).count();
             // Parent test = db.selector(Parent.class).where("id", "between", new String[]{"1", "5"}).findFirst();
             if (test != null) {
-                child.parentId = test.getId();
+                child.setParentId(test.getId());
                 temp += "first parent:" + test + "\n";
                 tv_db_result.setText(temp);
             }
@@ -105,7 +105,7 @@ public class DbFragment extends BaseFragment {
             //parent.name = "hahaha123";
             //db.update(parent);
 
-            Parent entity = db.findById(Parent.class, child.parentId);
+            Parent entity = child.getParent(db);
             temp += "find by id:" + entity.toString() + "\n";
             tv_db_result.setText(temp);
 

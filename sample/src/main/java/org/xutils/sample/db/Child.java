@@ -16,8 +16,10 @@
 package org.xutils.sample.db;
 
 
+import org.xutils.DbManager;
 import org.xutils.db.annotation.Column;
 import org.xutils.db.annotation.Table;
+import org.xutils.ex.DbException;
 
 /**
  * Author: wyouflf
@@ -31,19 +33,31 @@ public class Child {
     private int id;
 
     @Column(name = "name")
-    public String name;
+    private String name;
 
     @Column(name = "email")
     private String email;
 
-    @Column(name = "parentId")
-    public long parentId;
+    @Column(name = "parentId" /*, property = "UNIQUE"//如果是一对一加上唯一约束*/)
+    private long parentId; // 外键表id
 
     // 这个属性被忽略，不存入数据库
-    public String willIgnore;
+    private String willIgnore;
 
     @Column(name = "text")
     private String text;
+
+    public Parent getParent(DbManager db) throws DbException {
+        return db.findById(Parent.class, parentId);
+    }
+
+    public long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(long parentId) {
+        this.parentId = parentId;
+    }
 
     public int getId() {
         return id;
@@ -53,12 +67,28 @@ public class Child {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getWillIgnore() {
+        return willIgnore;
+    }
+
+    public void setWillIgnore(String willIgnore) {
+        this.willIgnore = willIgnore;
     }
 
     public String getText() {
@@ -72,7 +102,7 @@ public class Child {
     @Override
     public String toString() {
         return "Child{" +
-                "id=" + getId() +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", parentId=" + parentId +

@@ -1,6 +1,7 @@
 package org.xutils;
 
 import android.app.Application;
+import android.content.Context;
 
 import org.xutils.common.TaskController;
 import org.xutils.common.task.TaskControllerImpl;
@@ -8,6 +9,8 @@ import org.xutils.db.DbManagerImpl;
 import org.xutils.http.HttpManagerImpl;
 import org.xutils.image.ImageManagerImpl;
 import org.xutils.view.ViewInjectorImpl;
+
+import java.lang.reflect.Method;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -30,7 +33,15 @@ public final class x {
 
     public static Application app() {
         if (Ext.app == null) {
-            throw new RuntimeException("please invoke x.Ext.init(app) on Application#onCreate()");
+            try {
+                // 在IDE进行布局预览时使用
+                Class<?> renderActionClass = Class.forName("com.android.layoutlib.bridge.impl.RenderAction");
+                Method method = renderActionClass.getDeclaredMethod("getCurrentContext");
+                Context context = (Context) method.invoke(null);
+                Ext.app = new MockApplication(context);
+            } catch (Throwable ignored) {
+                throw new RuntimeException("please invoke x.Ext.init(app) on Application#onCreate()");
+            }
         }
         return Ext.app;
     }
@@ -112,6 +123,12 @@ public final class x {
 
         public static void setViewInjector(ViewInjector viewInjector) {
             Ext.viewInjector = viewInjector;
+        }
+    }
+
+    private static class MockApplication extends Application {
+        public MockApplication(Context baseContext) {
+            this.attachBaseContext(baseContext);
         }
     }
 }

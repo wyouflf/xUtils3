@@ -165,8 +165,8 @@ import java.util.concurrent.Executor;
             super(Looper.getMainLooper());
         }
 
-        @SuppressWarnings("unchecked")
         @Override
+        @SuppressWarnings("unchecked")
         public void handleMessage(Message msg) {
             if (msg.obj == null) {
                 throw new IllegalArgumentException("msg must not be null");

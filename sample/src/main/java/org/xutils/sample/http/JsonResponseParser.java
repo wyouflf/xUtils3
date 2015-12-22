@@ -37,16 +37,17 @@ public class JsonResponseParser implements ResponseParser {
             baiduResponse.setTest(result);
             list.add(baiduResponse);
             return list;
-            //return Sdk.json().decodeList(result,
-            //        (Class<?>) ParameterizedTypeUtil.getParameterizedType(resultType, List.class, 0));
+            // fastJson:
+            // return JSON.parseArray(result,
+            // (Class<?>) ParameterizedTypeUtil.getParameterizedType(resultType, List.class, 0));
         } else {
             // 这里只是个示例, 不做json转换.
             BaiduResponse baiduResponse = new BaiduResponse();
             baiduResponse.setTest(result);
             return baiduResponse;
-            //return Sdk.json().decode(result, resultClass);
+            // fastjson:
+            // return JSON.parseObject(result, resultClass);
         }
-
 
     }
 }

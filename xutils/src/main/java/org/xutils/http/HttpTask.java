@@ -8,6 +8,7 @@ import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ParameterizedTypeUtil;
 import org.xutils.ex.HttpException;
+import org.xutils.ex.HttpRedirectException;
 import org.xutils.http.app.HttpRetryHandler;
 import org.xutils.http.app.InterceptRequestListener;
 import org.xutils.http.app.RedirectHandler;
@@ -273,6 +274,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 if (this.isCancelled()) {
                     throw new Callback.CancelledException("cancelled after request");
                 }
+            } catch (HttpRedirectException redirectEx) {
+                retry = true;
+                LogUtil.w("Http Redirect:" + params.getUri());
             } catch (Throwable ex) {
                 if (this.request.getResponseCode() == 304) { // disk cache is valid.
                     return null;
@@ -526,7 +530,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             } catch (Throwable ex) {
                 this.ex = ex;
                 if (ex instanceof HttpException) {
-                    int errorCode = ((HttpException) ex).getCode();
+                    HttpException httpEx = (HttpException) ex;
+                    int errorCode = httpEx.getCode();
                     if (errorCode == 301 || errorCode == 302) {
                         RedirectHandler redirectHandler = params.getRedirectHandler();
                         if (redirectHandler != null) {
@@ -539,7 +544,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                                     // 开始重定向请求
                                     HttpTask.this.params = redirectParams;
                                     HttpTask.this.request = initRequest();
-                                    this.ex = new RuntimeException("Need Redirect!");
+                                    this.ex = new HttpRedirectException(errorCode, httpEx.getMessage(), httpEx.getResult());
                                 }
                             } catch (Throwable throwable) {
                                 this.ex = ex;

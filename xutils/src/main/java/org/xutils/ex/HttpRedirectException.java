@@ -15,31 +15,11 @@
 
 package org.xutils.ex;
 
-import java.io.IOException;
-
-/**
- * Author: wyouflf
- * Date: 13-7-24
- * Time: 下午3:00
- */
-public class BaseException extends IOException {
+public class HttpRedirectException extends HttpException {
     private static final long serialVersionUID = 1L;
 
-    public BaseException() {
-        super();
-    }
-
-    public BaseException(String detailMessage) {
-        super(detailMessage);
-    }
-
-    public BaseException(String detailMessage, Throwable throwable) {
-        super(detailMessage);
-        this.initCause(throwable);
-    }
-
-    public BaseException(Throwable throwable) {
-        super(throwable.getMessage());
-        this.initCause(throwable);
+    public HttpRedirectException(int code, String detailMessage, String result) {
+        super(code, detailMessage);
+        this.setResult(result);
     }
 }

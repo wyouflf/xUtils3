@@ -149,6 +149,10 @@ import java.util.Map;
             if (handler != null) {
 
                 String eventMethod = method.getName();
+                if ("toString".equals(eventMethod)) {
+                    return DynamicHandler.class.getSimpleName();
+                }
+
                 method = methodMap.get(eventMethod);
                 if (method == null && methodMap.size() == 1) {
                     for (Map.Entry<String, Method> entry : methodMap.entrySet()) {
@@ -174,7 +178,7 @@ import java.util.Map;
                         return method.invoke(handler, args);
                     } catch (Throwable ex) {
                         throw new RuntimeException("invoke method error:" +
-                                handler.getClass().getName() + "#" + eventMethod, ex);
+                                handler.getClass().getName() + "#" + method.getName(), ex);
                     }
                 } else {
                     LogUtil.w("method not impl: " + eventMethod + "(" + handler.getClass().getSimpleName() + ")");

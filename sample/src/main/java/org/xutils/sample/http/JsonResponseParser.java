@@ -4,6 +4,8 @@ import org.xutils.http.app.ResponseParser;
 import org.xutils.http.request.UriRequest;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by wyouflf on 15/11/5.
@@ -28,16 +30,23 @@ public class JsonResponseParser implements ResponseParser {
     @Override
     public Object parse(Type resultType, Class<?> resultClass, String result) throws Throwable {
         // TODO: json to java bean
-        //if (List.class.isAssignableFrom(resultClass)) {
-        //    return Sdk.json().decodeList(result,
-        //            (Class<?>) ParameterizedTypeUtil.getParameterizedType(resultType, List.class, 0));
-        //} else {
-        //    return Sdk.json().decode(result, resultClass);
-        //}
+        if (resultClass == List.class) {
+            // 这里只是个示例, 不做json转换.
+            List<BaiduResponse> list = new ArrayList<BaiduResponse>();
+            BaiduResponse baiduResponse = new BaiduResponse();
+            baiduResponse.setTest(result);
+            list.add(baiduResponse);
+            return list;
+            //return Sdk.json().decodeList(result,
+            //        (Class<?>) ParameterizedTypeUtil.getParameterizedType(resultType, List.class, 0));
+        } else {
+            // 这里只是个示例, 不做json转换.
+            BaiduResponse baiduResponse = new BaiduResponse();
+            baiduResponse.setTest(result);
+            return baiduResponse;
+            //return Sdk.json().decode(result, resultClass);
+        }
 
-        // 这里只是个示例, 不做json转换.
-        BaiduResponse baiduResponse = new BaiduResponse();
-        baiduResponse.setTest(result);
-        return baiduResponse;
+
     }
 }

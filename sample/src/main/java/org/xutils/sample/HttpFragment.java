@@ -20,6 +20,7 @@ import org.xutils.x;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 /**
  * Created by wyouflf on 15/11/4.
@@ -102,10 +103,10 @@ public class HttpFragment extends BaseFragment {
                  * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
                  *
                  **/
-                new Callback.CommonCallback<BaiduResponse>() {
+                new Callback.CommonCallback<List<BaiduResponse>>() {
                     @Override
-                    public void onSuccess(BaiduResponse result) {
-                        Toast.makeText(x.app(), result.getTest(), Toast.LENGTH_LONG).show();
+                    public void onSuccess(List<BaiduResponse> result) {
+                        Toast.makeText(x.app(), result.get(0).toString(), Toast.LENGTH_LONG).show();
                     }
 
                     @Override

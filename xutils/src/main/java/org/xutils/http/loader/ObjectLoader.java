@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.common.util.IOUtil;
+import org.xutils.common.util.ParameterizedTypeUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.http.annotation.HttpResponse;
 import org.xutils.http.app.RequestTracker;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.List;
 
 /**
  * Created by lei.jiao on 2014/6/27.
@@ -44,15 +46,39 @@ import java.lang.reflect.TypeVariable;
             }
         }
 
-        HttpResponse response = objectClass.getAnnotation(HttpResponse.class);
-        if (response != null) {
-            try {
-                this.parser = response.parser().newInstance();
-            } catch (Throwable ex) {
-                throw new RuntimeException("create parser error", ex);
+        if (List.class.equals(objectClass)) {
+            Type itemType = ParameterizedTypeUtil.getParameterizedType(this.objectType, List.class, 0);
+            Class<?> itemClass = null;
+            if (itemType instanceof ParameterizedType) {
+                itemClass = (Class<?>) ((ParameterizedType) itemType).getRawType();
+            } else if (itemType instanceof TypeVariable) {
+                throw new IllegalArgumentException(
+                        "not support callback type" + itemType.toString());
+            } else {
+                itemClass = (Class<?>) itemType;
+            }
+
+            HttpResponse response = itemClass.getAnnotation(HttpResponse.class);
+            if (response != null) {
+                try {
+                    this.parser = response.parser().newInstance();
+                } catch (Throwable ex) {
+                    throw new RuntimeException("create parser error", ex);
+                }
+            } else {
+                throw new IllegalArgumentException("not found @HttpResponse from " + itemType);
             }
         } else {
-            throw new IllegalArgumentException("not found @HttpResponse from " + objectClass.getName());
+            HttpResponse response = objectClass.getAnnotation(HttpResponse.class);
+            if (response != null) {
+                try {
+                    this.parser = response.parser().newInstance();
+                } catch (Throwable ex) {
+                    throw new RuntimeException("create parser error", ex);
+                }
+            } else {
+                throw new IllegalArgumentException("not found @HttpResponse from " + this.objectType);
+            }
         }
     }
 

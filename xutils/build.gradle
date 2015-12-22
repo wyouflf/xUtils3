@@ -5,7 +5,7 @@ apply plugin: 'com.jfrog.bintray'
 def siteUrl = 'https://github.com/wyouflf/xUtils3'
 def gitUrl = 'https://github.com/wyouflf/xUtils3.git'
 group = "org.xutils"
-version = "3.1.19"
+version = "3.1.20"
 
 android {
     compileSdkVersion 23

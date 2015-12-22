@@ -28,4 +28,9 @@ public class BaiduResponse {
     public void setTest(String test) {
         this.test = test;
     }
+
+    @Override
+    public String toString() {
+        return test;
+    }
 }

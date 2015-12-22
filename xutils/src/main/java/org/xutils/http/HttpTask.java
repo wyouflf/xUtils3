@@ -29,9 +29,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HttpTask<ResultType> extends AbsTask<ResultType> implements ProgressHandler {
 
     // 请求相关
+    private RequestParams params;
     private UriRequest request;
     private RequestWorker requestWorker;
-    private final RequestParams params;
     private final Executor executor;
     private final Callback.CommonCallback<ResultType> callback;
 
@@ -536,35 +536,10 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                                     if (redirectParams.getMethod() == null) {
                                         redirectParams.setMethod(params.getMethod());
                                     }
-                                    // 新任务执行时有可能会再次重定向
-                                    HttpTask<ResultType> task = new HttpTask<ResultType>(
-                                            redirectParams,
-                                            HttpTask.this,
-                                            new Callback.TypedCallback<ResultType>() {
-                                                @Override
-                                                public Type getResultType() {
-                                                    return loadType;
-                                                }
-
-                                                @Override
-                                                public void onSuccess(ResultType result) {
-                                                }
-
-                                                @Override
-                                                public void onError(Throwable ex, boolean isOnCallback) {
-                                                    RequestWorker.this.ex = ex;
-                                                }
-
-                                                @Override
-                                                public void onCancelled(CancelledException cex) {
-                                                }
-
-                                                @Override
-                                                public void onFinished() {
-                                                }
-                                            });
-                                    this.result = x.task().startSync(task);
-                                    this.ex = null;
+                                    // 开始重定向请求
+                                    HttpTask.this.params = redirectParams;
+                                    HttpTask.this.request = initRequest();
+                                    this.ex = new RuntimeException("Need Redirect!");
                                 }
                             } catch (Throwable throwable) {
                                 this.ex = ex;

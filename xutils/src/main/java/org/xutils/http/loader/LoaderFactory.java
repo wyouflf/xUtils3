@@ -9,7 +9,6 @@ import org.xutils.http.app.RequestTracker;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Author: wyouflf
@@ -33,7 +32,6 @@ public final class LoaderFactory {
     private static final HashMap<Type, Loader> converterHashMap = new HashMap<Type, Loader>();
 
     static {
-        converterHashMap.put(Map.class, new MapLoader());
         converterHashMap.put(JSONObject.class, new JSONObjectLoader());
         converterHashMap.put(JSONArray.class, new JSONArrayLoader());
         converterHashMap.put(String.class, new StringLoader());

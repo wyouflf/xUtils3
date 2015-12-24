@@ -202,26 +202,17 @@ public final class SqlInfoBuilder {
         return result;
     }
 
-    public static SqlInfo buildUpdateSqlInfo(TableEntity<?> table, Object entity, WhereBuilder whereBuilder, String... updateColumnNames) throws DbException {
+    public static SqlInfo buildUpdateSqlInfo(TableEntity<?> table, WhereBuilder whereBuilder, KeyValue... nameValuePairs) throws DbException {
 
-        List<KeyValue> keyValueList = entity2KeyValueList(table, entity);
-        if (keyValueList.size() == 0) return null;
-
-        HashSet<String> updateColumnNameSet = null;
-        if (updateColumnNames != null && updateColumnNames.length > 0) {
-            updateColumnNameSet = new HashSet<String>(updateColumnNames.length);
-            Collections.addAll(updateColumnNameSet, updateColumnNames);
-        }
+        if (nameValuePairs == null || nameValuePairs.length == 0) return null;
 
         SqlInfo result = new SqlInfo();
         StringBuilder builder = new StringBuilder("UPDATE ");
         builder.append("\"").append(table.getName()).append("\"");
         builder.append(" SET ");
-        for (KeyValue kv : keyValueList) {
-            if (updateColumnNameSet == null || updateColumnNameSet.contains(kv.key)) {
-                builder.append("\"").append(kv.key).append("\"").append("=?,");
-                result.addBindArg(kv);
-            }
+        for (KeyValue kv : nameValuePairs) {
+            builder.append("\"").append(kv.key).append("\"").append("=?,");
+            result.addBindArg(kv);
         }
         builder.deleteCharAt(builder.length() - 1);
         if (whereBuilder != null && whereBuilder.getWhereItemSize() > 0) {

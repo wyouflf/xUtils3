@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import org.xutils.common.util.KeyValue;
 import org.xutils.db.Selector;
 import org.xutils.db.sqlite.SqlInfo;
 import org.xutils.db.sqlite.WhereBuilder;
@@ -66,12 +67,12 @@ public interface DbManager extends Closeable {
 
     void delete(Class<?> entityType) throws DbException;
 
-    void delete(Class<?> entityType, WhereBuilder whereBuilder) throws DbException;
+    int delete(Class<?> entityType, WhereBuilder whereBuilder) throws DbException;
 
     ///////////// update
     void update(Object entity, String... updateColumnNames) throws DbException;
 
-    void update(Object entity, WhereBuilder whereBuilder, String... updateColumnNames) throws DbException;
+    int update(Class<?> entityType, WhereBuilder whereBuilder, KeyValue... nameValuePairs) throws DbException;
 
     ///////////// find
     <T> T findById(Class<T> entityType, Object idValue) throws DbException;
@@ -124,6 +125,10 @@ public interface DbManager extends Closeable {
     void close() throws IOException;
 
     ///////////// custom
+    int executeUpdateDelete(SqlInfo sqlInfo) throws DbException;
+
+    int executeUpdateDelete(String sql) throws DbException;
+
     void execNonQuery(SqlInfo sqlInfo) throws DbException;
 
     void execNonQuery(String sql) throws DbException;

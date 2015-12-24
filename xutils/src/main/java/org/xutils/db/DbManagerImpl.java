@@ -22,6 +22,7 @@ import android.text.TextUtils;
 
 import org.xutils.DbManager;
 import org.xutils.common.util.IOUtil;
+import org.xutils.common.util.KeyValue;
 import org.xutils.common.util.LogUtil;
 import org.xutils.db.sqlite.SqlInfo;
 import org.xutils.db.sqlite.SqlInfoBuilder;
@@ -116,6 +117,7 @@ public final class DbManagerImpl implements DbManager {
 
             if (entity instanceof List) {
                 List<?> entities = (List<?>) entity;
+                if (entities.isEmpty()) return;
                 TableEntity<?> table = TableEntity.get(this, entities.get(0).getClass());
                 createTableIfNotExist(table);
                 for (Object item : entities) {
@@ -140,6 +142,7 @@ public final class DbManagerImpl implements DbManager {
 
             if (entity instanceof List) {
                 List<?> entities = (List<?>) entity;
+                if (entities.isEmpty()) return;
                 TableEntity<?> table = TableEntity.get(this, entities.get(0).getClass());
                 createTableIfNotExist(table);
                 for (Object item : entities) {
@@ -164,6 +167,7 @@ public final class DbManagerImpl implements DbManager {
 
             if (entity instanceof List) {
                 List<?> entities = (List<?>) entity;
+                if (entities.isEmpty()) return;
                 TableEntity<?> table = TableEntity.get(this, entities.get(0).getClass());
                 createTableIfNotExist(table);
                 for (Object item : entities) {
@@ -189,6 +193,7 @@ public final class DbManagerImpl implements DbManager {
 
             if (entity instanceof List) {
                 List<?> entities = (List<?>) entity;
+                if (entities.isEmpty()) return false;
                 TableEntity<?> table = TableEntity.get(this, entities.get(0).getClass());
                 createTableIfNotExist(table);
                 for (Object item : entities) {
@@ -231,6 +236,7 @@ public final class DbManagerImpl implements DbManager {
 
             if (entity instanceof List) {
                 List<?> entities = (List<?>) entity;
+                if (entities.isEmpty()) return;
                 TableEntity<?> table = TableEntity.get(this, entities.get(0).getClass());
                 if (!table.tableIsExist()) return;
                 for (Object item : entities) {
@@ -254,18 +260,20 @@ public final class DbManagerImpl implements DbManager {
     }
 
     @Override
-    public void delete(Class<?> entityType, WhereBuilder whereBuilder) throws DbException {
+    public int delete(Class<?> entityType, WhereBuilder whereBuilder) throws DbException {
         TableEntity<?> table = TableEntity.get(this, entityType);
-        if (!table.tableIsExist()) return;
+        if (!table.tableIsExist()) return 0;
+        int result = 0;
         try {
             beginTransaction();
 
-            execNonQuery(SqlInfoBuilder.buildDeleteSqlInfo(table, whereBuilder));
+            result = executeUpdateDelete(SqlInfoBuilder.buildDeleteSqlInfo(table, whereBuilder));
 
             setTransactionSuccessful();
         } finally {
             endTransaction();
         }
+        return result;
     }
 
     @Override
@@ -275,6 +283,7 @@ public final class DbManagerImpl implements DbManager {
 
             if (entity instanceof List) {
                 List<?> entities = (List<?>) entity;
+                if (entities.isEmpty()) return;
                 TableEntity<?> table = TableEntity.get(this, entities.get(0).getClass());
                 if (!table.tableIsExist()) return;
                 for (Object item : entities) {
@@ -293,27 +302,22 @@ public final class DbManagerImpl implements DbManager {
     }
 
     @Override
-    public void update(Object entity, WhereBuilder whereBuilder, String... updateColumnNames) throws DbException {
+    public int update(Class<?> entityType, WhereBuilder whereBuilder, KeyValue... nameValuePairs) throws DbException {
+        TableEntity<?> table = TableEntity.get(this, entityType);
+        if (!table.tableIsExist()) return 0;
+
+        int result = 0;
         try {
             beginTransaction();
 
-            if (entity instanceof List) {
-                List<?> entities = (List<?>) entity;
-                TableEntity<?> table = TableEntity.get(this, entities.get(0).getClass());
-                if (!table.tableIsExist()) return;
-                for (Object item : entities) {
-                    execNonQuery(SqlInfoBuilder.buildUpdateSqlInfo(table, item, whereBuilder, updateColumnNames));
-                }
-            } else {
-                TableEntity<?> table = TableEntity.get(this, entity.getClass());
-                if (!table.tableIsExist()) return;
-                execNonQuery(SqlInfoBuilder.buildUpdateSqlInfo(table, entity, whereBuilder, updateColumnNames));
-            }
+            result = executeUpdateDelete(SqlInfoBuilder.buildUpdateSqlInfo(table, whereBuilder, nameValuePairs));
 
             setTransactionSuccessful();
         } finally {
             endTransaction();
         }
+
+        return result;
     }
 
     @Override
@@ -558,17 +562,45 @@ public final class DbManagerImpl implements DbManager {
 
 
     @Override
-    public void execNonQuery(SqlInfo sqlInfo) throws DbException {
-        /*try {
-            Object[] bindArgs = sqlInfo.getBindArgs();
-            if (bindArgs != null && bindArgs.length > 0) {
-                database.execSQL(sqlInfo.getSql(), bindArgs);
-            } else {
-                database.execSQL(sqlInfo.getSql());
-            }
+    public int executeUpdateDelete(SqlInfo sqlInfo) throws DbException {
+        SQLiteStatement statement = null;
+        try {
+            statement = sqlInfo.buildStatement(database);
+            return statement.executeUpdateDelete();
         } catch (Throwable e) {
             throw new DbException(e);
-        }*/
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.releaseReference();
+                } catch (Throwable ex) {
+                    LogUtil.e(ex.getMessage(), ex);
+                }
+            }
+        }
+    }
+
+    @Override
+    public int executeUpdateDelete(String sql) throws DbException {
+        SQLiteStatement statement = null;
+        try {
+            statement = database.compileStatement(sql);
+            return statement.executeUpdateDelete();
+        } catch (Throwable e) {
+            throw new DbException(e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.releaseReference();
+                } catch (Throwable ex) {
+                    LogUtil.e(ex.getMessage(), ex);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void execNonQuery(SqlInfo sqlInfo) throws DbException {
         SQLiteStatement statement = null;
         try {
             statement = sqlInfo.buildStatement(database);

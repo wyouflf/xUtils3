@@ -124,6 +124,12 @@ public class HttpRequest extends UriRequest {
             } else {
                 connection = (HttpURLConnection) url.openConnection();
             }
+
+            // try to fix bug: accidental EOFException before API 19
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                connection.setRequestProperty("Connection", "close");
+            }
+
             connection.setReadTimeout(params.getConnectTimeout());
             connection.setConnectTimeout(params.getConnectTimeout());
             connection.setInstanceFollowRedirects(params.getRedirectHandler() == null);

@@ -53,7 +53,9 @@ public final class MD5 {
         byte[] encodeBytes = null;
         try {
             encodeBytes = MessageDigest.getInstance("MD5").digest(string.getBytes("UTF-8"));
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException neverHappened) {
+        } catch (NoSuchAlgorithmException neverHappened) {
+            throw new RuntimeException(neverHappened);
+        } catch (UnsupportedEncodingException neverHappened) {
             throw new RuntimeException(neverHappened);
         }
 

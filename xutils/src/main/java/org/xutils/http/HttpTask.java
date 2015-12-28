@@ -55,8 +55,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     private final static int MAX_FILE_LOAD_WORKER = 3;
     private final static AtomicInteger sCurrFileLoadCount = new AtomicInteger(0);
 
-    private static final PriorityExecutor HTTP_EXECUTOR = new PriorityExecutor(5);
-    private static final PriorityExecutor CACHE_EXECUTOR = new PriorityExecutor(5);
+    private static final PriorityExecutor HTTP_EXECUTOR = new PriorityExecutor(5, true);
+    private static final PriorityExecutor CACHE_EXECUTOR = new PriorityExecutor(5, true);
 
 
     public HttpTask(RequestParams params, Callback.Cancelable cancelHandler,

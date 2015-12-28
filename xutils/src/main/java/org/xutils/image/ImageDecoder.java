@@ -47,7 +47,7 @@ public final class ImageDecoder {
     private final static byte[] GIF_HEADER = new byte[]{'G', 'I', 'F'};
     private final static byte[] WEBP_HEADER = new byte[]{'W', 'E', 'B', 'P'};
 
-    private final static Executor THUMB_CACHE_EXECUTOR = new PriorityExecutor(1);
+    private final static Executor THUMB_CACHE_EXECUTOR = new PriorityExecutor(1, true);
     private final static LruDiskCache THUMB_CACHE = LruDiskCache.getDiskCache("xUtils_img_thumb");
 
     static {

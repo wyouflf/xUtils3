@@ -36,7 +36,7 @@ public final class LruDiskCache {
     private static final int LOCK_WAIT = 1000 * 3; // 3s
     private static final String CACHE_DIR_NAME = "xUtils_cache";
     private static final String TEMP_FILE_SUFFIX = ".tmp";
-    private static final Executor trimExecutor = new PriorityExecutor(1);
+    private static final Executor trimExecutor = new PriorityExecutor(1, true);
 
     private boolean available = false;
     private final DbManager cacheDb;

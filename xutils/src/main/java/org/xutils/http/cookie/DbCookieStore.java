@@ -28,7 +28,7 @@ public enum DbCookieStore implements CookieStore {
 
     private final DbManager db;
     private static final int LIMIT_COUNT = 5000; // 限制最多5000条数据
-    private static final Executor trimExecutor = new PriorityExecutor(1);
+    private static final Executor trimExecutor = new PriorityExecutor(1, true);
 
     DbCookieStore() {
         db = x.getDb(DbConfigs.COOKIE.getConfig());

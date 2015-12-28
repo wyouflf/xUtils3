@@ -28,12 +28,28 @@ public class PriorityExecutor implements Executor {
         }
     };
 
-    private static final Comparator<Runnable> sRunnableComparator = new Comparator<Runnable>() {
-
+    private static final Comparator<Runnable> FIFO_CMP = new Comparator<Runnable>() {
         @Override
         public int compare(Runnable lhs, Runnable rhs) {
             if (lhs instanceof PriorityRunnable && rhs instanceof PriorityRunnable) {
-                return ((PriorityRunnable) lhs).priority.ordinal() - ((PriorityRunnable) rhs).priority.ordinal();
+                PriorityRunnable lpr = ((PriorityRunnable) lhs);
+                PriorityRunnable rpr = ((PriorityRunnable) rhs);
+                int result = lpr.priority.ordinal() - rpr.priority.ordinal();
+                return result == 0 ? (int) (lpr.SEQ - rpr.SEQ) : result;
+            } else {
+                return 0;
+            }
+        }
+    };
+
+    private static final Comparator<Runnable> FILO_CMP = new Comparator<Runnable>() {
+        @Override
+        public int compare(Runnable lhs, Runnable rhs) {
+            if (lhs instanceof PriorityRunnable && rhs instanceof PriorityRunnable) {
+                PriorityRunnable lpr = ((PriorityRunnable) lhs);
+                PriorityRunnable rpr = ((PriorityRunnable) rhs);
+                int result = lpr.priority.ordinal() - rpr.priority.ordinal();
+                return result == 0 ? (int) (rpr.SEQ - lpr.SEQ) : result;
             } else {
                 return 0;
             }
@@ -42,13 +58,22 @@ public class PriorityExecutor implements Executor {
 
     private final ThreadPoolExecutor mThreadPoolExecutor;
 
-    public PriorityExecutor() {
-        this(CORE_POOL_SIZE);
+    /**
+     * 默认工作线程数5
+     *
+     * @param fifo 优先级相同时, 等待队列的是否优先执行先加入的任务.
+     */
+    public PriorityExecutor(boolean fifo) {
+        this(CORE_POOL_SIZE, fifo);
     }
 
-    public PriorityExecutor(int poolSize) {
+    /**
+     * @param poolSize 工作线程数
+     * @param fifo     优先级相同时, 等待队列的是否优先执行先加入的任务.
+     */
+    public PriorityExecutor(int poolSize, boolean fifo) {
         BlockingQueue<Runnable> mPoolWorkQueue =
-                new PriorityBlockingQueue<Runnable>(MAXIMUM_POOL_SIZE, sRunnableComparator);
+                new PriorityBlockingQueue<Runnable>(MAXIMUM_POOL_SIZE, fifo ? FIFO_CMP : FILO_CMP);
         mThreadPoolExecutor = new ThreadPoolExecutor(
                 poolSize,
                 MAXIMUM_POOL_SIZE,

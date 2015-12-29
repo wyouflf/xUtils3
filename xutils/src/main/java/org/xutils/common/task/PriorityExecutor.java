@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by wyouflf on 15/6/5.
@@ -18,6 +19,7 @@ public class PriorityExecutor implements Executor {
     private static final int CORE_POOL_SIZE = 5;
     private static final int MAXIMUM_POOL_SIZE = 256;
     private static final int KEEP_ALIVE = 1;
+    private static final AtomicLong SEQ_SEED = new AtomicLong(0);
 
     private static final ThreadFactory sThreadFactory = new ThreadFactory() {
         private final AtomicInteger mCount = new AtomicInteger(1);
@@ -102,7 +104,10 @@ public class PriorityExecutor implements Executor {
     }
 
     @Override
-    public void execute(final Runnable runnable) {
+    public void execute(Runnable runnable) {
+        if (runnable instanceof PriorityRunnable) {
+            ((PriorityRunnable) runnable).SEQ = SEQ_SEED.getAndIncrement();
+        }
         mThreadPoolExecutor.execute(runnable);
     }
 }

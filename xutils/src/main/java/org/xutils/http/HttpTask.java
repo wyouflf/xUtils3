@@ -142,7 +142,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             synchronized (DOWNLOAD_TASK) {
                 String downloadTaskKey = this.params.getSaveFilePath();
                 if (TextUtils.isEmpty(downloadTaskKey)) {
-                    downloadTaskKey = this.params.getCacheKey();
+                    downloadTaskKey = this.request.getCacheKey();
                 }
                 if (!TextUtils.isEmpty(downloadTaskKey)) {
                     WeakReference<HttpTask<?>> taskRef = DOWNLOAD_TASK.get(downloadTaskKey);

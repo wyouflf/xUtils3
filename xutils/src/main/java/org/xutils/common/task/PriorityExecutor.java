@@ -26,7 +26,7 @@ public class PriorityExecutor implements Executor {
 
         @Override
         public Thread newThread(Runnable runnable) {
-            return new Thread(runnable, "PriorityExecutor #" + mCount.getAndIncrement());
+            return new Thread(runnable, "xTID#" + mCount.getAndIncrement());
         }
     };
 

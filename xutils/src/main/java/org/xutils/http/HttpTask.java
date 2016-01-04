@@ -323,6 +323,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                     return null;
                 } else {
                     exception = ex;
+                    if (this.isCancelled() && !(exception instanceof Callback.CancelledException)) {
+                        exception = new Callback.CancelledException("canceled by user");
+                    }
                     retry = retryHandler.retryRequest(ex, ++retryCount, this.request);
                 }
             }

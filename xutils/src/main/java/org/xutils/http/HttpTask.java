@@ -1,5 +1,7 @@
 package org.xutils.http;
 
+import android.text.TextUtils;
+
 import org.xutils.common.Callback;
 import org.xutils.common.task.AbsTask;
 import org.xutils.common.task.Priority;
@@ -19,7 +21,9 @@ import org.xutils.x;
 
 import java.io.Closeable;
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -54,6 +58,10 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     private Type loadType;
     private final static int MAX_FILE_LOAD_WORKER = 3;
     private final static AtomicInteger sCurrFileLoadCount = new AtomicInteger(0);
+
+    // 文件下载任务
+    private static final HashMap<String, WeakReference<HttpTask<?>>>
+            DOWNLOAD_TASK = new HashMap<String, WeakReference<HttpTask<?>>>(1);
 
     private static final PriorityExecutor HTTP_EXECUTOR = new PriorityExecutor(5, true);
     private static final PriorityExecutor CACHE_EXECUTOR = new PriorityExecutor(5, true);
@@ -94,9 +102,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         }
     }
 
-    // 初始化请求参数
-    private UriRequest initRequest() throws Throwable {
-        // get loadType
+    // 解析loadType
+    private void resolveLoadType() {
         Class<?> callBackType = callback.getClass();
         if (callback instanceof Callback.TypedCallback) {
             loadType = ((Callback.TypedCallback) callback).getResultType();
@@ -105,11 +112,14 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         } else {
             loadType = ParameterizedTypeUtil.getParameterizedType(callBackType, Callback.CommonCallback.class, 0);
         }
+    }
 
+    // 初始化请求参数
+    private UriRequest initRequest() throws Throwable {
         // init request
         params.init();
         UriRequest result = UriRequestFactory.getUriRequest(params, loadType);
-        result.setCallingClassLoader(callBackType.getClassLoader());
+        result.setCallingClassLoader(callback.getClass().getClassLoader());
         result.setProgressHandler(this);
 
         // init tracker
@@ -126,6 +136,29 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         return result;
     }
 
+    // 文件下载冲突检测
+    private void checkDownloadTask() {
+        if (File.class == loadType) {
+            synchronized (DOWNLOAD_TASK) {
+                String downloadTaskKey = this.params.getSaveFilePath();
+                if (TextUtils.isEmpty(downloadTaskKey)) {
+                    downloadTaskKey = this.params.getCacheKey();
+                }
+                if (!TextUtils.isEmpty(downloadTaskKey)) {
+                    WeakReference<HttpTask<?>> taskRef = DOWNLOAD_TASK.get(downloadTaskKey);
+                    if (taskRef != null) {
+                        HttpTask<?> task = taskRef.get();
+                        if (task != null) {
+                            task.closeRequestSync();
+                        }
+                        DOWNLOAD_TASK.remove(downloadTaskKey);
+                    }
+                    DOWNLOAD_TASK.put(downloadTaskKey, new WeakReference<HttpTask<?>>(this));
+                } // end if (!TextUtils.isEmpty(downloadTaskKey))
+            }
+        }
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     protected ResultType doBackground() throws Throwable {
@@ -136,7 +169,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
         // 初始化请求参数
         ResultType result = null;
+        resolveLoadType();
         request = initRequest();
+        checkDownloadTask();
         // retry 初始化
         boolean retry = true;
         int retryCount = 0;
@@ -387,7 +422,12 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         if (tracker != null) {
             tracker.onFinished(request);
         }
-        closeRequest();
+        x.task().run(new Runnable() {
+            @Override
+            public void run() {
+                closeRequestSync();
+            }
+        });
         callback.onFinished();
     }
 
@@ -400,24 +440,24 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     @Override
     protected void cancelWorks() {
-        closeRequest();
-    }
-
-    private void closeRequest() {
         x.task().run(new Runnable() {
             @Override
             public void run() {
-                clearRawResult();
-                if (requestWorker != null && params.isCancelFast()) {
-                    try {
-                        requestWorker.interrupt();
-                    } catch (Throwable ignored) {
-                    }
-                }
-                // wtf: okhttp close the inputStream be locked by BufferedInputStream#read
-                IOUtil.closeQuietly(request);
+                closeRequestSync();
             }
         });
+    }
+
+    private void closeRequestSync() {
+        clearRawResult();
+        if (requestWorker != null && params.isCancelFast()) {
+            try {
+                requestWorker.interrupt();
+            } catch (Throwable ignored) {
+            }
+        }
+        // wtf: okhttp close the inputStream be locked by BufferedInputStream#read
+        IOUtil.closeQuietly(request);
     }
 
     @Override

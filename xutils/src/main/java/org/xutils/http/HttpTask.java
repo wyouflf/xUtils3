@@ -141,14 +141,20 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         if (File.class == loadType) {
             synchronized (DOWNLOAD_TASK) {
                 String downloadTaskKey = this.params.getSaveFilePath();
-                if (TextUtils.isEmpty(downloadTaskKey)) {
-                    downloadTaskKey = this.request.getCacheKey();
-                }
+                /*{
+                    // 不处理缓存文件下载冲突,
+                    // 缓存文件下载冲突会抛出FileLockedException异常,
+                    // 使用异常处理控制是否重新尝试下载.
+                    if (TextUtils.isEmpty(downloadTaskKey)) {
+                        downloadTaskKey = this.request.getCacheKey();
+                    }
+                }*/
                 if (!TextUtils.isEmpty(downloadTaskKey)) {
                     WeakReference<HttpTask<?>> taskRef = DOWNLOAD_TASK.get(downloadTaskKey);
                     if (taskRef != null) {
                         HttpTask<?> task = taskRef.get();
                         if (task != null) {
+                            task.cancel();
                             task.closeRequestSync();
                         }
                         DOWNLOAD_TASK.remove(downloadTaskKey);

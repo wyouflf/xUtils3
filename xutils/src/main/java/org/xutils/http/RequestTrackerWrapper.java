@@ -46,7 +46,7 @@ import org.xutils.http.request.UriRequest;
     @Override
     public void onSuccess(UriRequest request, Object result) {
         try {
-            base.onSuccess(request, true);
+            base.onSuccess(request, result);
         } catch (Throwable ex) {
             LogUtil.e(ex.getMessage(), ex);
         }

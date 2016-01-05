@@ -9,7 +9,7 @@ import org.xutils.common.Callback;
 import org.xutils.ex.DbException;
 import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
-import org.xutils.sample.download.DownloadService;
+import org.xutils.sample.download.DownloadManager;
 import org.xutils.sample.http.BaiduParams;
 import org.xutils.sample.http.BaiduResponse;
 import org.xutils.view.annotation.ContentView;
@@ -194,7 +194,7 @@ public class HttpFragment extends BaseFragment {
         for (int i = 0; i < 5; i++) {
             String url = et_url.getText().toString();
             String label = i + "xUtils_" + System.nanoTime();
-            DownloadService.getDownloadManager().startDownload(
+            DownloadManager.getInstance().startDownload(
                     url, label,
                     "/sdcard/xUtils/" + label + ".aar", true, false, null);
         }

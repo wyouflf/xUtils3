@@ -4,6 +4,7 @@ import org.xutils.DbManager;
 import org.xutils.common.Callback;
 import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.LogUtil;
+import org.xutils.db.converter.ColumnConverterFactory;
 import org.xutils.ex.DbException;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
@@ -20,6 +21,11 @@ import java.util.concurrent.Executor;
  * Time: 下午8:10
  */
 public final class DownloadManager {
+
+    static {
+        // 注册DownloadState在数据库中的值类型映射
+        ColumnConverterFactory.registerColumnConverter(DownloadState.class, new DownloadStateConverter());
+    }
 
     private static DownloadManager instance;
 
@@ -52,7 +58,7 @@ public final class DownloadManager {
     }
 
     /*package*/
-    static DownloadManager getInstance() {
+    public static DownloadManager getInstance() {
         if (instance == null) {
             synchronized (DownloadManager.class) {
                 if (instance == null) {

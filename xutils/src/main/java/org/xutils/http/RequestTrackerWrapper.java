@@ -35,18 +35,18 @@ import org.xutils.http.request.UriRequest;
     }
 
     @Override
-    public void onCache(UriRequest request) {
+    public void onCache(UriRequest request, Object result) {
         try {
-            base.onCache(request);
+            base.onCache(request, result);
         } catch (Throwable ex) {
             LogUtil.e(ex.getMessage(), ex);
         }
     }
 
     @Override
-    public void onSuccess(UriRequest request) {
+    public void onSuccess(UriRequest request, Object result) {
         try {
-            base.onSuccess(request);
+            base.onSuccess(request, true);
         } catch (Throwable ex) {
             LogUtil.e(ex.getMessage(), ex);
         }

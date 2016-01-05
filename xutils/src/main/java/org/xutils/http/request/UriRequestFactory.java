@@ -1,6 +1,7 @@
 package org.xutils.http.request;
 
 import org.xutils.http.RequestParams;
+import org.xutils.http.app.RequestTracker;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
@@ -11,6 +12,7 @@ import java.lang.reflect.Type;
  */
 public final class UriRequestFactory {
 
+    private static RequestTracker defaultTracker;
     private static Class<? extends AssetsRequest> ASSETS_REQUEST_CLS;
 
     private UriRequestFactory() {
@@ -33,6 +35,14 @@ public final class UriRequestFactory {
         } else {
             throw new IllegalArgumentException("The url not be support: " + uri);
         }
+    }
+
+    public static void registerDefaultTracker(RequestTracker tracker) {
+        defaultTracker = tracker;
+    }
+
+    public static RequestTracker getDefaultTracker() {
+        return defaultTracker;
     }
 
     public static void registerAssetsRequestClass(Class<? extends AssetsRequest> assetsRequestCls) {

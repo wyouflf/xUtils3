@@ -7,7 +7,6 @@ import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.ParameterizedTypeUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.http.annotation.HttpResponse;
-import org.xutils.http.app.RequestTracker;
 import org.xutils.http.app.ResponseParser;
 import org.xutils.http.request.UriRequest;
 
@@ -125,14 +124,5 @@ import java.util.List;
     @Override
     public void save2Cache(UriRequest request) {
         saveStringCache(request, resultStr);
-    }
-
-    @Override
-    public RequestTracker getResponseTracker() {
-        if (this.parser instanceof RequestTracker) {
-            return (RequestTracker) parser;
-        } else {
-            return tracker;
-        }
     }
 }

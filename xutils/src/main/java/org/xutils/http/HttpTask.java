@@ -90,14 +90,29 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             this.interceptRequestListener = (InterceptRequestListener) callback;
         }
 
-        // init executor
-        if (params.getExecutor() != null) {
-            this.executor = params.getExecutor();
-        } else {
-            if (cacheCallback != null) {
-                this.executor = CACHE_EXECUTOR;
+        {// init tracker
+            RequestTracker customTracker = null;
+            if (callback instanceof RequestTracker) {
+                customTracker = (RequestTracker) callback;
+            } else if (params instanceof RequestTracker) {
+                customTracker = (RequestTracker) params;
             } else {
-                this.executor = HTTP_EXECUTOR;
+                customTracker = UriRequestFactory.getDefaultTracker();
+            }
+            if (customTracker != null) {
+                tracker = new RequestTrackerWrapper(customTracker);
+            }
+        }
+
+        {// init executor
+            if (params.getExecutor() != null) {
+                this.executor = params.getExecutor();
+            } else {
+                if (cacheCallback != null) {
+                    this.executor = CACHE_EXECUTOR;
+                } else {
+                    this.executor = HTTP_EXECUTOR;
+                }
             }
         }
     }
@@ -115,24 +130,12 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     }
 
     // 初始化请求参数
-    private UriRequest initRequest() throws Throwable {
+    private UriRequest createNewRequest() throws Throwable {
         // init request
         params.init();
         UriRequest result = UriRequestFactory.getUriRequest(params, loadType);
         result.setCallingClassLoader(callback.getClass().getClassLoader());
         result.setProgressHandler(this);
-
-        // init tracker
-        RequestTracker customTracker = null;
-        if (callback instanceof RequestTracker) {
-            customTracker = (RequestTracker) callback;
-        } else {
-            customTracker = result.getResponseTracker();
-        }
-        if (customTracker != null) {
-            tracker = new RequestTrackerWrapper(customTracker);
-        }
-
         return result;
     }
 
@@ -176,7 +179,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         // 初始化请求参数
         ResultType result = null;
         resolveLoadType();
-        request = initRequest();
+        request = createNewRequest();
         checkDownloadTask();
         // retry 初始化
         boolean retry = true;
@@ -349,10 +352,11 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             case FLAG_CACHE: {
                 synchronized (cacheLock) {
                     try {
+                        ResultType result = (ResultType) args[0];
                         if (tracker != null) {
-                            tracker.onCache(request);
+                            tracker.onCache(request, result);
                         }
-                        trustCache = this.cacheCallback.onCache((ResultType) args[0]);
+                        trustCache = this.cacheCallback.onCache(result);
                     } catch (Throwable ex) {
                         trustCache = false;
                         callback.onError(ex, true);
@@ -402,7 +406,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     @Override
     protected void onSuccess(ResultType result) {
         if (tracker != null) {
-            tracker.onSuccess(request);
+            tracker.onSuccess(request, result);
         }
         if (result != null) {
             callback.onSuccess(result);
@@ -592,7 +596,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                                     }
                                     // 开始重定向请求
                                     HttpTask.this.params = redirectParams;
-                                    HttpTask.this.request = initRequest();
+                                    HttpTask.this.request = createNewRequest();
                                     this.ex = new HttpRedirectException(errorCode, httpEx.getMessage(), httpEx.getResult());
                                 }
                             } catch (Throwable throwable) {

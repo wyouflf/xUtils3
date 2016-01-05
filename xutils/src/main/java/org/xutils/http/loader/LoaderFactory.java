@@ -4,7 +4,6 @@ package org.xutils.http.loader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.xutils.http.RequestParams;
-import org.xutils.http.app.RequestTracker;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -18,13 +17,6 @@ public final class LoaderFactory {
 
     private LoaderFactory() {
     }
-
-    private static RequestTracker defaultTracker;
-
-    /**
-     * key: loadType
-     */
-    private static final HashMap<Type, RequestTracker> trackerHashMap = new HashMap<Type, RequestTracker>();
 
     /**
      * key: loadType
@@ -54,20 +46,10 @@ public final class LoaderFactory {
             result = result.newInstance();
         }
         result.setParams(params);
-        RequestTracker tracker = trackerHashMap.get(type);
-        result.setResponseTracker(tracker == null ? defaultTracker : tracker);
         return result;
     }
 
     public static <T> void registerLoader(Type type, Loader<T> loader) {
         converterHashMap.put(type, loader);
-    }
-
-    public static void registerDefaultTracker(RequestTracker tracker) {
-        defaultTracker = tracker;
-    }
-
-    public static void registerTracker(Type type, RequestTracker tracker) {
-        trackerHashMap.put(type, tracker);
     }
 }

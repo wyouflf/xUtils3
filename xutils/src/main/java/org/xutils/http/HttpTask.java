@@ -136,6 +136,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         UriRequest result = UriRequestFactory.getUriRequest(params, loadType);
         result.setCallingClassLoader(callback.getClass().getClassLoader());
         result.setProgressHandler(this);
+        this.update(FLAG_REQUEST_CREATED, result);
         return result;
     }
 
@@ -342,13 +343,20 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         return result;
     }
 
-    private static final int FLAG_CACHE = 1;
-    private static final int FLAG_PROGRESS = 2;
+    private static final int FLAG_REQUEST_CREATED = 1;
+    private static final int FLAG_CACHE = 2;
+    private static final int FLAG_PROGRESS = 3;
 
     @Override
     @SuppressWarnings("unchecked")
     protected void onUpdate(int flag, Object... args) {
         switch (flag) {
+            case FLAG_REQUEST_CREATED: {
+                if (this.tracker != null) {
+                    this.tracker.onRequestCreated((UriRequest) args[0]);
+                }
+                break;
+            }
             case FLAG_CACHE: {
                 synchronized (cacheLock) {
                     try {
@@ -364,6 +372,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                         cacheLock.notifyAll();
                     }
                 }
+                break;
             }
             case FLAG_PROGRESS: {
                 if (this.progressCallback != null && args.length == 3) {
@@ -376,6 +385,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                         callback.onError(ex, true);
                     }
                 }
+                break;
             }
             default: {
                 break;
@@ -386,7 +396,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     @Override
     protected void onWaiting() {
         if (tracker != null) {
-            tracker.onWaiting(request);
+            tracker.onWaiting(params);
         }
         if (progressCallback != null) {
             progressCallback.onWaiting();
@@ -396,7 +406,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     @Override
     protected void onStarted() {
         if (tracker != null) {
-            tracker.onStart(request);
+            tracker.onStart(params);
         }
         if (progressCallback != null) {
             progressCallback.onStarted();

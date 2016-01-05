@@ -1,5 +1,6 @@
 package org.xutils.http.app;
 
+import org.xutils.http.RequestParams;
 import org.xutils.http.request.UriRequest;
 
 /**
@@ -16,9 +17,11 @@ import org.xutils.http.request.UriRequest;
  */
 public interface RequestTracker {
 
-    void onWaiting(UriRequest request);
+    void onWaiting(RequestParams params);
 
-    void onStart(UriRequest request);
+    void onStart(RequestParams params);
+
+    void onRequestCreated(UriRequest request);
 
     void onCache(UriRequest request, Object result);
 

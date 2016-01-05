@@ -17,18 +17,27 @@ import org.xutils.http.request.UriRequest;
     }
 
     @Override
-    public void onWaiting(UriRequest request) {
+    public void onWaiting(RequestParams params) {
         try {
-            base.onWaiting(request);
+            base.onWaiting(params);
         } catch (Throwable ex) {
             LogUtil.e(ex.getMessage(), ex);
         }
     }
 
     @Override
-    public void onStart(UriRequest request) {
+    public void onStart(RequestParams params) {
         try {
-            base.onStart(request);
+            base.onStart(params);
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public void onRequestCreated(UriRequest request) {
+        try {
+            base.onRequestCreated(request);
         } catch (Throwable ex) {
             LogUtil.e(ex.getMessage(), ex);
         }

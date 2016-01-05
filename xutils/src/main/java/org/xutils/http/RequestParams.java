@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -711,15 +712,17 @@ public class RequestParams {
         Field[] fields = type.getDeclaredFields();
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
-                field.setAccessible(true);
-                try {
-                    String name = field.getName();
-                    Object value = field.get(this);
-                    if (value != null) {
-                        this.addParameter(name, value);
+                if (!Modifier.isTransient(field.getModifiers())) {
+                    field.setAccessible(true);
+                    try {
+                        String name = field.getName();
+                        Object value = field.get(this);
+                        if (value != null) {
+                            this.addParameter(name, value);
+                        }
+                    } catch (IllegalAccessException ex) {
+                        LogUtil.e(ex.getMessage(), ex);
                     }
-                } catch (IllegalAccessException ex) {
-                    LogUtil.e(ex.getMessage(), ex);
                 }
             }
         }

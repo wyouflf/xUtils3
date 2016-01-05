@@ -302,9 +302,11 @@ public class HttpRequest extends UriRequest {
     public void close() throws IOException {
         if (inputStream != null) {
             IOUtil.closeQuietly(inputStream);
+            inputStream = null;
         }
         if (connection != null) {
             connection.disconnect();
+            //connection = null;
         }
     }
 

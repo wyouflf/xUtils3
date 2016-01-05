@@ -84,6 +84,7 @@ public class LocalFileRequest extends UriRequest {
     @Override
     public void close() throws IOException {
         IOUtil.closeQuietly(inputStream);
+        inputStream = null;
     }
 
     @Override

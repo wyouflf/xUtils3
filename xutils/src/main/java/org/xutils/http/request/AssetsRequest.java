@@ -85,6 +85,7 @@ public class AssetsRequest extends UriRequest {
     @Override
     public void close() throws IOException {
         IOUtil.closeQuietly(inputStream);
+        inputStream = null;
     }
 
     @Override

@@ -268,6 +268,7 @@ public enum DbCookieStore implements CookieStore {
                     int count = (int) db.selector(CookieEntity.class).count();
                     if (count > LIMIT_COUNT + 10) {
                         List<CookieEntity> rmList = db.selector(CookieEntity.class)
+                                .where("expiry", "!=", -1L).orderBy("expiry", false)
                                 .limit(count - LIMIT_COUNT).findAll();
                         if (rmList != null) {
                             db.delete(rmList);

@@ -118,6 +118,8 @@ public final class DownloadManager {
         // start downloading
         if (viewHolder == null) {
             viewHolder = new DefaultDownloadViewHolder(null, downloadInfo);
+        } else {
+            viewHolder.update(downloadInfo);
         }
         DownloadCallback callback = new DownloadCallback(viewHolder);
         callback.setDownloadManager(this);

@@ -114,7 +114,7 @@ public class RequestParams {
         this.builder = builder;
     }
 
-    // invoke via UriRequest#<init>()
+    // invoke via HttpTask#createNewRequest
     /*package*/ void init() throws Throwable {
         if (!TextUtils.isEmpty(buildUri)) return;
 

@@ -14,7 +14,7 @@ import java.lang.reflect.Type;
 public final class UriRequestFactory {
 
     private static Class<? extends RequestTracker> defaultTrackerCls;
-    private static Class<? extends AssetsRequest> ASSETS_REQUEST_CLS;
+    private static Class<? extends AssetsRequest> assetsRequestCls;
 
     private UriRequestFactory() {
     }
@@ -24,9 +24,9 @@ public final class UriRequestFactory {
         if (uri.startsWith("http")) {
             return new HttpRequest(params, loadType);
         } else if (uri.startsWith("assets://")) {
-            if (ASSETS_REQUEST_CLS != null) {
+            if (assetsRequestCls != null) {
                 Constructor<? extends AssetsRequest> constructor
-                        = ASSETS_REQUEST_CLS.getConstructor(RequestParams.class, Class.class);
+                        = assetsRequestCls.getConstructor(RequestParams.class, Class.class);
                 return constructor.newInstance(params, loadType);
             } else {
                 return new AssetsRequest(params, loadType);
@@ -39,7 +39,7 @@ public final class UriRequestFactory {
     }
 
     public static void registerDefaultTrackerClass(Class<? extends RequestTracker> trackerCls) {
-        defaultTrackerCls = trackerCls;
+        UriRequestFactory.defaultTrackerCls = trackerCls;
     }
 
     public static RequestTracker getDefaultTracker() {
@@ -52,6 +52,6 @@ public final class UriRequestFactory {
     }
 
     public static void registerAssetsRequestClass(Class<? extends AssetsRequest> assetsRequestCls) {
-        ASSETS_REQUEST_CLS = assetsRequestCls;
+        UriRequestFactory.assetsRequestCls = assetsRequestCls;
     }
 }

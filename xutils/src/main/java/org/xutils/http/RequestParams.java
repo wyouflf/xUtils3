@@ -116,6 +116,8 @@ public class RequestParams {
 
     // invoke via UriRequest#<init>()
     /*package*/ void init() throws Throwable {
+        if (!TextUtils.isEmpty(buildUri)) return;
+
         if (TextUtils.isEmpty(uri) && getHttpRequest() == null) {
             throw new IllegalStateException("uri is empty && @HttpRequest == null");
         }

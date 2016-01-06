@@ -133,9 +133,12 @@ public final class DownloadManager {
         callbackMap.put(downloadInfo, callback);
 
         if (downloadInfoList.contains(downloadInfo)) {
+            int index = downloadInfoList.indexOf(downloadInfo);
             downloadInfoList.remove(downloadInfo);
+            downloadInfoList.add(index, downloadInfo);
+        } else {
+            downloadInfoList.add(downloadInfo);
         }
-        downloadInfoList.add(downloadInfo);
     }
 
     public void stopDownload(int index) {

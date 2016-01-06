@@ -9,9 +9,9 @@ import org.xutils.http.request.UriRequest;
  * 所有回调方法都在主线程进行.
  * <p/>
  * 用法:
- * 1. 请的callback参数同时实现RequestTracker;
- * 2. 自定义的RequestParams实现RequestTracker;
- * 3. 注册给UriRequestFactory.
+ * 1. 请的callback参数同时实现RequestTracker接口;
+ * 2. 自定义的RequestParams实现RequestTracker接口;
+ * 3. 注册给UriRequestFactory的默认RequestTracker.
  * 注意: 请求回调RequestTracker时优先级按照上面的顺序,
  * 找到一个RequestTracker的实现会忽略其他.
  */

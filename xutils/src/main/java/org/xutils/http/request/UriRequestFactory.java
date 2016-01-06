@@ -1,5 +1,6 @@
 package org.xutils.http.request;
 
+import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.http.app.RequestTracker;
 
@@ -12,7 +13,7 @@ import java.lang.reflect.Type;
  */
 public final class UriRequestFactory {
 
-    private static RequestTracker defaultTracker;
+    private static Class<? extends RequestTracker> defaultTrackerCls;
     private static Class<? extends AssetsRequest> ASSETS_REQUEST_CLS;
 
     private UriRequestFactory() {
@@ -37,12 +38,17 @@ public final class UriRequestFactory {
         }
     }
 
-    public static void registerDefaultTracker(RequestTracker tracker) {
-        defaultTracker = tracker;
+    public static void registerDefaultTrackerClass(Class<? extends RequestTracker> trackerCls) {
+        defaultTrackerCls = trackerCls;
     }
 
     public static RequestTracker getDefaultTracker() {
-        return defaultTracker;
+        try {
+            return defaultTrackerCls == null ? null : defaultTrackerCls.newInstance();
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
+        }
+        return null;
     }
 
     public static void registerAssetsRequestClass(Class<? extends AssetsRequest> assetsRequestCls) {

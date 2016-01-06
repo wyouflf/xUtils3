@@ -69,6 +69,15 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
     protected void cancelWorks() {
     }
 
+    /**
+     * 取消任务时是否不等待任务彻底结束, 立即收到取消的通知.
+     *
+     * @return
+     */
+    protected boolean isCancelFast() {
+        return false;
+    }
+
     @Override
     public final synchronized void cancel() {
         if (!this.isCancelled) {
@@ -77,7 +86,7 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
             if (cancelHandler != null && !cancelHandler.isCancelled()) {
                 cancelHandler.cancel();
             }
-            if (this.state == State.WAITING) {
+            if (this.state == State.WAITING || (this.state == State.STARTED && isCancelFast())) {
                 if (taskProxy != null) {
                     taskProxy.onCancelled(new Callback.CancelledException("cancelled by user"));
                     taskProxy.onFinished();

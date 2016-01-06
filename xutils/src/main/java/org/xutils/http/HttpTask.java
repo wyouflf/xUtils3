@@ -471,6 +471,11 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         });
     }
 
+    @Override
+    protected boolean isCancelFast() {
+        return params.isCancelFast();
+    }
+
     private void closeRequestSync() {
         clearRawResult();
         if (requestWorker != null && params.isCancelFast()) {

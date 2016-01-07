@@ -514,9 +514,11 @@ import java.util.concurrent.atomic.AtomicLong;
     private synchronized void setSuccessDrawable4Callback(final Drawable drawable) {
         final ImageView view = viewRef.get();
         if (view != null) {
-            view.setScaleType(options.getImageScaleType());
             if (drawable instanceof GifDrawable) {
+                view.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            } else {
+                view.setScaleType(options.getImageScaleType());
             }
             if (options.getAnimation() != null) {
                 ImageAnimationHelper.animationDisplay(view, drawable, options.getAnimation());

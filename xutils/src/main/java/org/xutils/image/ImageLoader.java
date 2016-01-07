@@ -515,7 +515,6 @@ import java.util.concurrent.atomic.AtomicLong;
         final ImageView view = viewRef.get();
         if (view != null) {
             if (drawable instanceof GifDrawable) {
-                view.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             } else {
                 view.setScaleType(options.getImageScaleType());

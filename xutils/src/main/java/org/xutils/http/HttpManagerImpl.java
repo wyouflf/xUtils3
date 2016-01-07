@@ -62,17 +62,22 @@ public final class HttpManagerImpl implements HttpManager {
 
     @Override
     public <T> T requestSync(HttpMethod method, RequestParams entity, Class<T> resultType) throws Throwable {
+        DefaultSyncCallback<T> callback = new DefaultSyncCallback<T>(resultType);
+        return requestSync(method, entity, callback);
+    }
+
+    @Override
+    public <T> T requestSync(HttpMethod method, RequestParams entity, Callback.TypedCallback<T> callback) throws Throwable {
         entity.setMethod(method);
-        SyncCallback<T> callback = new SyncCallback<T>(resultType);
         HttpTask<T> task = new HttpTask<T>(entity, null, callback);
         return x.task().startSync(task);
     }
 
-    private class SyncCallback<T> implements Callback.TypedCallback<T> {
+    private class DefaultSyncCallback<T> implements Callback.TypedCallback<T> {
 
         private final Class<T> resultType;
 
-        public SyncCallback(Class<T> resultType) {
+        public DefaultSyncCallback(Class<T> resultType) {
             this.resultType = resultType;
         }
 

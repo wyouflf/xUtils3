@@ -317,7 +317,9 @@ public final class ImageDecoder {
             if (cancelable != null && cancelable.isCancelled()) {
                 throw new Callback.CancelledException("cancelled during decode image");
             }
-            in = new BufferedInputStream(new FileInputStream(file));
+            int buffSize = 1024 * 16;
+            in = new BufferedInputStream(new FileInputStream(file), buffSize);
+            in.mark(buffSize);
             Movie movie = Movie.decodeStream(in);
             if (movie == null) {
                 throw new IOException("decode image error");

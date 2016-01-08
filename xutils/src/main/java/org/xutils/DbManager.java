@@ -142,7 +142,7 @@ public interface DbManager extends Closeable {
     }
 
     public interface TableCreateListener {
-        public void onTableCreate(DbManager db, TableEntity<?> table);
+        public void onTableCreated(DbManager db, TableEntity<?> table);
     }
 
     public static class DaoConfig {

@@ -472,7 +472,7 @@ public final class DbManagerImpl implements DbManager {
                     table.setCheckedDatabase(true);
                     TableCreateListener listener = this.daoConfig.getTableCreateListener();
                     if (listener != null) {
-                        listener.onTableCreate(this, table);
+                        listener.onTableCreated(this, table);
                     }
                 }
             }

@@ -33,6 +33,10 @@ public class HttpException extends BaseException {
         this.code = code;
     }
 
+    public void setCode(int code) {
+        this.code = code;
+    }
+
     public void setMessage(String message) {
         this.customMessage = message;
     }

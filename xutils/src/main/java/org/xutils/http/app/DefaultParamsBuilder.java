@@ -46,7 +46,7 @@ public class DefaultParamsBuilder implements ParamsBuilder {
 
             cacheKey = params.getUri() + "?";
 
-            // 添加cacheKeys对应的queryParams
+            // 添加cacheKeys对应的参数
             for (String key : cacheKeys) {
                 String value = params.getStringParameter(key);
                 if (value != null) {

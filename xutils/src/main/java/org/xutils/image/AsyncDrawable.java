@@ -2,6 +2,7 @@ package org.xutils.image;
 
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Region;
@@ -63,7 +64,7 @@ public final class AsyncDrawable extends Drawable {
 
     @Override
     public int getOpacity() {
-        return baseDrawable == null ? Byte.MAX_VALUE : baseDrawable.getOpacity();
+        return baseDrawable == null ? PixelFormat.TRANSLUCENT : baseDrawable.getOpacity();
     }
 
     @Override

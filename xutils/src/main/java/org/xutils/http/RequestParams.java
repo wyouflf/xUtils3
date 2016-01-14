@@ -1,5 +1,6 @@
 package org.xutils.http;
 
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -703,24 +704,39 @@ public class RequestParams {
     }
 
     private void initEntityParams() {
-        addEntityParams2Map(this.getClass());
+        resolveKVPairs(this, this.getClass(), new ResolveKVListener() {
+            @Override
+            public void onReadKV(String name, Object value) {
+                addParameter(name, value);
+            }
+        });
     }
 
-    private void addEntityParams2Map(Class<?> type) {
+    private interface ResolveKVListener {
+        void onReadKV(String name, Object value);
+    }
+
+    private void resolveKVPairs(Object entity, Class<?> type, ResolveKVListener listener) {
         if (type == null || type == RequestParams.class || type == Object.class) {
             return;
+        } else {
+            ClassLoader cl = type.getClassLoader();
+            if (cl == null || cl == Integer.class.getClassLoader()) {
+                return;
+            }
         }
 
         Field[] fields = type.getDeclaredFields();
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
-                if (!Modifier.isTransient(field.getModifiers())) {
+                if (!Modifier.isTransient(field.getModifiers())
+                        && field.getType() != Parcelable.Creator.class) {
                     field.setAccessible(true);
                     try {
                         String name = field.getName();
-                        Object value = field.get(this);
+                        Object value = field.get(entity);
                         if (value != null) {
-                            this.addParameter(name, value);
+                            listener.onReadKV(name, value);
                         }
                     } catch (IllegalAccessException ex) {
                         LogUtil.e(ex.getMessage(), ex);
@@ -729,7 +745,7 @@ public class RequestParams {
             }
         }
 
-        addEntityParams2Map(type.getSuperclass());
+        resolveKVPairs(entity, type.getSuperclass(), listener);
     }
 
     private boolean invokedGetHttpRequest = false;
@@ -777,6 +793,27 @@ public class RequestParams {
         }
     }
 
+    private Object parseJSONObject(Object value) {
+        Object result = value;
+        ClassLoader cl = value.getClass().getClassLoader();
+        if (cl != null && cl != Integer.class.getClassLoader()) {
+            final JSONObject jo = new JSONObject();
+            resolveKVPairs(value, value.getClass(), new ResolveKVListener() {
+                @Override
+                public void onReadKV(String name, Object value) {
+                    try {
+                        value = parseJSONObject(value);
+                        jo.put(name, value);
+                    } catch (JSONException ex) {
+                        LogUtil.e(ex.getMessage(), ex);
+                    }
+                }
+            });
+            result = jo;
+        }
+        return result;
+    }
+
     private void params2Json(final JSONObject jsonObject, final List<KeyValue> paramList) throws JSONException {
         HashSet<String> arraySet = new HashSet<String>(paramList.size());
         LinkedHashMap<String, JSONArray> tempData = new LinkedHashMap<String, JSONArray>(paramList.size());
@@ -792,7 +829,8 @@ public class RequestParams {
                 ja = new JSONArray();
                 tempData.put(key, ja);
             }
-            ja.put(kv.value);
+
+            ja.put(parseJSONObject(kv.value));
 
             if (kv instanceof ArrayItem) {
                 arraySet.add(key);

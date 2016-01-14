@@ -12,8 +12,8 @@ import org.xutils.common.util.ParameterizedTypeUtil;
 import org.xutils.ex.HttpException;
 import org.xutils.ex.HttpRedirectException;
 import org.xutils.http.app.HttpRetryHandler;
-import org.xutils.http.app.RequestInterceptListener;
 import org.xutils.http.app.RedirectHandler;
+import org.xutils.http.app.RequestInterceptListener;
 import org.xutils.http.app.RequestTracker;
 import org.xutils.http.request.UriRequest;
 import org.xutils.http.request.UriRequestFactory;
@@ -90,29 +90,29 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             this.requestInterceptListener = (RequestInterceptListener) callback;
         }
 
-        {// init tracker
-            RequestTracker customTracker = null;
-            if (callback instanceof RequestTracker) {
-                customTracker = (RequestTracker) callback;
-            } else if (params instanceof RequestTracker) {
-                customTracker = (RequestTracker) params;
-            } else {
-                customTracker = UriRequestFactory.getDefaultTracker();
+        // init tracker
+        {
+            RequestTracker customTracker = params.getRequestTracker();
+            if (customTracker == null) {
+                if (callback instanceof RequestTracker) {
+                    customTracker = (RequestTracker) callback;
+                } else {
+                    customTracker = UriRequestFactory.getDefaultTracker();
+                }
             }
             if (customTracker != null) {
                 tracker = new RequestTrackerWrapper(customTracker);
             }
         }
 
-        {// init executor
-            if (params.getExecutor() != null) {
-                this.executor = params.getExecutor();
+        // init executor
+        if (params.getExecutor() != null) {
+            this.executor = params.getExecutor();
+        } else {
+            if (cacheCallback != null) {
+                this.executor = CACHE_EXECUTOR;
             } else {
-                if (cacheCallback != null) {
-                    this.executor = CACHE_EXECUTOR;
-                } else {
-                    this.executor = HTTP_EXECUTOR;
-                }
+                this.executor = HTTP_EXECUTOR;
             }
         }
     }

@@ -14,6 +14,7 @@ import org.xutils.http.app.DefaultParamsBuilder;
 import org.xutils.http.app.HttpRetryHandler;
 import org.xutils.http.app.ParamsBuilder;
 import org.xutils.http.app.RedirectHandler;
+import org.xutils.http.app.RequestTracker;
 import org.xutils.http.body.BodyItemWrapper;
 import org.xutils.http.body.FileBody;
 import org.xutils.http.body.InputStreamBody;
@@ -84,6 +85,7 @@ public class RequestParams {
     private boolean cancelFast = false; // 是否可以被立即停止, true: 为请求创建新的线程, 取消时请求线程被立即中断.
     private HttpRetryHandler httpRetryHandler; // 自定义HttpRetryHandler
     private RedirectHandler redirectHandler; // 自定义重定向接口, 默认系统自动重定向.
+    private RequestTracker requestTracker; // 自定义日志记录接口.
 
     /**
      * 使用空构造创建时必须, 必须是带有@HttpRequest注解的子类.
@@ -385,6 +387,14 @@ public class RequestParams {
      */
     public void setRedirectHandler(RedirectHandler redirectHandler) {
         this.redirectHandler = redirectHandler;
+    }
+
+    public RequestTracker getRequestTracker() {
+        return requestTracker;
+    }
+
+    public void setRequestTracker(RequestTracker requestTracker) {
+        this.requestTracker = requestTracker;
     }
 
     /**

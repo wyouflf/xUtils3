@@ -12,7 +12,7 @@ import org.xutils.common.util.ParameterizedTypeUtil;
 import org.xutils.ex.HttpException;
 import org.xutils.ex.HttpRedirectException;
 import org.xutils.http.app.HttpRetryHandler;
-import org.xutils.http.app.InterceptRequestListener;
+import org.xutils.http.app.RequestInterceptListener;
 import org.xutils.http.app.RedirectHandler;
 import org.xutils.http.app.RequestTracker;
 import org.xutils.http.request.UriRequest;
@@ -49,7 +49,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     private Callback.CacheCallback<ResultType> cacheCallback;
     private Callback.PrepareCallback prepareCallback;
     private Callback.ProgressCallback progressCallback;
-    private InterceptRequestListener interceptRequestListener;
+    private RequestInterceptListener requestInterceptListener;
 
     // 日志追踪
     private RequestTracker tracker;
@@ -86,8 +86,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         if (callback instanceof Callback.ProgressCallback) {
             this.progressCallback = (Callback.ProgressCallback<ResultType>) callback;
         }
-        if (callback instanceof InterceptRequestListener) {
-            this.interceptRequestListener = (InterceptRequestListener) callback;
+        if (callback instanceof RequestInterceptListener) {
+            this.requestInterceptListener = (RequestInterceptListener) callback;
         }
 
         {// init tracker
@@ -577,8 +577,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 }
 
                 // intercept response
-                if (interceptRequestListener != null) {
-                    interceptRequestListener.beforeRequest(request);
+                if (requestInterceptListener != null) {
+                    requestInterceptListener.beforeRequest(request);
                 }
 
                 try {
@@ -588,8 +588,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 }
 
                 // intercept response
-                if (interceptRequestListener != null) {
-                    interceptRequestListener.afterRequest(request);
+                if (requestInterceptListener != null) {
+                    requestInterceptListener.afterRequest(request);
                 }
 
                 if (this.ex != null) {

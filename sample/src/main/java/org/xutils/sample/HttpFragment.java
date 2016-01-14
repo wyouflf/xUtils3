@@ -9,6 +9,7 @@ import org.xutils.common.Callback;
 import org.xutils.ex.DbException;
 import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
+import org.xutils.http.app.RequestInterceptListener;
 import org.xutils.sample.download.DownloadManager;
 import org.xutils.sample.http.BaiduParams;
 import org.xutils.sample.http.BaiduResponse;
@@ -98,7 +99,7 @@ public class HttpFragment extends BaseFragment {
                  *
                  * 3. 请求过程拦截或记录日志: 参考 {@link org.xutils.http.app.RequestTracker}
                  *
-                 * 4. 请求Header获取: 参考 {@link org.xutils.http.app.InterceptRequestListener}
+                 * 4. 请求Header获取: 参考 {@link RequestInterceptListener}
                  *
                  * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
                  *

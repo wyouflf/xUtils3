@@ -106,7 +106,7 @@ Callback.Cancelable cancelable
         *
         * 4. 请求Header获取: 参考 {@link org.xutils.http.app.RequestInterceptListener}
         *
-        * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams
+        * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
         *
         **/
        new Callback.CommonCallback<String>() {
@@ -141,11 +141,7 @@ Callback.Cancelable cancelable
            }
        });
 
-// cancelable.cancel(); // 取消
-// 如果需要记录请求的日志, 可使用RequestTracker接口(优先级依次降低, 找到一个实现后会忽略后面的):
-// 1. 自定义Callback同时实现RequestTracker接口;
-// 2. 自定义ResponseParser同时实现RequestTracker接口;
-// 3. 在LoaderFactory注册.
+// cancelable.cancel(); // 取消请求
 ```
 #### 如果你只需要一个简单的版本:
 ```java

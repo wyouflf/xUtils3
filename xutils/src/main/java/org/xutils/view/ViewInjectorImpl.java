@@ -160,7 +160,7 @@ public final class ViewInjectorImpl implements ViewInjector {
                             field.setAccessible(true);
                             field.set(handler, view);
                         } else {
-                            throw new RuntimeException("Invalid @ViewInject for"
+                            throw new RuntimeException("Invalid @ViewInject for "
                                     + handlerType.getSimpleName() + "." + field.getName());
                         }
                     } catch (Throwable ex) {

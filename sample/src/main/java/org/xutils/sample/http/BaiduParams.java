@@ -25,6 +25,7 @@ public class BaiduParams extends RequestParams {
         bb.add("a");
         bb.add("c");
         // this.setMultipart(true); // 使用multipart表单
+        // this.setAsJsonContent(true); // 请求body将参数转换为json形式发送
     }
 
     //public long timestamp = System.currentTimeMillis();

@@ -83,6 +83,7 @@ public class RequestParams {
     private String saveFilePath; // 下载文件时文件保存的路径和文件名
     private boolean multipart = false; // 是否强制使用multipart表单
     private boolean cancelFast = false; // 是否可以被立即停止, true: 为请求创建新的线程, 取消时请求线程被立即中断.
+    private int loadingUpdateMaxTimeSpan = 300; // 进度刷新最大间隔时间(ms)
     private HttpRetryHandler httpRetryHandler; // 自定义HttpRetryHandler
     private RedirectHandler redirectHandler; // 自定义重定向接口, 默认系统自动重定向.
     private RequestTracker requestTracker; // 自定义日志记录接口.
@@ -366,6 +367,19 @@ public class RequestParams {
      */
     public void setCancelFast(boolean cancelFast) {
         this.cancelFast = cancelFast;
+    }
+
+    public int getLoadingUpdateMaxTimeSpan() {
+        return loadingUpdateMaxTimeSpan;
+    }
+
+    /**
+     * 进度刷新最大间隔时间(默认300毫秒)
+     *
+     * @param loadingUpdateMaxTimeSpan
+     */
+    public void setLoadingUpdateMaxTimeSpan(int loadingUpdateMaxTimeSpan) {
+        this.loadingUpdateMaxTimeSpan = loadingUpdateMaxTimeSpan;
     }
 
     public HttpRetryHandler getHttpRetryHandler() {

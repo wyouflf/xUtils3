@@ -136,6 +136,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         UriRequest result = UriRequestFactory.getUriRequest(params, loadType);
         result.setCallingClassLoader(callback.getClass().getClassLoader());
         result.setProgressHandler(this);
+        this.loadingUpdateMaxTimeSpan = params.getLoadingUpdateMaxTimeSpan();
         this.update(FLAG_REQUEST_CREATED, result);
         return result;
     }
@@ -499,8 +500,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     }
 
     // ############################### start: region implements ProgressHandler
-    private final static long RATE = 300; // 0.3s
     private long lastUpdateTime;
+    private long loadingUpdateMaxTimeSpan = 300; // 300ms
 
     /**
      * @param total
@@ -524,7 +525,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 this.update(FLAG_PROGRESS, total, current, request.isLoading());
             } else {
                 long currTime = System.currentTimeMillis();
-                if (currTime - lastUpdateTime >= RATE) {
+                if (currTime - lastUpdateTime >= loadingUpdateMaxTimeSpan) {
                     lastUpdateTime = currTime;
                     this.update(FLAG_PROGRESS, total, current, request.isLoading());
                 }

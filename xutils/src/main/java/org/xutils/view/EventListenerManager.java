@@ -32,7 +32,7 @@ import java.util.Map;
 
 /*package*/ final class EventListenerManager {
 
-    private final static long QUICK_EVENT_TIME_SPAN = 400;
+    private final static long QUICK_EVENT_TIME_SPAN = 300;
     private final static HashSet<String> AVOID_QUICK_EVENT_SET = new HashSet<String>(2);
 
     static {

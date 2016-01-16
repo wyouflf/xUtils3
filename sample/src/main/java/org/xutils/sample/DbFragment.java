@@ -24,7 +24,7 @@ import java.util.List;
 public class DbFragment extends BaseFragment {
 
     DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
-            .setDbName("test")
+            .setDbName("test.db")
             .setDbDir(new File("/sdcard"))
             .setDbVersion(2)
             .setDbUpgradeListener(new DbManager.DbUpgradeListener() {

@@ -892,4 +892,152 @@ public class RequestParams {
             this.setHeader = setHeader;
         }
     }
+    
+    //添加builder模式
+    public static class Builder {
+        protected RequestParams params;
+
+        public Builder() {
+            newRequestParams();
+        }
+
+        protected void newRequestParams() {
+            params = new RequestParams();
+        }
+
+        public RequestParams build() {
+            return params;
+        }
+
+        public Builder setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
+            params.setSslSocketFactory(sslSocketFactory);
+            return this;
+        }
+
+        public Builder setMethod(HttpMethod method){
+            params.setMethod(method);
+            return this;
+        }
+        public Builder setUseCookie(boolean useCookie){
+            params.setUseCookie(useCookie);
+            return this;
+        }
+        public Builder setProxy(Proxy proxy){
+            params.setProxy(proxy);
+            return this;
+        }
+        public Builder setPriority(Priority priority){
+            params.setPriority(priority);
+            return this;
+        }
+        public Builder setConnectTimeout(int connectTimeout){
+            params.setConnectTimeout(connectTimeout);
+            return this;
+        }
+        public Builder setCacheDirName(String cacheDirName){
+            params.setCacheDirName(cacheDirName);
+            return this;
+        }
+        public Builder setCacheSize(long cacheSize){
+            params.setCacheSize(cacheSize);
+            return this;
+        }
+        public Builder setCacheMaxAge(long cacheMaxAge){
+            params.setCacheMaxAge(cacheMaxAge);
+            return this;
+        }
+        public Builder setExecutor(Executor executor){
+            params.setExecutor(executor);
+            return this;
+        }
+        public Builder setAutoResume(boolean autoResume){
+            params.setAutoResume(autoResume);
+            return this;
+        }
+        public Builder setAutoRename(boolean autoRename){
+            params.setAutoRename(autoRename);
+            return this;
+        }
+        public Builder setSaveFilePath(String saveFilePath){
+            params.setSaveFilePath(saveFilePath);
+            return this;
+        }
+        public Builder setMaxRetryCount(int maxRetryCount){
+            params.setMaxRetryCount(maxRetryCount);
+            return this;
+        }
+        public Builder setMultipart(boolean multipart){
+            params.setMultipart(multipart);
+            return this;
+        }
+        public Builder setCancelFast(boolean cancelFast){
+            params.setCancelFast(cancelFast);
+            return this;
+        }
+        public Builder setLoadingUpdateMaxTimeSpan(int loadingUpdateMaxTimeSpan){
+            params.setLoadingUpdateMaxTimeSpan(loadingUpdateMaxTimeSpan);
+            return this;
+        }
+        public Builder setHttpRetryHandler(HttpRetryHandler httpRetryHandler){
+            params.setHttpRetryHandler(httpRetryHandler);
+            return this;
+        }
+        public Builder setRedirectHandler(RedirectHandler redirectHandler){
+            params.setRedirectHandler(redirectHandler);
+            return this;
+        }
+        public Builder setRequestTracker(RequestTracker requestTracker){
+            params.setRequestTracker(requestTracker);
+            return this;
+        }
+        public Builder setHeader(String name, String value) {
+            params.setHeader(name,value);
+            return this;
+        }
+        public Builder addHeader(String name, String value){
+            params.addHeader(name,value);
+            return this;
+        }
+        public Builder addParameter(String name, Object value){
+            params.addParameter(name,value);
+            return this;
+        }
+        public Builder addQueryStringParameter(String name, String value){
+            params.addQueryStringParameter(name,value);
+            return this;
+        }
+        public Builder addBodyParameter(String name, String value) {
+            params.addBodyParameter(name,value);
+            return this;
+        }
+        public Builder addBodyParameter(String name, File value) {
+            params.addBodyParameter(name,value,null,null);
+            return this;
+        }
+
+        public Builder addBodyParameter(String name, Object value, String contentType) {
+            params.addBodyParameter(name,value,contentType,null);
+            return this;
+        }
+        public Builder addBodyParameter(String name, Object value, String contentType, String fileName) {
+            params.addBodyParameter(name,value,contentType,fileName);
+            return this;
+        }
+        public Builder setAsJsonContent(boolean asJsonContent){
+            params.setAsJsonContent(asJsonContent);
+            return this;
+        }
+        public Builder setBodyContent(String content){
+            params.setBodyContent(content);
+            return this;
+        }
+        public Builder removeParameter(String name){
+            params.removeParameter(name);
+            return this;
+        }
+        public Builder setRequestBody(RequestBody requestBody){
+            params.setRequestBody(requestBody);
+            return this;
+        }
+    }
 }

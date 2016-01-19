@@ -31,16 +31,9 @@ public class HttpFragment extends BaseFragment {
 
     /**
      * 1. 方法必须私有限定,
-     * 2. 方法以Click或Event结尾, 方便配置混淆编译参数 :
-     * -keepattributes *Annotation*
-     * -keepclassmembers class * {
-     * void *(android.view.View);
-     * *** *Click(...);
-     * *** *Event(...);
-     * }
-     * 3. 方法参数形式必须和type对应的Listener接口一致.
-     * 4. 注解参数value支持数组: value={id1, id2, id3}
-     * 5. 其它参数说明见{@link org.xutils.view.annotation.Event}类的说明.
+     * 2. 方法参数形式必须和type对应的Listener接口一致.
+     * 3. 注解参数value支持数组: value={id1, id2, id3}
+     * 4. 其它参数说明见{@link org.xutils.view.annotation.Event}类的说明.
      **/
     @Event(value = R.id.btn_test1,
             type = View.OnClickListener.class/*可选参数, 默认是View.OnClickListener.class*/)

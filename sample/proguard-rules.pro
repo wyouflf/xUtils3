@@ -17,8 +17,7 @@
 #}
 
 ################### region for xUtils
--keepattributes Exceptions,InnerClasses,Signature,Deprecated,*Annotation*,Synthetic,EnclosingMethod
-
+-keepattributes Signature,*Annotation*
 -keep public class org.xutils.** {
     public protected *;
 }
@@ -29,9 +28,8 @@
     public protected *;
 }
 -keepclassmembers class * extends org.xutils.http.RequestParams {*;}
+-keepclassmembers @org.xutils.http.annotation.* class * {*;}
 -keepclassmembers class * {
-   void *(android.view.View);
-   *** *Click(...);
-   *** *Event(...);
+   @org.xutils.view.annotation.Event <methods>;
 }
 #################### end region

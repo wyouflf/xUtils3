@@ -121,7 +121,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     private void resolveLoadType() {
         Class<?> callBackType = callback.getClass();
         if (callback instanceof Callback.TypedCallback) {
-            loadType = ((Callback.TypedCallback) callback).getResultType();
+            loadType = ((Callback.TypedCallback) callback).getLoadType();
         } else if (callback instanceof Callback.PrepareCallback) {
             loadType = ParameterizedTypeUtil.getParameterizedType(callBackType, Callback.PrepareCallback.class, 0);
         } else {

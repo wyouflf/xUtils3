@@ -19,7 +19,7 @@ public interface Callback {
     }
 
     public interface TypedCallback<ResultType> extends CommonCallback<ResultType> {
-        Type getResultType();
+        Type getLoadType();
     }
 
     public interface CacheCallback<ResultType> extends CommonCallback<ResultType> {

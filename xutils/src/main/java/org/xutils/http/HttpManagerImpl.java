@@ -82,7 +82,7 @@ public final class HttpManagerImpl implements HttpManager {
         }
 
         @Override
-        public Type getResultType() {
+        public Type getLoadType() {
             return resultType;
         }
 

@@ -26,6 +26,7 @@ import org.xutils.x;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
@@ -38,6 +39,7 @@ import java.util.concurrent.atomic.AtomicLong;
         Callback.PrepareCallback<File, Drawable>,
         Callback.CacheCallback<Drawable>,
         Callback.ProgressCallback<Drawable>,
+        Callback.TypedCallback<Drawable>,
         Callback.Cancelable {
 
     private MemCacheKey key;
@@ -372,6 +374,13 @@ import java.util.concurrent.atomic.AtomicLong;
         if (validView4Callback(true) && progressCallback != null) {
             progressCallback.onLoading(total, current, isDownloading);
         }
+    }
+
+    private static final Type loadType = File.class;
+
+    @Override
+    public Type getLoadType() {
+        return loadType;
     }
 
     @Override

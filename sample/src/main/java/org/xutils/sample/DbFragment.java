@@ -25,7 +25,7 @@ public class DbFragment extends BaseFragment {
 
     DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
             .setDbName("test")
-            .setDbDir(new File("/sdcard"))
+            .setDbDir(new File("/sdcard")) // "sdcard"的写法并非最佳实践, 这里为了简单, 先这样写了.
             .setDbVersion(2)
             .setDbUpgradeListener(new DbManager.DbUpgradeListener() {
                 @Override

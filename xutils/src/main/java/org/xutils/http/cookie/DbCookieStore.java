@@ -27,8 +27,8 @@ public enum DbCookieStore implements CookieStore {
     INSTANCE;
 
     private final DbManager db;
+    private final Executor trimExecutor = new PriorityExecutor(1, true);
     private static final int LIMIT_COUNT = 5000; // 限制最多5000条数据
-    private static final Executor trimExecutor = new PriorityExecutor(1, true);
 
     // delete expires
     private long lastDeleteExpiryTime = 0L;

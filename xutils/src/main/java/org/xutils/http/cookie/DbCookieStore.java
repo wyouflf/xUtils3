@@ -30,8 +30,13 @@ public enum DbCookieStore implements CookieStore {
     private static final int LIMIT_COUNT = 5000; // 限制最多5000条数据
     private static final Executor trimExecutor = new PriorityExecutor(1, true);
 
+    // delete expires
+    private long lastDeleteExpiryTime = 0L;
+    private static final long DELETE_EXPIRY_SPAN = 1000;
+
     DbCookieStore() {
         db = x.getDb(DbConfigs.COOKIE.getConfig());
+        trimSize();
     }
 
     /**
@@ -72,8 +77,6 @@ public enum DbCookieStore implements CookieStore {
         uri = getEffectiveURI(uri);
 
         List<HttpCookie> rt = new ArrayList<HttpCookie>();
-
-        deleteExpiryCookies();
 
         try {
 
@@ -116,7 +119,9 @@ public enum DbCookieStore implements CookieStore {
             List<CookieEntity> cookieEntityList = selector.where(where).findAll();
             if (cookieEntityList != null) {
                 for (CookieEntity cookieEntity : cookieEntityList) {
-                    rt.add(cookieEntity.toHttpCookie());
+                    if (!cookieEntity.isExpired()) {
+                        rt.add(cookieEntity.toHttpCookie());
+                    }
                 }
             }
         } catch (Throwable ex) {
@@ -132,13 +137,13 @@ public enum DbCookieStore implements CookieStore {
     public List<HttpCookie> getCookies() {
         List<HttpCookie> rt = new ArrayList<HttpCookie>();
 
-        deleteExpiryCookies();
-
         try {
             List<CookieEntity> cookieEntityList = db.findAll(CookieEntity.class);
             if (cookieEntityList != null) {
                 for (CookieEntity cookieEntity : cookieEntityList) {
-                    rt.add(cookieEntity.toHttpCookie());
+                    if (!cookieEntity.isExpired()) {
+                        rt.add(cookieEntity.toHttpCookie());
+                    }
                 }
             }
         } catch (Throwable ex) {
@@ -241,7 +246,18 @@ public enum DbCookieStore implements CookieStore {
         try {
             if (fistDeleteExpiry) {
                 fistDeleteExpiry = false;
-                deleteDefaultExpiryCookies();
+                try {
+                    db.delete(CookieEntity.class, WhereBuilder.b("expiry", "=", -1L));
+                } catch (Throwable ex) {
+                    LogUtil.e(ex.getMessage(), ex);
+                }
+            }
+
+            long current = System.currentTimeMillis();
+            if (current - lastDeleteExpiryTime < DELETE_EXPIRY_SPAN) {
+                return;
+            } else {
+                lastDeleteExpiryTime = current;
             }
 
             db.delete(CookieEntity.class, WhereBuilder
@@ -252,18 +268,13 @@ public enum DbCookieStore implements CookieStore {
         }
     }
 
-    private void deleteDefaultExpiryCookies() {
-        try {
-            db.delete(CookieEntity.class, WhereBuilder.b("expiry", "=", -1L));
-        } catch (Throwable ex) {
-            LogUtil.e(ex.getMessage(), ex);
-        }
-    }
-
     private void trimSize() {
         trimExecutor.execute(new Runnable() {
             @Override
             public void run() {
+
+                deleteExpiryCookies();
+
                 try {
                     int count = (int) db.selector(CookieEntity.class).count();
                     if (count > LIMIT_COUNT + 10) {

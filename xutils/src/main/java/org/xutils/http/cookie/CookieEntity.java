@@ -106,4 +106,8 @@ import java.net.URI;
     public void setUri(String uri) {
         this.uri = uri;
     }
+
+    public boolean isExpired() {
+        return expiry != -1L && expiry < System.currentTimeMillis();
+    }
 }

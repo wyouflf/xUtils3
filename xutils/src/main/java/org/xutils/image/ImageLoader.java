@@ -449,7 +449,13 @@ import java.util.concurrent.atomic.AtomicLong;
 
         if (ex instanceof FileLockedException) {
             LogUtil.d("ImageFileLocked: " + key.url);
-            doBind(viewRef.get(), key.url, options, callback);
+            x.task().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    doBind(viewRef.get(), key.url, options, callback);
+
+                }
+            }, 10);
             return;
         }
 

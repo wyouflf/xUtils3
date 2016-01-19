@@ -49,60 +49,7 @@ public final class ProcessLock implements Closeable {
      * @return null 或 进程锁, 如果锁已经被占用, 返回null.
      */
     public static ProcessLock tryLock(final String lockName, final boolean writeMode) {
-        synchronized (LOCK_MAP) {
-
-            // android对文件锁共享支持的不好, 暂时全部互斥.
-            if (LOCK_MAP.containsKey(lockName)) {
-                ProcessLock lock = LOCK_MAP.get(lockName);
-                if (lock == null) {
-                    LOCK_MAP.remove(lockName);
-                } else if (lock.isValid()) {
-                    return null;
-                } else {
-                    LOCK_MAP.remove(lockName);
-                    lock.release();
-                }
-            }
-
-            FileInputStream in = null;
-            FileOutputStream out = null;
-            Closeable stream = null;
-            FileChannel channel = null;
-            try {
-                File file = new File(x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE), customHash(lockName));
-                if (file.exists() || file.createNewFile()) {
-                    if (writeMode) {
-                        out = new FileOutputStream(file, false);
-                        channel = out.getChannel();
-                        stream = out;
-                    } else {
-                        in = new FileInputStream(file);
-                        channel = in.getChannel();
-                        stream = in;
-                    }
-                    if (channel != null) {
-                        FileLock fileLock = channel.tryLock(0L, Long.MAX_VALUE, !writeMode);
-                        if (isValid(fileLock)) {
-                            LogUtil.d("lock: " + lockName + ":" + PID);
-                            ProcessLock processLock = new ProcessLock(lockName, file, fileLock, stream);
-                            LOCK_MAP.put(lockName, processLock);
-                            return processLock;
-                        } else {
-                            release(lockName, fileLock, file, out);
-                        }
-                    } else {
-                        throw new IOException("can not get file channel:" + file.getAbsolutePath());
-                    }
-                }
-            } catch (Throwable ignored) {
-                LogUtil.d("tryLock: " + lockName + ", " + ignored.getMessage());
-                IOUtil.closeQuietly(in);
-                IOUtil.closeQuietly(out);
-                IOUtil.closeQuietly(channel);
-            }
-        }
-
-        return null;
+        return tryLockInternal(lockName, customHash(lockName), writeMode);
     }
 
     /**
@@ -113,11 +60,12 @@ public final class ProcessLock implements Closeable {
      * @param maxWaitTimeMillis 最大值 1000 * 60
      * @return null 或 进程锁, 如果锁已经被占用, 则在超时时间内继续尝试获取该锁.
      */
-    public static ProcessLock tryLock(String lockName, boolean writeMode, long maxWaitTimeMillis) {
+    public static ProcessLock tryLock(final String lockName, final boolean writeMode, final long maxWaitTimeMillis) {
         ProcessLock lock = null;
-        final long expiryTime = System.currentTimeMillis() + maxWaitTimeMillis;
+        long expiryTime = System.currentTimeMillis() + maxWaitTimeMillis;
+        String hash = customHash(lockName);
         while (System.currentTimeMillis() < expiryTime) {
-            lock = tryLock(lockName, writeMode);
+            lock = tryLockInternal(lockName, hash, writeMode);
             if (lock != null) {
                 break;
             } else {
@@ -178,12 +126,7 @@ public final class ProcessLock implements Closeable {
 
     private final static DecimalFormat FORMAT = new DecimalFormat("0.##################");
 
-    /**
-     * 取得字符串的自定义hash值, 尽量保证255字节内的hash不重复.
-     *
-     * @param str
-     * @return
-     */
+    // 取得字符串的自定义hash值, 尽量保证255字节内的hash不重复.
     private static String customHash(String str) {
         if (TextUtils.isEmpty(str)) return "0";
         double hash = 0.0;
@@ -192,6 +135,65 @@ public final class ProcessLock implements Closeable {
             hash = (255.0 * hash + bytes[i]) * 0.005;
         }
         return FORMAT.format(hash);
+    }
+
+    private static ProcessLock tryLockInternal(final String lockName, final String hash, final boolean writeMode) {
+        synchronized (LOCK_MAP) {
+
+            // android对文件锁共享支持的不好, 暂时全部互斥.
+            if (LOCK_MAP.containsKey(lockName)) {
+                ProcessLock lock = LOCK_MAP.get(lockName);
+                if (lock == null) {
+                    LOCK_MAP.remove(lockName);
+                } else if (lock.isValid()) {
+                    return null;
+                } else {
+                    LOCK_MAP.remove(lockName);
+                    lock.release();
+                }
+            }
+
+            FileInputStream in = null;
+            FileOutputStream out = null;
+            Closeable stream = null;
+            FileChannel channel = null;
+            try {
+                File file = new File(
+                        x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE),
+                        hash);
+                if (file.exists() || file.createNewFile()) {
+                    if (writeMode) {
+                        out = new FileOutputStream(file, false);
+                        channel = out.getChannel();
+                        stream = out;
+                    } else {
+                        in = new FileInputStream(file);
+                        channel = in.getChannel();
+                        stream = in;
+                    }
+                    if (channel != null) {
+                        FileLock fileLock = channel.tryLock(0L, Long.MAX_VALUE, !writeMode);
+                        if (isValid(fileLock)) {
+                            LogUtil.d("lock: " + lockName + ":" + PID);
+                            ProcessLock processLock = new ProcessLock(lockName, file, fileLock, stream);
+                            LOCK_MAP.put(lockName, processLock);
+                            return processLock;
+                        } else {
+                            release(lockName, fileLock, file, out);
+                        }
+                    } else {
+                        throw new IOException("can not get file channel:" + file.getAbsolutePath());
+                    }
+                }
+            } catch (Throwable ignored) {
+                LogUtil.d("tryLock: " + lockName + ", " + ignored.getMessage());
+                IOUtil.closeQuietly(in);
+                IOUtil.closeQuietly(out);
+                IOUtil.closeQuietly(channel);
+            }
+        }
+
+        return null;
     }
 
     @Override

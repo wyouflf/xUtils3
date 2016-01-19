@@ -27,9 +27,9 @@
 -keepclassmembers class * extends org.xutils.** {
     public protected *;
 }
--keepclassmembers class * extends org.xutils.http.RequestParams {*;}
+-keepclassmembers @org.xutils.db.annotation.* class * {*;}
 -keepclassmembers @org.xutils.http.annotation.* class * {*;}
 -keepclassmembers class * {
-   @org.xutils.view.annotation.Event <methods>;
+    @org.xutils.view.annotation.Event <methods>;
 }
 #################### end region

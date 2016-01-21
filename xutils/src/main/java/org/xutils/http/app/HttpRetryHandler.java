@@ -49,7 +49,7 @@ public class HttpRetryHandler {
         this.maxRetryCount = maxRetryCount;
     }
 
-    public boolean retryRequest(Throwable ex, int count, UriRequest request) {
+    public boolean canRetry(UriRequest request, Throwable ex, int count) {
 
         LogUtil.w(ex.getMessage(), ex);
 

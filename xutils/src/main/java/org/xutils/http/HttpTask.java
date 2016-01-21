@@ -24,6 +24,8 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -166,7 +168,18 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                     }
                     DOWNLOAD_TASK.put(downloadTaskKey, new WeakReference<HttpTask<?>>(this));
                 } // end if (!TextUtils.isEmpty(downloadTaskKey))
-            }
+
+                if (DOWNLOAD_TASK.size() > MAX_FILE_LOAD_WORKER) {
+                    Iterator<Map.Entry<String, WeakReference<HttpTask<?>>>>
+                            entryItr = DOWNLOAD_TASK.entrySet().iterator();
+                    while (entryItr.hasNext()) {
+                        Map.Entry<String, WeakReference<HttpTask<?>>> next = entryItr.next();
+                        if (next.getValue() == null && next.getValue().get() == null) {
+                            entryItr.remove();
+                        }
+                    }
+                }
+            } // end synchronized
         }
     }
 

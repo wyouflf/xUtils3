@@ -90,6 +90,16 @@ public interface DbManager extends Closeable {
     ///////////// table
 
     /**
+     * 获取表信息
+     *
+     * @param entityType
+     * @param <T>
+     * @return
+     * @throws DbException
+     */
+    <T> TableEntity<T> getTable(Class<T> entityType) throws DbException;
+
+    /**
      * 删除表
      *
      * @param entityType

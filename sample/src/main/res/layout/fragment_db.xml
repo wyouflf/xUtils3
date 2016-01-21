@@ -10,6 +10,12 @@
         android:layout_height="wrap_content"
         android:text="TEST DB" />
 
+    <Button
+        android:id="@+id/btn_test_db2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TEST 性能" />
+
     <TextView
         android:id="@+id/tv_db_result"
         android:layout_width="match_parent"

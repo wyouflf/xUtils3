@@ -5,6 +5,7 @@ import android.widget.TextView;
 
 import org.xutils.DbManager;
 import org.xutils.db.table.DbModel;
+import org.xutils.ex.DbException;
 import org.xutils.sample.db.Child;
 import org.xutils.sample.db.Parent;
 import org.xutils.view.annotation.ContentView;
@@ -13,6 +14,7 @@ import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -119,6 +121,89 @@ public class DbFragment extends BaseFragment {
             temp += "error :" + e.getMessage() + "\n";
             tv_db_result.setText(temp);
         }
+    }
+
+    @Event(R.id.btn_test_db2)
+    private void onTestDb2Click(View view) {
+        tv_db_result.setText("wait...");
+        x.task().run(new Runnable() { // 异步执行
+            @Override
+            public void run() {
+
+                DbManager db = x.getDb(daoConfig);
+                String result = "";
+
+                List<Parent> parentList = new ArrayList<Parent>();
+                for (int i = 0; i < 1000; i++) {
+                    Parent parent = new Parent();
+                    parent.setAdmin(true);
+                    parent.setDate(new java.sql.Date(1234));
+                    parent.setTime(new Date());
+                    parent.setEmail(i + "_@qq.com");
+                    parentList.add(parent);
+                }
+
+                long start = System.currentTimeMillis();
+                for (Parent parent : parentList) {
+                    try {
+                        db.save(parent);
+                    } catch (DbException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                result += "插入1000条数据:" + (System.currentTimeMillis() - start) + "ms\n";
+
+                start = System.currentTimeMillis();
+                try {
+                    parentList = db.selector(Parent.class).orderBy("id", true).limit(1000).findAll();
+                } catch (DbException ex) {
+                    ex.printStackTrace();
+                }
+                result += "查找1000条数据:" + (System.currentTimeMillis() - start) + "ms\n";
+
+                start = System.currentTimeMillis();
+                try {
+                    db.delete(parentList);
+                } catch (DbException ex) {
+                    ex.printStackTrace();
+                }
+                result += "删除1000条数据:" + (System.currentTimeMillis() - start) + "ms\n";
+
+                // 批量插入
+                parentList = new ArrayList<Parent>();
+                for (int i = 0; i < 1000; i++) {
+                    Parent parent = new Parent();
+                    parent.setAdmin(true);
+                    parent.setDate(new java.sql.Date(1234));
+                    parent.setTime(new Date());
+                    parent.setEmail(i + "_@qq.com");
+                    parentList.add(parent);
+                }
+
+                start = System.currentTimeMillis();
+                try {
+                    db.save(parentList);
+                } catch (DbException ex) {
+                    ex.printStackTrace();
+                }
+                result += "批量插入1000条数据:" + (System.currentTimeMillis() - start) + "ms\n";
+
+                try {
+                    parentList = db.selector(Parent.class).orderBy("id", true).limit(1000).findAll();
+                    db.delete(parentList);
+                } catch (DbException ex) {
+                    ex.printStackTrace();
+                }
+
+                final String finalResult = result;
+                x.task().post(new Runnable() { // UI同步执行
+                    @Override
+                    public void run() {
+                        tv_db_result.setText(finalResult);
+                    }
+                });
+            }
+        });
     }
 
 }

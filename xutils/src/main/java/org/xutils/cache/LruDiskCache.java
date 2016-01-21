@@ -89,20 +89,28 @@ public final class LruDiskCache {
             LogUtil.e(ex.getMessage(), ex);
         }
 
-        // update hint & lastAccess...
         if (result != null) {
 
             if (result.getExpires() < System.currentTimeMillis()) {
                 return null;
             }
 
-            result.setHits(result.getHits() + 1);
-            result.setLastAccess(System.currentTimeMillis());
-            try {
-                this.cacheDb.update(result, "hits", "lastAccess");
-            } catch (Throwable ex) {
-                LogUtil.e(ex.getMessage(), ex);
+            { // update hint & lastAccess...
+                final DiskCacheEntity finalResult = result;
+                trimExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalResult.setHits(finalResult.getHits() + 1);
+                        finalResult.setLastAccess(System.currentTimeMillis());
+                        try {
+                            cacheDb.update(finalResult, "hits", "lastAccess");
+                        } catch (Throwable ex) {
+                            LogUtil.e(ex.getMessage(), ex);
+                        }
+                    }
+                });
             }
+
         }
 
         return result;

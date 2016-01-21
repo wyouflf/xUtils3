@@ -79,7 +79,7 @@ public final class ImageManagerImpl implements ImageManager {
     }
 
     @Override
-    public Callback.Cancelable loadFile(String url, ImageOptions options, Callback.CommonCallback<File> callback) {
+    public Callback.Cancelable loadFile(String url, ImageOptions options, Callback.CacheCallback<File> callback) {
         return ImageLoader.doLoadFile(url, options, callback);
     }
 

@@ -156,24 +156,13 @@ import java.util.concurrent.atomic.AtomicLong;
     /*package*/
     static Cancelable doLoadFile(final String url,
                                  final ImageOptions options,
-                                 final Callback.CommonCallback<File> callback) {
+                                 final Callback.CacheCallback<File> callback) {
         if (TextUtils.isEmpty(url)) {
             postBindArgsException(null, options, "url is null", callback);
             return null;
         }
 
-        RequestParams params = new RequestParams(url);
-        params.setCacheDirName(DISK_CACHE_DIR_NAME);
-        params.setConnectTimeout(1000 * 8);
-        params.setPriority(Priority.BG_LOW);
-        params.setExecutor(EXECUTOR);
-        params.setUseCookie(false);
-        if (options != null) {
-            ImageOptions.ParamsBuilder paramsBuilder = options.getParamsBuilder();
-            if (paramsBuilder != null) {
-                params = paramsBuilder.buildParams(params, options);
-            }
-        }
+        RequestParams params = createRequestParams(url, options);
         return x.http().get(params, callback);
     }
 
@@ -322,17 +311,7 @@ import java.util.concurrent.atomic.AtomicLong;
         }
 
         // request
-        RequestParams params = new RequestParams(url);
-        params.setCacheDirName(DISK_CACHE_DIR_NAME);
-        params.setConnectTimeout(1000 * 8);
-        params.setPriority(Priority.BG_LOW);
-        params.setExecutor(EXECUTOR);
-        params.setCancelFast(true);
-        params.setUseCookie(false);
-        ImageOptions.ParamsBuilder paramsBuilder = options.getParamsBuilder();
-        if (paramsBuilder != null) {
-            params = paramsBuilder.buildParams(params, options);
-        }
+        RequestParams params = createRequestParams(url, options);
         if (view instanceof FakeImageView) {
             synchronized (FAKE_IMG_MAP) {
                 FAKE_IMG_MAP.put(url, (FakeImageView) view);
@@ -491,6 +470,23 @@ import java.util.concurrent.atomic.AtomicLong;
         if (callback != null) {
             callback.onFinished();
         }
+    }
+
+    private static RequestParams createRequestParams(String url, ImageOptions options) {
+        RequestParams params = new RequestParams(url);
+        params.setCacheDirName(DISK_CACHE_DIR_NAME);
+        params.setConnectTimeout(1000 * 8);
+        params.setPriority(Priority.BG_LOW);
+        params.setExecutor(EXECUTOR);
+        params.setCancelFast(true);
+        params.setUseCookie(false);
+        if (options != null) {
+            ImageOptions.ParamsBuilder paramsBuilder = options.getParamsBuilder();
+            if (paramsBuilder != null) {
+                params = paramsBuilder.buildParams(params, options);
+            }
+        }
+        return params;
     }
 
     private boolean validView4Callback(boolean forceValidAsyncDrawable) {

@@ -111,6 +111,7 @@ public final class ProcessLock implements Closeable {
         synchronized (LOCK_MAP) {
             if (fileLock != null) {
                 try {
+                    LOCK_MAP.remove(lockName);
                     fileLock.release();
                     LogUtil.d("released: " + lockName + ":" + PID);
                 } catch (Throwable ignored) {

@@ -134,7 +134,7 @@ public class RequestParams {
         HttpRequest httpRequest = this.getHttpRequest();
         if (httpRequest != null) {
             builder = httpRequest.builder().newInstance();
-            buildUri = builder.buildUri(httpRequest);
+            buildUri = builder.buildUri(this, httpRequest);
             builder.buildParams(this);
             builder.buildSign(this, httpRequest.signs());
             if (sslSocketFactory == null) {

@@ -23,11 +23,12 @@ public class DefaultParamsBuilder implements ParamsBuilder {
     /**
      * 根据@HttpRequest构建请求的url
      *
+     * @param params
      * @param httpRequest
      * @return
      */
     @Override
-    public String buildUri(HttpRequest httpRequest) {
+    public String buildUri(RequestParams params, HttpRequest httpRequest) {
         return httpRequest.host() + "/" + httpRequest.path();
     }
 

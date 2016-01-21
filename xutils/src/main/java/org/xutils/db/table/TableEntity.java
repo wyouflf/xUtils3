@@ -16,17 +16,17 @@
 package org.xutils.db.table;
 
 import android.database.Cursor;
-import android.text.TextUtils;
 
 import org.xutils.DbManager;
+import org.xutils.common.util.DoubleKeyValueMap;
 import org.xutils.common.util.IOUtil;
 import org.xutils.db.annotation.Table;
 import org.xutils.ex.DbException;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public final class TableEntity<T> {
@@ -46,7 +46,8 @@ public final class TableEntity<T> {
     /**
      * key: dbName#className
      */
-    private static final HashMap<String, TableEntity<?>> tableMap = new HashMap<String, TableEntity<?>>();
+    private static final DoubleKeyValueMap<DbManager, Class<?>, TableEntity<?>> tableMap
+            = new DoubleKeyValueMap<DbManager, Class<?>, TableEntity<?>>();
 
     private TableEntity(DbManager db, Class<T> entityType) throws Throwable {
         this.db = db;
@@ -73,15 +74,14 @@ public final class TableEntity<T> {
     @SuppressWarnings("unchecked")
     public static <T> TableEntity<T> get(DbManager db, Class<T> entityType) throws DbException {
         synchronized (tableMap) {
-            String tableKey = generateTableKey(db, entityType);
-            TableEntity<T> table = (TableEntity<T>) tableMap.get(tableKey);
+            TableEntity<T> table = (TableEntity<T>) tableMap.get(db, entityType);
             if (table == null) {
                 try {
                     table = new TableEntity<T>(db, entityType);
                 } catch (Throwable ex) {
                     throw new DbException(ex);
                 }
-                tableMap.put(tableKey, table);
+                tableMap.put(db, entityType, table);
             }
 
             return table;
@@ -90,26 +90,26 @@ public final class TableEntity<T> {
 
     public static void remove(DbManager db, Class<?> entityType) {
         synchronized (tableMap) {
-            String tableKey = generateTableKey(db, entityType);
-            tableMap.remove(tableKey);
+            tableMap.remove(db, entityType);
         }
     }
 
     public static void remove(DbManager db, String tableName) {
         synchronized (tableMap) {
             if (tableMap.size() > 0) {
-                String key = null;
-                for (Map.Entry<String, TableEntity<?>> entry : tableMap.entrySet()) {
+                Class<?> key2 = null;
+                ConcurrentHashMap<Class<?>, TableEntity<?>> cls_table_map = tableMap.get(db);
+                for (Map.Entry<Class<?>, TableEntity<?>> entry : cls_table_map.entrySet()) {
                     TableEntity table = entry.getValue();
                     if (table != null) {
-                        if (table.getName().equals(tableName) && table.getDb() == db) {
-                            key = entry.getKey();
+                        if (table.getName().equals(tableName)) {
+                            key2 = entry.getKey();
                             break;
                         }
                     }
                 }
-                if (!TextUtils.isEmpty(key)) {
-                    tableMap.remove(key);
+                if (key2 != null) {
+                    tableMap.remove(db, key2);
                 }
             }
         }
@@ -172,10 +172,6 @@ public final class TableEntity<T> {
 
     public void setCheckedDatabase(boolean checkedDatabase) {
         this.checkedDatabase = checkedDatabase;
-    }
-
-    private static String generateTableKey(DbManager db, Class<?> entityType) {
-        return db.getDaoConfig().toString() + "#" + entityType.getName();
     }
 
     @Override

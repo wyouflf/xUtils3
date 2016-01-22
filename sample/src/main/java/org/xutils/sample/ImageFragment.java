@@ -51,10 +51,10 @@ public class ImageFragment extends BaseFragment {
         imageOptions = new ImageOptions.Builder()
                 .setSize(DensityUtil.dip2px(120), DensityUtil.dip2px(120))
                 .setRadius(DensityUtil.dip2px(5))
-                        // 如果ImageView的大小不是定义为wrap_content, 不要crop.
+                // 如果ImageView的大小不是定义为wrap_content, 不要crop.
                 .setCrop(true)
-                        // 加载中或错误图片的ScaleType
-                        //.setPlaceholderScaleType(ImageView.ScaleType.MATRIX)
+                // 加载中或错误图片的ScaleType
+                //.setPlaceholderScaleType(ImageView.ScaleType.MATRIX)
                 .setImageScaleType(ImageView.ScaleType.CENTER_CROP)
                 .setLoadingDrawableId(R.mipmap.ic_launcher)
                 .setFailureDrawableId(R.mipmap.ic_launcher)
@@ -221,6 +221,7 @@ public class ImageFragment extends BaseFragment {
             String src = m_image.group(1);
             if (src.length() < 100) {
                 pics.add("http://" + src + ".jpg");
+                //pics.add("http://f.hiphotos.baidu.com/zhidao/pic/item/2fdda3cc7cd98d104cc21595203fb80e7bec907b.jpg");
             }
         }
         return pics;

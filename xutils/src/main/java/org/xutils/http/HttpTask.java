@@ -174,7 +174,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                             entryItr = DOWNLOAD_TASK.entrySet().iterator();
                     while (entryItr.hasNext()) {
                         Map.Entry<String, WeakReference<HttpTask<?>>> next = entryItr.next();
-                        if (next.getValue() == null && next.getValue().get() == null) {
+                        if (next.getValue() == null || next.getValue().get() == null) {
                             entryItr.remove();
                         }
                     }

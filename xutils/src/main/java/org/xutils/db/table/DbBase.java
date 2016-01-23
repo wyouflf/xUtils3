@@ -13,6 +13,7 @@ import org.xutils.ex.DbException;
 import java.util.HashMap;
 
 /**
+ * DbManager基类, 包含表结构的基本操作.
  * Created by wyouflf on 16/1/22.
  */
 public abstract class DbBase implements DbManager {
@@ -71,6 +72,20 @@ public abstract class DbBase implements DbManager {
             } finally {
                 IOUtil.closeQuietly(cursor);
             }
+        }
+    }
+
+    @Override
+    public void addColumn(Class<?> entityType, String column) throws DbException {
+        TableEntity<?> table = this.getTable(entityType);
+        ColumnEntity col = table.getColumnMap().get(column);
+        if (col != null) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("ALTER TABLE ").append("\"").append(table.getName()).append("\"").
+                    append(" ADD COLUMN ").append("\"").append(col.getName()).append("\"").
+                    append(" ").append(col.getColumnDbType()).
+                    append(" ").append(col.getProperty());
+            execNonQuery(builder.toString());
         }
     }
 

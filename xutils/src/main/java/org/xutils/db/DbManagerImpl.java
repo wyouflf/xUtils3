@@ -460,27 +460,6 @@ public final class DbManagerImpl extends DbBase {
     }
 
     @Override
-    public void addColumn(Class<?> entityType, String column) throws DbException {
-        try {
-            beginTransaction();
-            this.removeTable(entityType);
-            TableEntity<?> table = this.getTable(entityType);
-            ColumnEntity col = table.getColumnMap().get(column);
-            if (col != null) {
-                StringBuilder builder = new StringBuilder();
-                builder.append("ALTER TABLE ").append("\"").append(table.getName()).append("\"").
-                        append(" ADD COLUMN ").append("\"").append(col.getName()).append("\"").
-                        append(" ").append(col.getColumnDbType()).
-                        append(" ").append(col.getProperty());
-                execNonQuery(builder.toString());
-            }
-            setTransactionSuccessful();
-        } finally {
-            endTransaction();
-        }
-    }
-
-    @Override
     public void close() throws IOException {
         if (DAO_MAP.containsKey(daoConfig)) {
             DAO_MAP.remove(daoConfig);

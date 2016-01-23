@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 请求的基础参数
  * Created by wyouflf on 16/1/23.
  */
 /*package*/ abstract class BaseParams {

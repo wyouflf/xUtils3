@@ -44,8 +44,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     // 缓存控制
     private Object rawResult = null;
-    private final Object cacheLock = new Object();
     private volatile Boolean trustCache = null;
+    private final Object cacheLock = new Object();
 
     // 扩展callback
     private Callback.CacheCallback<ResultType> cacheCallback;
@@ -174,7 +174,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                             entryItr = DOWNLOAD_TASK.entrySet().iterator();
                     while (entryItr.hasNext()) {
                         Map.Entry<String, WeakReference<HttpTask<?>>> next = entryItr.next();
-                        if (next.getValue() == null || next.getValue().get() == null) {
+                        WeakReference<HttpTask<?>> value = next.getValue();
+                        if (value == null || value.get() == null) {
                             entryItr.remove();
                         }
                     }

@@ -132,7 +132,7 @@ import java.util.concurrent.atomic.AtomicLong;
                                      final ImageOptions options,
                                      final Callback.CommonCallback<Drawable> callback) {
         if (TextUtils.isEmpty(url)) {
-            postBindArgsException(null, options, "url is null", callback);
+            postArgsException(null, options, "url is null", callback);
             return null;
         }
 
@@ -158,7 +158,7 @@ import java.util.concurrent.atomic.AtomicLong;
                                  final ImageOptions options,
                                  final Callback.CacheCallback<File> callback) {
         if (TextUtils.isEmpty(url)) {
-            postBindArgsException(null, options, "url is null", callback);
+            postArgsException(null, options, "url is null", callback);
             return null;
         }
 
@@ -184,12 +184,12 @@ import java.util.concurrent.atomic.AtomicLong;
         ImageOptions localOptions = options;
         {
             if (view == null) {
-                postBindArgsException(null, localOptions, "view is null", callback);
+                postArgsException(null, localOptions, "view is null", callback);
                 return null;
             }
 
             if (TextUtils.isEmpty(url)) {
-                postBindArgsException(view, localOptions, "url is null", callback);
+                postArgsException(view, localOptions, "url is null", callback);
                 return null;
             }
 
@@ -522,7 +522,7 @@ import java.util.concurrent.atomic.AtomicLong;
         return false;
     }
 
-    private synchronized void setSuccessDrawable4Callback(final Drawable drawable) {
+    private void setSuccessDrawable4Callback(final Drawable drawable) {
         final ImageView view = viewRef.get();
         if (view != null) {
             view.setScaleType(options.getImageScaleType());
@@ -542,7 +542,7 @@ import java.util.concurrent.atomic.AtomicLong;
         }
     }
 
-    private synchronized void setErrorDrawable4Callback() {
+    private void setErrorDrawable4Callback() {
         final ImageView view = viewRef.get();
         if (view != null) {
             Drawable drawable = options.getFailureDrawable(view);
@@ -551,7 +551,7 @@ import java.util.concurrent.atomic.AtomicLong;
         }
     }
 
-    private static void postBindArgsException(
+    private static void postArgsException(
             final ImageView view, final ImageOptions options,
             final String exMsg, final Callback.CommonCallback<?> callback) {
         x.task().autoPost(new Runnable() {

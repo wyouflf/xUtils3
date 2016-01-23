@@ -15,7 +15,7 @@ public class JsonResponseParser implements ResponseParser {
     @Override
     public void checkResponse(UriRequest request) throws Throwable {
         // custom check ?
-        // check header ?
+        // get headers ?
     }
 
     /**
@@ -37,15 +37,14 @@ public class JsonResponseParser implements ResponseParser {
             baiduResponse.setTest(result);
             list.add(baiduResponse);
             return list;
-            // fastJson:
-            // return JSON.parseArray(result,
-            // (Class<?>) ParameterizedTypeUtil.getParameterizedType(resultType, List.class, 0));
+            // fastJson 解析:
+            // return JSON.parseArray(result, (Class<?>) ParameterizedTypeUtil.getParameterizedType(resultType, List.class, 0));
         } else {
             // 这里只是个示例, 不做json转换.
             BaiduResponse baiduResponse = new BaiduResponse();
             baiduResponse.setTest(result);
             return baiduResponse;
-            // fastjson:
+            // fastjson 解析:
             // return JSON.parseObject(result, resultClass);
         }
 

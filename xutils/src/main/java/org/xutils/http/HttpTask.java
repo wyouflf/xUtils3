@@ -273,6 +273,13 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             this.request.clearCacheHeader();
         }
 
+        // 判断请求的缓存策略
+        if (callback instanceof Callback.ProxyCacheCallback) {
+            if (((Callback.ProxyCacheCallback) callback).onlyCache()) {
+                return null;
+            }
+        }
+
         // 发起请求
         retry = true;
         while (retry) {

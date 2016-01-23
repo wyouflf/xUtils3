@@ -26,6 +26,10 @@ public interface Callback {
         boolean onCache(ResultType result);
     }
 
+    public interface ProxyCacheCallback<ResultType> extends CacheCallback<ResultType> {
+        boolean onlyCache();
+    }
+
     public interface PrepareCallback<PrepareType, ResultType> extends CommonCallback<ResultType> {
         ResultType prepare(PrepareType rawData);
     }

@@ -14,6 +14,8 @@ import java.lang.reflect.Modifier;
  */
 /*package*/ final class RequestParamsHelper {
 
+    private static final ClassLoader BOOT_CL = String.class.getClassLoader();
+
     private RequestParamsHelper() {
     }
 
@@ -27,7 +29,7 @@ import java.lang.reflect.Modifier;
             return;
         } else {
             ClassLoader cl = type.getClassLoader();
-            if (cl == null || cl == Integer.class.getClassLoader()) {
+            if (cl == null || cl == BOOT_CL) {
                 return;
             }
         }
@@ -58,7 +60,7 @@ import java.lang.reflect.Modifier;
     static Object parseJSONObject(Object value) {
         Object result = value;
         ClassLoader cl = value.getClass().getClassLoader();
-        if (cl != null && cl != Integer.class.getClassLoader()) {
+        if (cl != null && cl != BOOT_CL) {
             final JSONObject jo = new JSONObject();
             parseKV(value, value.getClass(), new ParseKVListener() {
                 @Override

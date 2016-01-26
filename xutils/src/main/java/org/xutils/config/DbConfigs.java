@@ -12,6 +12,12 @@ public enum DbConfigs {
     HTTP(new DbManager.DaoConfig()
             .setDbName("xUtils_http_cache.db")
             .setDbVersion(1)
+            .setDbOpenListener(new DbManager.DbOpenListener() {
+                @Override
+                public void onDbOpened(DbManager db) {
+                    db.getDatabase().enableWriteAheadLogging();
+                }
+            })
             .setDbUpgradeListener(new DbManager.DbUpgradeListener() {
                 @Override
                 public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
@@ -26,6 +32,12 @@ public enum DbConfigs {
     COOKIE(new DbManager.DaoConfig()
             .setDbName("xUtils_http_cookie.db")
             .setDbVersion(1)
+            .setDbOpenListener(new DbManager.DbOpenListener() {
+                @Override
+                public void onDbOpened(DbManager db) {
+                    db.getDatabase().enableWriteAheadLogging();
+                }
+            })
             .setDbUpgradeListener(new DbManager.DbUpgradeListener() {
                 @Override
                 public void onUpgrade(DbManager db, int oldVersion, int newVersion) {

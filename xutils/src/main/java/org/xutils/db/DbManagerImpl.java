@@ -56,9 +56,13 @@ public final class DbManagerImpl extends DbBase {
         if (config == null) {
             throw new IllegalArgumentException("daoConfig may not be null");
         }
-        this.database = createDatabase(config);
         this.daoConfig = config;
         this.allowTransaction = config.isAllowTransaction();
+        this.database = openOrCreateDatabase(config);
+        DbOpenListener dbOpenListener = config.getDbOpenListener();
+        if (dbOpenListener != null) {
+            dbOpenListener.onDbOpened(this);
+        }
     }
 
     public synchronized static DbManager getInstance(DaoConfig daoConfig) {
@@ -397,7 +401,7 @@ public final class DbManagerImpl extends DbBase {
 
     //******************************************** config ******************************************************
 
-    private SQLiteDatabase createDatabase(DaoConfig config) {
+    private SQLiteDatabase openOrCreateDatabase(DaoConfig config) {
         SQLiteDatabase result = null;
 
         File dbDir = config.getDbDir();

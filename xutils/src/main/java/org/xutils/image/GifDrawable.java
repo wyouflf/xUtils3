@@ -13,6 +13,7 @@ import org.xutils.common.util.LogUtil;
 public class GifDrawable extends Drawable implements Runnable, Animatable {
 
     private int byteCount;
+    private int rate = 300;
     private volatile boolean running;
 
     private final Movie movie;
@@ -25,6 +26,10 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
         this.duration = movie.duration();
     }
 
+    public int getDuration() {
+        return duration;
+    }
+
     public Movie getMovie() {
         return movie;
     }
@@ -34,6 +39,14 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
             byteCount = (movie.width() * movie.height() * 3) * (5/*fake frame count*/);
         }
         return byteCount;
+    }
+
+    public int getRate() {
+        return rate;
+    }
+
+    public void setRate(int rate) {
+        this.rate = rate;
     }
 
     @Override
@@ -72,7 +85,7 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
     public void run() {
         if (duration > 0) {
             this.invalidateSelf();
-            this.scheduleSelf(this, SystemClock.uptimeMillis() + 300); // scheduleSelf(runnable, when)
+            this.scheduleSelf(this, SystemClock.uptimeMillis() + rate);
         }
     }
 

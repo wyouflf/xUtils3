@@ -27,6 +27,7 @@ public class DbFragment extends BaseFragment {
 
     DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
             .setDbName("test.db")
+            // 不设置dbDir时, 默认存储在app的私有目录.
             .setDbDir(new File("/sdcard")) // "sdcard"的写法并非最佳实践, 这里为了简单, 先这样写了.
             .setDbVersion(2)
             .setDbUpgradeListener(new DbManager.DbUpgradeListener() {

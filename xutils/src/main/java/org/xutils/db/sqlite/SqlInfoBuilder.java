@@ -255,9 +255,8 @@ public final class SqlInfoBuilder {
 
     public static List<KeyValue> entity2KeyValueList(TableEntity<?> table, Object entity) {
 
-        List<KeyValue> keyValueList = new ArrayList<KeyValue>();
-
         Collection<ColumnEntity> columns = table.getColumnMap().values();
+        List<KeyValue> keyValueList = new ArrayList<KeyValue>(columns.size());
         for (ColumnEntity column : columns) {
             KeyValue kv = column2KeyValue(entity, column);
             if (kv != null) {

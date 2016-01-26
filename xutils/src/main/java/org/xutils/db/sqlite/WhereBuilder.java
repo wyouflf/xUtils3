@@ -169,8 +169,8 @@ public class WhereBuilder {
                 if (value instanceof Iterable) {
                     items = (Iterable<?>) value;
                 } else if (value.getClass().isArray()) {
-                    List<Object> arrayList = new ArrayList<Object>();
                     int len = Array.getLength(value);
+                    List<Object> arrayList = new ArrayList<Object>(len);
                     for (int i = 0; i < len; i++) {
                         arrayList.add(Array.get(value, i));
                     }
@@ -202,8 +202,8 @@ public class WhereBuilder {
                 if (value instanceof Iterable) {
                     items = (Iterable<?>) value;
                 } else if (value.getClass().isArray()) {
-                    List<Object> arrayList = new ArrayList<Object>();
                     int len = Array.getLength(value);
+                    List<Object> arrayList = new ArrayList<Object>(len);
                     for (int i = 0; i < len; i++) {
                         arrayList.add(Array.get(value, i));
                     }

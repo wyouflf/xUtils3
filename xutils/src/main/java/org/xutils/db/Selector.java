@@ -97,7 +97,7 @@ public final class Selector<T> {
 
     public Selector<T> orderBy(String columnName) {
         if (orderByList == null) {
-            orderByList = new ArrayList<OrderBy>();
+            orderByList = new ArrayList<OrderBy>(5);
         }
         orderByList.add(new OrderBy(columnName));
         return this;
@@ -105,7 +105,7 @@ public final class Selector<T> {
 
     public Selector<T> orderBy(String columnName, boolean desc) {
         if (orderByList == null) {
-            orderByList = new ArrayList<OrderBy>();
+            orderByList = new ArrayList<OrderBy>(5);
         }
         orderByList.add(new OrderBy(columnName, desc));
         return this;

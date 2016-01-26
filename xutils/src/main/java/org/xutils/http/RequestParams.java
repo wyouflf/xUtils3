@@ -372,6 +372,7 @@ public class RequestParams extends BaseParams {
 
     @Override
     public String toString() {
-        return getUri();
+        String url = getUri();
+        return TextUtils.isEmpty(url) ? super.toString() : url;
     }
 }

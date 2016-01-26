@@ -142,7 +142,7 @@ public class ImageFragment extends BaseFragment {
         public View getView(final int position, View view, ViewGroup parent) {
             ImageItemHolder holder = null;
             if (view == null) {
-                view = mInflater.inflate(R.layout.image_item, null);
+                view = mInflater.inflate(R.layout.image_item, parent, false);
                 holder = new ImageItemHolder();
                 x.view().inject(holder, view);
                 view.setTag(holder);

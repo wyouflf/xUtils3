@@ -20,12 +20,12 @@ public class FileUtil {
             File cacheDir = x.app().getExternalCacheDir();
             if (cacheDir == null) {
                 result = new File(Environment.getExternalStorageDirectory(),
-                        ".android/" + x.app().getPackageName() + "/" + dirName);
+                        "Android/data/" + x.app().getPackageName() + "/cache/" + dirName);
             } else {
                 result = new File(cacheDir, dirName);
             }
         } else {
-            result = new File(x.app().getFilesDir(), dirName);
+            result = new File(x.app().getCacheDir(), dirName);
         }
         if (result.exists() || result.mkdirs()) {
             return result;

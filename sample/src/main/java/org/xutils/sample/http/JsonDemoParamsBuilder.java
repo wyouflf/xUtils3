@@ -49,11 +49,21 @@ public class JsonDemoParamsBuilder implements ParamsBuilder {
 
     @Override
     public void buildParams(RequestParams params) {
-        // 将post请求的body参数以json形式提交
-        params.setAsJsonContent(true);
         // 添加公共参数
         params.addParameter("common_a", "xxxx");
         params.addParameter("common_b", "xxxx");
+
+
+        // 将post请求的body参数以json形式提交
+        params.setAsJsonContent(true);
+        // 或者query参数和body参数都json形式
+        /*String json = params.toJSONString();
+        params.clearParams();// 清空参数
+        if (params.getMethod() == HttpMethod.GET) {
+            params.addQueryStringParameter("xxx", json);
+        } else {
+            params.setBodyContent(json);
+        }*/
     }
 
     @Override

@@ -26,6 +26,7 @@ public class IOUtil {
             try {
                 closeable.close();
             } catch (Throwable ignored) {
+                LogUtil.d(ignored.getMessage(), ignored);
             }
         }
     }
@@ -35,6 +36,7 @@ public class IOUtil {
             try {
                 cursor.close();
             } catch (Throwable ignored) {
+                LogUtil.d(ignored.getMessage(), ignored);
             }
         }
     }
@@ -93,7 +95,7 @@ public class IOUtil {
         while ((len = reader.read(buf)) >= 0) {
             sb.append(buf, 0, len);
         }
-        return sb.toString().trim();
+        return sb.toString();
     }
 
     public static void writeStr(OutputStream out, String str) throws IOException {

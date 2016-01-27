@@ -432,7 +432,6 @@ import java.util.concurrent.atomic.AtomicLong;
                 @Override
                 public void run() {
                     doBind(viewRef.get(), key.url, options, callback);
-
                 }
             }, 10);
             return;

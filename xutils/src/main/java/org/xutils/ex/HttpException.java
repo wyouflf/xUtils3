@@ -21,6 +21,7 @@ public class HttpException extends BaseException {
     private static final long serialVersionUID = 1L;
 
     private int code;
+    private String errorCode;
     private String customMessage;
     private String result;
 
@@ -46,6 +47,14 @@ public class HttpException extends BaseException {
      */
     public int getCode() {
         return code;
+    }
+
+    public String getErrorCode() {
+        return errorCode == null ? String.valueOf(code) : errorCode;
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
     }
 
     @Override

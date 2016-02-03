@@ -411,11 +411,42 @@ import java.util.Map;
         }
     }
 
+    @Override
+    public String toString() {
+        checkBodyParams();
+        final StringBuilder sb = new StringBuilder();
+        if (!queryStringParams.isEmpty()) {
+            for (KeyValue kv : queryStringParams) {
+                sb.append("&").append(kv.key).append("=").append(kv.value);
+
+            }
+            sb.deleteCharAt(sb.length() - 1);
+        }
+
+        if (HttpMethod.permitsRequestBody(this.method)) {
+            sb.append("<");
+            if (!TextUtils.isEmpty(bodyContent)) {
+                sb.append(bodyContent);
+            } else {
+                if (!bodyParams.isEmpty()) {
+                    for (KeyValue kv : bodyParams) {
+                        sb.append("&").append(kv.key).append("=").append(kv.value);
+
+                    }
+                    sb.deleteCharAt(sb.length() - 1);
+                }
+            }
+            sb.append(">");
+        }
+        return sb.toString();
+    }
+
     private void checkBodyParams() {
-        if (!bodyParams.isEmpty() &&
-                (!HttpMethod.permitsRequestBody(method)
-                        || !TextUtils.isEmpty(bodyContent)
-                        || requestBody != null)) {
+        if (bodyParams.isEmpty()) return;
+
+        if (!HttpMethod.permitsRequestBody(method)
+                || !TextUtils.isEmpty(bodyContent)
+                || requestBody != null) {
             queryStringParams.addAll(bodyParams);
             bodyParams.clear();
         }

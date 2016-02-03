@@ -3,6 +3,7 @@ package org.xutils.http;
 import android.text.TextUtils;
 
 import org.xutils.common.task.Priority;
+import org.xutils.common.util.LogUtil;
 import org.xutils.http.annotation.HttpRequest;
 import org.xutils.http.app.DefaultParamsBuilder;
 import org.xutils.http.app.HttpRetryHandler;
@@ -370,9 +371,21 @@ public class RequestParams extends BaseParams {
         return httpRequest;
     }
 
+    /**
+     * 在网络请求onStart前, 尽量不要在UI线程调用这个方法, 可能产生性能影响.
+     *
+     * @return
+     */
     @Override
     public String toString() {
-        String url = getUri();
-        return TextUtils.isEmpty(url) ? super.toString() : url;
+        try {
+            this.init();
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
+        }
+        String url = this.getUri();
+        return TextUtils.isEmpty(url) ?
+                super.toString() :
+                url + (url.contains("?") ? "&" : "?") + super.toString();
     }
 }

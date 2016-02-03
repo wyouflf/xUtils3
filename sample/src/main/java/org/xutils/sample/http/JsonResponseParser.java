@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by wyouflf on 15/11/5.
  */
-public class JsonResponseParser implements ResponseParser {
+public class JsonResponseParser implements ResponseParser {// 如果实现 InputStreamResponseParser, 可实现自定义流数据转换.
 
     @Override
     public void checkResponse(UriRequest request) throws Throwable {

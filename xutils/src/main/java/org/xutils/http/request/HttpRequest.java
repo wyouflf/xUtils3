@@ -19,10 +19,12 @@ import org.xutils.http.cookie.DbCookieStore;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -173,7 +175,16 @@ public class HttpRequest extends UriRequest {
 
         { // write body
             HttpMethod method = params.getMethod();
-            connection.setRequestMethod(method.toString());
+            try {
+                connection.setRequestMethod(method.toString());
+            } catch (ProtocolException ex) {
+                try { // fix: HttpURLConnection not support PATCH method.
+                    Field methodField = HttpURLConnection.class.getDeclaredField("method");
+                    methodField.set(connection, method.toString());
+                } catch (Throwable ignored) {
+                    throw ex;
+                }
+            }
             if (HttpMethod.permitsRequestBody(method)) {
                 RequestBody body = params.getRequestBody();
                 if (body != null) {

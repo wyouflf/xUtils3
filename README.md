@@ -22,6 +22,7 @@ compile 'org.xutils:xutils:3.3.14'
 2. Cookie的使用: https://github.com/wyouflf/xUtils3/issues/125
 3. 关于query参数? http请求可以通过 header, url, body(请求体)传参; query参数是url中问号(?)后面的参数.
 4. 关于body参数? body参数只有PUT, POST, PATCH, DELETE(老版本RFC2616文档没有明确指出它是否支持, 所以暂时支持)请求支持.
+5. 自定义Http参数对象和结果解析: https://github.com/wyouflf/xUtils3/issues/191
 
 #### 使用前配置
 ##### 需要的权限

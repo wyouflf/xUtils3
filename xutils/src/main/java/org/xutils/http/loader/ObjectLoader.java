@@ -111,8 +111,11 @@ import java.util.List;
 
     @Override
     public Object load(final UriRequest request) throws Throwable {
-        request.sendRequest();
-        parser.checkResponse(request);
+        try {
+            request.sendRequest();
+        } finally {
+            parser.checkResponse(request);
+        }
         return this.load(request.getInputStream());
     }
 

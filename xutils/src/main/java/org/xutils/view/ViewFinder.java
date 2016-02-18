@@ -1,7 +1,6 @@
 package org.xutils.view;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.View;
 
 /**
@@ -47,9 +46,9 @@ import android.view.View;
         return view;
     }
 
-    public Context getContext() {
+    /*public Context getContext() {
         if (view != null) return view.getContext();
         if (activity != null) return activity;
         return null;
-    }
+    }*/
 }

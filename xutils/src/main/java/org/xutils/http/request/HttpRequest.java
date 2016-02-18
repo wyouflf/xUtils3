@@ -180,6 +180,7 @@ public class HttpRequest extends UriRequest {
             } catch (ProtocolException ex) {
                 try { // fix: HttpURLConnection not support PATCH method.
                     Field methodField = HttpURLConnection.class.getDeclaredField("method");
+                    methodField.setAccessible(true);
                     methodField.set(connection, method.toString());
                 } catch (Throwable ignored) {
                     throw ex;

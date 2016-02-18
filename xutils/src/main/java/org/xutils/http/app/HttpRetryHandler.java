@@ -53,17 +53,20 @@ public class HttpRetryHandler {
 
         LogUtil.w(ex.getMessage(), ex);
 
-        if (count > maxRetryCount || request == null) {
+        if (count > maxRetryCount) {
+            LogUtil.w(request.toString());
             LogUtil.w("The Max Retry times has been reached!");
             return false;
         }
 
         if (!HttpMethod.permitsRetry(request.getParams().getMethod())) {
+            LogUtil.w(request.toString());
             LogUtil.w("The Request Method can not be retried.");
             return false;
         }
 
         if (blackList.contains(ex.getClass())) {
+            LogUtil.w(request.toString());
             LogUtil.w("The Exception can not be retried.");
             return false;
         }

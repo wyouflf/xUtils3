@@ -417,8 +417,7 @@ import java.util.Map;
         final StringBuilder sb = new StringBuilder();
         if (!queryStringParams.isEmpty()) {
             for (KeyValue kv : queryStringParams) {
-                sb.append("&").append(kv.key).append("=").append(kv.value);
-
+                sb.append(kv.key).append("=").append(kv.value).append("&");
             }
             sb.deleteCharAt(sb.length() - 1);
         }
@@ -430,8 +429,7 @@ import java.util.Map;
             } else {
                 if (!bodyParams.isEmpty()) {
                     for (KeyValue kv : bodyParams) {
-                        sb.append("&").append(kv.key).append("=").append(kv.value);
-
+                        sb.append(kv.key).append("=").append(kv.value).append("&");
                     }
                     sb.deleteCharAt(sb.length() - 1);
                 }

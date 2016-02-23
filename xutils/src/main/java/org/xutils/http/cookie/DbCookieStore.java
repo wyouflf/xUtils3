@@ -30,13 +30,16 @@ public enum DbCookieStore implements CookieStore {
     private final Executor trimExecutor = new PriorityExecutor(1, true);
     private static final int LIMIT_COUNT = 5000; // 限制最多5000条数据
 
-    // delete expires
-    private long lastDeleteExpiryTime = 0L;
-    private static final long DELETE_EXPIRY_SPAN = 1000;
+    private long lastTrimTime = 0L;
+    private static final long TRIM_TIME_SPAN = 1000;
 
     DbCookieStore() {
         db = x.getDb(DbConfigs.COOKIE.getConfig());
-        trimSize();
+        try {
+            db.delete(CookieEntity.class, WhereBuilder.b("expiry", "=", -1L));
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
+        }
     }
 
     /**
@@ -86,15 +89,13 @@ public enum DbCookieStore implements CookieStore {
 
             String host = uri.getHost();
             if (!TextUtils.isEmpty(host)) {
-                WhereBuilder subWhere = WhereBuilder.b("domain", "=", host);
+                WhereBuilder subWhere = WhereBuilder.b("domain", "=", host).or("domain", "=", "." + host);
+                int firstDot = host.indexOf(".");
                 int lastDot = host.lastIndexOf(".");
-                if (lastDot > 1) {
-                    lastDot = host.lastIndexOf(".", lastDot - 1);
-                    if (lastDot > 0) {
-                        String domain = host.substring(lastDot, host.length());
-                        if (!TextUtils.isEmpty(domain)) {
-                            subWhere.or("domain", "=", domain);
-                        }
+                if (firstDot > 0 && lastDot > firstDot) {
+                    String domain = host.substring(firstDot, host.length());
+                    if (!TextUtils.isEmpty(domain)) {
+                        subWhere.or("domain", "=", domain);
                     }
                 }
                 where.and(subWhere);
@@ -240,41 +241,28 @@ public enum DbCookieStore implements CookieStore {
         return true;
     }
 
-    private volatile boolean fistDeleteExpiry = true;
-
-    private void deleteExpiryCookies() {
-        try {
-            if (fistDeleteExpiry) {
-                fistDeleteExpiry = false;
-                try {
-                    db.delete(CookieEntity.class, WhereBuilder.b("expiry", "=", -1L));
-                } catch (Throwable ex) {
-                    LogUtil.e(ex.getMessage(), ex);
-                }
-            }
-
-            long current = System.currentTimeMillis();
-            if (current - lastDeleteExpiryTime < DELETE_EXPIRY_SPAN) {
-                return;
-            } else {
-                lastDeleteExpiryTime = current;
-            }
-
-            db.delete(CookieEntity.class, WhereBuilder
-                    .b("expiry", "<", System.currentTimeMillis())
-                    .and("expiry", "!=", -1L));
-        } catch (Throwable ex) {
-            LogUtil.e(ex.getMessage(), ex);
-        }
-    }
-
     private void trimSize() {
         trimExecutor.execute(new Runnable() {
             @Override
             public void run() {
 
-                deleteExpiryCookies();
+                long current = System.currentTimeMillis();
+                if (current - lastTrimTime < TRIM_TIME_SPAN) {
+                    return;
+                } else {
+                    lastTrimTime = current;
+                }
 
+                // delete expires
+                try {
+                    db.delete(CookieEntity.class, WhereBuilder
+                            .b("expiry", "<", System.currentTimeMillis())
+                            .and("expiry", "!=", -1L));
+                } catch (Throwable ex) {
+                    LogUtil.e(ex.getMessage(), ex);
+                }
+
+                // trim by limit count
                 try {
                     int count = (int) db.selector(CookieEntity.class).count();
                     if (count > LIMIT_COUNT + 10) {

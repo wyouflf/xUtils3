@@ -43,9 +43,8 @@ public final class LruDiskCache {
     private long diskCacheSize = LIMIT_SIZE;
     private final Executor trimExecutor = new PriorityExecutor(1, true);
 
-    // delete expires
-    private long lastDeleteExpiryTime = 0L;
-    private static final long DELETE_EXPIRY_SPAN = 1000;
+    private long lastTrimTime = 0L;
+    private static final long TRIM_TIME_SPAN = 1000;
 
     public synchronized static LruDiskCache getDiskCache(String dirName) {
         if (TextUtils.isEmpty(dirName)) dirName = CACHE_DIR_NAME;
@@ -247,6 +246,13 @@ public final class LruDiskCache {
             public void run() {
                 if (available) {
 
+                    long current = System.currentTimeMillis();
+                    if (current - lastTrimTime < TRIM_TIME_SPAN) {
+                        return;
+                    } else {
+                        lastTrimTime = current;
+                    }
+
                     // trim expires
                     deleteExpiry();
 
@@ -304,13 +310,6 @@ public final class LruDiskCache {
     }
 
     private void deleteExpiry() {
-        long current = System.currentTimeMillis();
-        if (current - lastDeleteExpiryTime < DELETE_EXPIRY_SPAN) {
-            return;
-        } else {
-            lastDeleteExpiryTime = current;
-        }
-
         try {
             WhereBuilder whereBuilder = WhereBuilder.b("expires", "<", System.currentTimeMillis());
             List<DiskCacheEntity> rmList = cacheDb.selector(DiskCacheEntity.class).where(whereBuilder).findAll();

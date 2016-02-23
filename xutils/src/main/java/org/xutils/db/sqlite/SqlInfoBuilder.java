@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class SqlInfoBuilder {
 
-
     private static final ConcurrentHashMap<TableEntity<?>, String> INSERT_SQL_CACHE = new ConcurrentHashMap<TableEntity<?>, String>();
     private static final ConcurrentHashMap<TableEntity<?>, String> REPLACE_SQL_CACHE = new ConcurrentHashMap<TableEntity<?>, String>();
 

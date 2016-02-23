@@ -14,7 +14,6 @@ import java.io.File;
  */
 public final class ImageManagerImpl implements ImageManager {
 
-
     private static final Object lock = new Object();
     private static ImageManagerImpl instance;
 

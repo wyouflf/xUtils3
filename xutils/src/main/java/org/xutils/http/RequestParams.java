@@ -2,6 +2,7 @@ package org.xutils.http;
 
 import android.text.TextUtils;
 
+import org.json.JSONException;
 import org.xutils.common.task.Priority;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.annotation.HttpRequest;
@@ -348,10 +349,10 @@ public class RequestParams extends BaseParams {
         this.requestTracker = requestTracker;
     }
 
-    private void initEntityParams() {
+    private void initEntityParams() throws JSONException {
         RequestParamsHelper.parseKV(this, this.getClass(), new RequestParamsHelper.ParseKVListener() {
             @Override
-            public void onParseKV(String name, Object value) {
+            public void onParseKV(String name, Object value) throws JSONException {
                 addParameter(name, value);
             }
         });

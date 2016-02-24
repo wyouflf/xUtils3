@@ -244,6 +244,9 @@ public class FileLoader extends Loader<File> {
                 }
                 // 从缓存获取文件, 不rename和断点, 直接退出.
                 if (result != null && result.exists()) {
+                    if (isAutoRename) {
+                        responseFileName = getResponseFileName(request);
+                    }
                     result = autoRename(result);
                 } else {
                     IOUtil.deleteFileOrDir(result);

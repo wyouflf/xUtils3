@@ -40,7 +40,7 @@ import java.util.List;
                 objectClass = (Class<?>) ((ParameterizedType) objectType).getRawType();
             } else if (objectType instanceof TypeVariable) {
                 throw new IllegalArgumentException(
-                        "not support callback type" + objectType.toString());
+                        "not support callback type " + objectType.toString());
             } else {
                 objectClass = (Class<?>) objectType;
             }
@@ -53,7 +53,7 @@ import java.util.List;
                 itemClass = (Class<?>) ((ParameterizedType) itemType).getRawType();
             } else if (itemType instanceof TypeVariable) {
                 throw new IllegalArgumentException(
-                        "not support callback type" + itemType.toString());
+                        "not support callback type " + itemType.toString());
             } else {
                 itemClass = (Class<?>) itemType;
             }

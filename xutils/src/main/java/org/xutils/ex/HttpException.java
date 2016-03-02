@@ -76,6 +76,6 @@ public class HttpException extends BaseException {
 
     @Override
     public String toString() {
-        return "code: " + code + ", msg: " + getMessage() + ", result: " + result;
+        return "errorCode: " + getErrorCode() + ", msg: " + getMessage() + ", result: " + result;
     }
 }

@@ -138,6 +138,9 @@ public final class ViewInjectorImpl implements ViewInjector {
             return;
         }
 
+        // 从父类到子类递归
+        injectObject(handler, handlerType.getSuperclass(), finder);
+
         // inject view
         Field[] fields = handlerType.getDeclaredFields();
         if (fields != null && fields.length > 0) {
@@ -168,7 +171,7 @@ public final class ViewInjectorImpl implements ViewInjector {
                     }
                 }
             }
-        }
+        } // end inject view
 
         // inject event
         Method[] methods = handlerType.getDeclaredMethods();
@@ -204,9 +207,8 @@ public final class ViewInjectorImpl implements ViewInjector {
                     }
                 }
             }
-        }
+        } // end inject event
 
-        injectObject(handler, handlerType.getSuperclass(), finder);
     }
 
 }

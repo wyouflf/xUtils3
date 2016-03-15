@@ -26,6 +26,9 @@ public final class AsyncDrawable extends Drawable {
             throw new IllegalArgumentException("imageLoader may not be null");
         }
         baseDrawable = drawable;
+        while (baseDrawable instanceof AsyncDrawable) {
+            baseDrawable = ((AsyncDrawable) baseDrawable).baseDrawable;
+        }
         imageLoaderReference = new WeakReference<ImageLoader>(imageLoader);
     }
 

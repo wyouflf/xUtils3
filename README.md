@@ -271,16 +271,7 @@ ____
 * webp来自:https://github.com/webmproject/libwebp
 * webpbackport来自:https://github.com/alexey-pelykh/webp-android-backport
 * 其中为webpbackport添加了nativeDecodeFile的实现, 并修复在Android 5.0以上系统存在bug:
-```CPP
-// android_backport_webp.cpp
-// 修改:
-jclassRef = jniEnv->FindClass(...);
-// 为:
-jclass temp = jniEnv->FindClass(...);
-jclassRef = (jclass)jniEnv->NewGlobalRef(temp);
-jniEnv->DeleteLocalRef(temp);
-// 其他jni代码修改见: http://my.oschina.net/u/1171837/blog/533153
-```
+jni代码修改见: https://github.com/wyouflf/webp-android-backport/commits/master
 
 ----
 ### 关于作者

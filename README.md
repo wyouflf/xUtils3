@@ -270,8 +270,8 @@ ____
 * 部分4.x的机型对webp格式的支持仍然有问题, 需要借助webp.
 * webp来自:https://github.com/webmproject/libwebp
 * webpbackport来自:https://github.com/alexey-pelykh/webp-android-backport
-* 其中为webpbackport添加了nativeDecodeFile的实现, 并修复在Android 5.0以上系统存在bug:
-jni代码修改见: https://github.com/wyouflf/webp-android-backport/commits/master
+* xUtils在使用webpbackport时为其添加了nativeDecodeFile的实现, 并修复其在Android 5.0及以上系统存在bug:
+jni代码见: https://github.com/wyouflf/webp-android-backport/commits/master
 
 ----
 ### 关于作者

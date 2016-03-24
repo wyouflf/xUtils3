@@ -228,7 +228,7 @@ public class HttpRequest extends UriRequest {
 
         // check response code
         responseCode = connection.getResponseCode();
-        if (responseCode >= 300) {
+        if (responseCode > 200) {
             HttpException httpException = new HttpException(responseCode, this.getResponseMessage());
             try {
                 httpException.setResult(IOUtil.readStr(this.getInputStream(), params.getCharset()));

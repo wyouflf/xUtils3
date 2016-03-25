@@ -262,7 +262,7 @@ public class HttpRequest extends UriRequest {
     @Override
     public Object loadResult() throws Throwable {
         isLoading = true;
-        if (responseCode == 205) return null;
+        if (responseCode == 204 || responseCode == 205) return null;
         return super.loadResult();
     }
 

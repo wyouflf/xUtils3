@@ -40,6 +40,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     private UriRequest request;
     private RequestWorker requestWorker;
     private final Executor executor;
+    private volatile boolean hasException = false;
     private final Callback.CommonCallback<ResultType> callback;
 
     // 缓存控制
@@ -359,6 +360,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         }
 
         if (exception != null && result == null && !trustCache) {
+            hasException = true;
             throw exception;
         }
 
@@ -437,12 +439,11 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     @Override
     protected void onSuccess(ResultType result) {
+        if (hasException) return;
         if (tracker != null) {
             tracker.onSuccess(request, result);
         }
-        if (result != null) {
-            callback.onSuccess(result);
-        }
+        callback.onSuccess(result);
     }
 
     @Override

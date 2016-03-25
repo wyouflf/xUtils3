@@ -228,7 +228,7 @@ public class HttpRequest extends UriRequest {
 
         // check response code
         responseCode = connection.getResponseCode();
-        if (responseCode > 200) {
+        if (responseCode >= 300) {
             HttpException httpException = new HttpException(responseCode, this.getResponseMessage());
             try {
                 httpException.setResult(IOUtil.readStr(this.getInputStream(), params.getCharset()));
@@ -262,6 +262,7 @@ public class HttpRequest extends UriRequest {
     @Override
     public Object loadResult() throws Throwable {
         isLoading = true;
+        if (responseCode == 205) return null;
         return super.loadResult();
     }
 

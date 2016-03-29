@@ -7,7 +7,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Created by wyouflf on 15/8/20.
- * <p/>
+ * <p>
  * {@link org.xutils.http.annotation.HttpRequest} 注解的参数构建的模板接口
  */
 public interface ParamsBuilder {

@@ -7,7 +7,7 @@ import org.xutils.http.request.UriRequest;
  * Created by wyouflf on 15/9/10.
  * 请求过程追踪, 适合用来记录请求日志.
  * 所有回调方法都在主线程进行.
- * <p/>
+ * <p>
  * 用法:
  * 1. 将RequestTracker实例设置给请求参数RequestParams.
  * 2. 请的callback参数同时实现RequestTracker接口;

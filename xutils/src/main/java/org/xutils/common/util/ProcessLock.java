@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.text.DecimalFormat;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 进程间锁, 仅在同一个应用中有效.
@@ -25,20 +27,29 @@ public final class ProcessLock implements Closeable {
     private final FileLock mFileLock;
     private final File mFile;
     private final Closeable mStream;
+    private final boolean mWriteMode;
 
     private final static String LOCK_FILE_DIR = "process_lock";
     private final static int PID = android.os.Process.myPid();
-    private final static HashMap<String, ProcessLock> LOCK_MAP = new HashMap<String, ProcessLock>(5);
+    /**
+     * key1: lockName
+     * key2: mFileLock.hashCode()
+     */
+    private final static DoubleKeyValueMap<String, Integer, ProcessLock> LOCK_MAP = new DoubleKeyValueMap<String, Integer, ProcessLock>();
 
     static {
-        IOUtil.deleteFileOrDir(x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE));
+        File dir = x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE);
+        if (dir != null) {
+            dir.deleteOnExit();
+        }
     }
 
-    private ProcessLock(String lockName, File file, FileLock fileLock, Closeable stream) {
+    private ProcessLock(String lockName, File file, FileLock fileLock, Closeable stream, boolean writeMode) {
         mLockName = lockName;
         mFileLock = fileLock;
         mFile = file;
         mStream = stream;
+        mWriteMode = writeMode;
     }
 
     /**
@@ -92,7 +103,7 @@ public final class ProcessLock implements Closeable {
      * 释放锁
      */
     public void release() {
-        release(mLockName, mFileLock, mFile, mStream);
+        release(mLockName, mFileLock, mStream);
     }
 
     /**
@@ -107,11 +118,11 @@ public final class ProcessLock implements Closeable {
         return fileLock != null && fileLock.isValid();
     }
 
-    private static void release(String lockName, FileLock fileLock, File file, Closeable stream) {
+    private static void release(String lockName, FileLock fileLock, Closeable stream) {
         synchronized (LOCK_MAP) {
             if (fileLock != null) {
                 try {
-                    LOCK_MAP.remove(lockName);
+                    LOCK_MAP.remove(lockName, fileLock.hashCode());
                     fileLock.release();
                     LogUtil.d("released: " + lockName + ":" + PID);
                 } catch (Throwable ignored) {
@@ -121,7 +132,6 @@ public final class ProcessLock implements Closeable {
             }
 
             IOUtil.closeQuietly(stream);
-            IOUtil.deleteFileOrDir(file);
         }
     }
 
@@ -141,28 +151,35 @@ public final class ProcessLock implements Closeable {
     private static ProcessLock tryLockInternal(final String lockName, final String hash, final boolean writeMode) {
         synchronized (LOCK_MAP) {
 
-            // android对文件锁共享支持的不好, 暂时全部互斥.
-            if (LOCK_MAP.containsKey(lockName)) {
-                ProcessLock lock = LOCK_MAP.get(lockName);
-                if (lock == null) {
-                    LOCK_MAP.remove(lockName);
-                } else if (lock.isValid()) {
-                    return null;
-                } else {
-                    LOCK_MAP.remove(lockName);
-                    lock.release();
+            ConcurrentHashMap<Integer, ProcessLock> locks = LOCK_MAP.get(lockName);
+            if (locks != null && !locks.isEmpty()) {
+                Iterator<Map.Entry<Integer, ProcessLock>> itr = locks.entrySet().iterator();
+                while (itr.hasNext()) {
+                    Map.Entry<Integer, ProcessLock> entry = itr.next();
+                    ProcessLock value = entry.getValue();
+                    if (value != null) {
+                        if (!value.isValid()) {
+                            itr.remove();
+                        } else if (writeMode) {
+                            return null;
+                        } else if (value.mWriteMode) {
+                            return null;
+                        }
+                    } else {
+                        itr.remove();
+                    }
                 }
             }
 
             FileInputStream in = null;
             FileOutputStream out = null;
-            Closeable stream = null;
             FileChannel channel = null;
             try {
                 File file = new File(
                         x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE),
                         hash);
                 if (file.exists() || file.createNewFile()) {
+                    Closeable stream = null;
                     if (writeMode) {
                         out = new FileOutputStream(file, false);
                         channel = out.getChannel();
@@ -176,11 +193,11 @@ public final class ProcessLock implements Closeable {
                         FileLock fileLock = channel.tryLock(0L, Long.MAX_VALUE, !writeMode);
                         if (isValid(fileLock)) {
                             LogUtil.d("lock: " + lockName + ":" + PID);
-                            ProcessLock processLock = new ProcessLock(lockName, file, fileLock, stream);
-                            LOCK_MAP.put(lockName, processLock);
-                            return processLock;
+                            ProcessLock result = new ProcessLock(lockName, file, fileLock, stream, writeMode);
+                            LOCK_MAP.put(lockName, fileLock.hashCode(), result);
+                            return result;
                         } else {
-                            release(lockName, fileLock, file, out);
+                            release(lockName, fileLock, out);
                         }
                     } else {
                         throw new IOException("can not get file channel:" + file.getAbsolutePath());
@@ -199,7 +216,7 @@ public final class ProcessLock implements Closeable {
 
     @Override
     public String toString() {
-        return mLockName;
+        return mLockName + ": " + mFile.getName();
     }
 
     @Override

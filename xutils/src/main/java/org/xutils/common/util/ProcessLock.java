@@ -33,7 +33,7 @@ public final class ProcessLock implements Closeable {
     private final static int PID = android.os.Process.myPid();
     /**
      * key1: lockName
-     * key2: mFileLock.hashCode()
+     * key2: fileLock.hashCode()
      */
     private final static DoubleKeyValueMap<String, Integer, ProcessLock> LOCK_MAP = new DoubleKeyValueMap<String, Integer, ProcessLock>();
 

@@ -9,6 +9,7 @@ import org.xutils.common.Callback;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.common.util.ProcessLock;
+import org.xutils.ex.FileLockedException;
 import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
 import org.xutils.http.request.UriRequest;
@@ -40,7 +41,6 @@ import java.util.Date;
 public class FileLoader extends Loader<File> {
 
     private static final int CHECK_SIZE = 512;
-    private static final int LOCK_WAIT = 1000 * 3; // 3s
 
     private String tempSaveFilePath;
     private String saveFilePath;
@@ -72,6 +72,10 @@ public class FileLoader extends Loader<File> {
         BufferedOutputStream bos = null;
         try {
             targetFile = new File(tempSaveFilePath);
+            if (targetFile.isDirectory()) {
+                // 防止文件正在写入时, 父文件夹被删除, 继续写入时造成偶现文件节点异常问题.
+                IOUtil.deleteFileOrDir(targetFile);
+            }
             if (!targetFile.exists()) {
                 File dir = targetFile.getParentFile();
                 if (dir.exists() || dir.mkdirs()) {
@@ -183,9 +187,9 @@ public class FileLoader extends Loader<File> {
             }
 
             // 等待, 若不能下载则取消此次下载.
-            processLock = ProcessLock.tryLock(saveFilePath + "_lock", true, LOCK_WAIT);
+            processLock = ProcessLock.tryLock(saveFilePath + "_lock", true);
             if (processLock == null || !processLock.isValid()) {
-                throw new Callback.CancelledException("download exists: " + saveFilePath);
+                throw new FileLockedException("download exists: " + saveFilePath);
             }
 
             params = request.getParams();
@@ -202,7 +206,7 @@ public class FileLoader extends Loader<File> {
                     }
                 }
                 // retry 时需要覆盖RANGE参数
-                params.addHeader("RANGE", "bytes=" + range + "-");
+                params.setHeader("RANGE", "bytes=" + range + "-");
             }
 
             if (progressHandler != null && !progressHandler.updateProgress(0, 0, false)) {
@@ -240,6 +244,9 @@ public class FileLoader extends Loader<File> {
                 }
                 // 从缓存获取文件, 不rename和断点, 直接退出.
                 if (result != null && result.exists()) {
+                    if (isAutoRename) {
+                        responseFileName = getResponseFileName(request);
+                    }
                     result = autoRename(result);
                 } else {
                     IOUtil.deleteFileOrDir(result);

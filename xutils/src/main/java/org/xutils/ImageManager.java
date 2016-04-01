@@ -24,7 +24,9 @@ public interface ImageManager {
 
     Callback.Cancelable loadDrawable(String url, ImageOptions options, Callback.CommonCallback<Drawable> callback);
 
-    Callback.Cancelable loadFile(String url, ImageOptions options, Callback.CommonCallback<File> callback);
+    Callback.Cancelable loadFile(String url, ImageOptions options, Callback.CacheCallback<File> callback);
+
+    void clearMemCache();
 
     void clearCacheFiles();
 }

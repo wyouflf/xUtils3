@@ -4,12 +4,10 @@ package org.xutils.http.loader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.xutils.http.RequestParams;
-import org.xutils.http.app.RequestTracker;
 
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Author: wyouflf
@@ -20,20 +18,12 @@ public final class LoaderFactory {
     private LoaderFactory() {
     }
 
-    private static RequestTracker defaultTracker;
-
-    /**
-     * key: loadType
-     */
-    private static final HashMap<Type, RequestTracker> trackerHashMap = new HashMap<Type, RequestTracker>();
-
     /**
      * key: loadType
      */
     private static final HashMap<Type, Loader> converterHashMap = new HashMap<Type, Loader>();
 
     static {
-        converterHashMap.put(Map.class, new MapLoader());
         converterHashMap.put(JSONObject.class, new JSONObjectLoader());
         converterHashMap.put(JSONArray.class, new JSONArrayLoader());
         converterHashMap.put(String.class, new StringLoader());
@@ -54,8 +44,6 @@ public final class LoaderFactory {
             result = new ObjectLoader(type);
         } else {
             result = result.newInstance();
-            RequestTracker tracker = trackerHashMap.get(type);
-            result.setResponseTracker(tracker == null ? defaultTracker : tracker);
         }
         result.setParams(params);
         return result;
@@ -63,13 +51,5 @@ public final class LoaderFactory {
 
     public static <T> void registerLoader(Type type, Loader<T> loader) {
         converterHashMap.put(type, loader);
-    }
-
-    public static void registerDefaultTracker(RequestTracker tracker) {
-        defaultTracker = tracker;
-    }
-
-    public static void registerTracker(Type type, RequestTracker tracker) {
-        trackerHashMap.put(type, tracker);
     }
 }

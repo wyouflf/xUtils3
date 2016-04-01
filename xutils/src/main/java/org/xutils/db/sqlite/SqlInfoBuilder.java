@@ -15,14 +15,15 @@
 
 package org.xutils.db.sqlite;
 
+import org.xutils.common.util.KeyValue;
 import org.xutils.db.table.ColumnEntity;
 import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,7 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Build "insert", "replace",，"update", "delete" and "create" sql.
  */
 public final class SqlInfoBuilder {
-
 
     private static final ConcurrentHashMap<TableEntity<?>, String> INSERT_SQL_CACHE = new ConcurrentHashMap<TableEntity<?>, String>();
     private static final ConcurrentHashMap<TableEntity<?>, String> REPLACE_SQL_CACHE = new ConcurrentHashMap<TableEntity<?>, String>();
@@ -201,26 +201,17 @@ public final class SqlInfoBuilder {
         return result;
     }
 
-    public static SqlInfo buildUpdateSqlInfo(TableEntity<?> table, Object entity, WhereBuilder whereBuilder, String... updateColumnNames) throws DbException {
+    public static SqlInfo buildUpdateSqlInfo(TableEntity<?> table, WhereBuilder whereBuilder, KeyValue... nameValuePairs) throws DbException {
 
-        List<KeyValue> keyValueList = entity2KeyValueList(table, entity);
-        if (keyValueList.size() == 0) return null;
-
-        HashSet<String> updateColumnNameSet = null;
-        if (updateColumnNames != null && updateColumnNames.length > 0) {
-            updateColumnNameSet = new HashSet<String>(updateColumnNames.length);
-            Collections.addAll(updateColumnNameSet, updateColumnNames);
-        }
+        if (nameValuePairs == null || nameValuePairs.length == 0) return null;
 
         SqlInfo result = new SqlInfo();
         StringBuilder builder = new StringBuilder("UPDATE ");
         builder.append("\"").append(table.getName()).append("\"");
         builder.append(" SET ");
-        for (KeyValue kv : keyValueList) {
-            if (updateColumnNameSet == null || updateColumnNameSet.contains(kv.key)) {
-                builder.append("\"").append(kv.key).append("\"").append("=?,");
-                result.addBindArg(kv);
-            }
+        for (KeyValue kv : nameValuePairs) {
+            builder.append("\"").append(kv.key).append("\"").append("=?,");
+            result.addBindArg(kv);
         }
         builder.deleteCharAt(builder.length() - 1);
         if (whereBuilder != null && whereBuilder.getWhereItemSize() > 0) {
@@ -263,9 +254,8 @@ public final class SqlInfoBuilder {
 
     public static List<KeyValue> entity2KeyValueList(TableEntity<?> table, Object entity) {
 
-        List<KeyValue> keyValueList = new LinkedList<KeyValue>();
-
         Collection<ColumnEntity> columns = table.getColumnMap().values();
+        List<KeyValue> keyValueList = new ArrayList<KeyValue>(columns.size());
         for (ColumnEntity column : columns) {
             KeyValue kv = column2KeyValue(entity, column);
             if (kv != null) {

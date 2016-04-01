@@ -16,7 +16,6 @@
 package org.xutils.db.table;
 
 import android.database.Cursor;
-import android.text.TextUtils;
 
 import org.xutils.DbManager;
 import org.xutils.common.util.IOUtil;
@@ -24,9 +23,7 @@ import org.xutils.db.annotation.Table;
 import org.xutils.ex.DbException;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 
 public final class TableEntity<T> {
@@ -37,18 +34,14 @@ public final class TableEntity<T> {
     private ColumnEntity id;
     private Class<T> entityType;
     private Constructor<T> constructor;
+    private volatile boolean checkedDatabase;
 
     /**
      * key: columnName
      */
     private final LinkedHashMap<String, ColumnEntity> columnMap;
 
-    /**
-     * key: dbName#className
-     */
-    private static final HashMap<String, TableEntity<?>> tableMap = new HashMap<String, TableEntity<?>>();
-
-    private TableEntity(DbManager db, Class<T> entityType) throws Throwable {
+    /*package*/ TableEntity(DbManager db, Class<T> entityType) throws Throwable {
         this.db = db;
         this.entityType = entityType;
         this.constructor = entityType.getConstructor();
@@ -68,45 +61,6 @@ public final class TableEntity<T> {
 
     public T createEntity() throws Throwable {
         return this.constructor.newInstance();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static synchronized <T> TableEntity<T> get(DbManager db, Class<T> entityType) throws DbException {
-        String tableKey = db.getDaoConfig().getDbName() + "#" + entityType.getName();
-        TableEntity<T> table = (TableEntity<T>) tableMap.get(tableKey);
-        if (table == null) {
-            try {
-                table = new TableEntity<T>(db, entityType);
-            } catch (Throwable ex) {
-                throw new DbException(ex);
-            }
-            tableMap.put(tableKey, table);
-        }
-
-        return table;
-    }
-
-    public static synchronized void remove(DbManager db, Class<?> entityType) {
-        String tableKey = db.getDaoConfig().getDbName() + "#" + entityType.getName();
-        tableMap.remove(tableKey);
-    }
-
-    public static synchronized void remove(DbManager db, String tableName) {
-        if (tableMap.size() > 0) {
-            String key = null;
-            for (Map.Entry<String, TableEntity<?>> entry : tableMap.entrySet()) {
-                TableEntity table = entry.getValue();
-                if (table != null) {
-                    if (table.getName().equals(tableName) && table.getDb() == db) {
-                        key = entry.getKey();
-                        break;
-                    }
-                }
-            }
-            if (!TextUtils.isEmpty(key)) {
-                tableMap.remove(key);
-            }
-        }
     }
 
     public boolean tableIsExist() throws DbException {
@@ -158,13 +112,11 @@ public final class TableEntity<T> {
         return columnMap;
     }
 
-    private boolean checkedDatabase;
-
-    public boolean isCheckedDatabase() {
+    /*package*/ boolean isCheckedDatabase() {
         return checkedDatabase;
     }
 
-    public void setCheckedDatabase(boolean checkedDatabase) {
+    /*package*/ void setCheckedDatabase(boolean checkedDatabase) {
         this.checkedDatabase = checkedDatabase;
     }
 

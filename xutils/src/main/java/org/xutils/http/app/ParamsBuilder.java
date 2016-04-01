@@ -15,10 +15,11 @@ public interface ParamsBuilder {
     /**
      * 根据@HttpRequest构建请求的url
      *
+     * @param params
      * @param httpRequest
      * @return
      */
-    String buildUri(HttpRequest httpRequest);
+    String buildUri(RequestParams params, HttpRequest httpRequest);
 
     /**
      * 根据注解的cacheKeys构建缓存的自定义key,

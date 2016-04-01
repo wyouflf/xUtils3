@@ -56,6 +56,17 @@ public final class ColumnUtils {
         return BOOLEAN_TYPES.contains(fieldType);
     }
 
+    @SuppressWarnings("unchecked")
+    public static Object convert2DbValueIfNeeded(final Object value) {
+        Object result = value;
+        if (value != null) {
+            Class<?> valueType = value.getClass();
+            ColumnConverter converter = ColumnConverterFactory.getColumnConverter(valueType);
+            result = converter.fieldValue2DbValue(value);
+        }
+        return result;
+    }
+
     /* package */
     static Method findGetMethod(Class<?> entityType, Field field) {
         if (Object.class.equals(entityType)) return null;
@@ -70,7 +81,7 @@ public final class ColumnUtils {
             try {
                 getMethod = entityType.getDeclaredMethod(methodName);
             } catch (NoSuchMethodException e) {
-                LogUtil.d(methodName + " not exist");
+                LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
             }
         }
 
@@ -95,7 +106,7 @@ public final class ColumnUtils {
             try {
                 setMethod = entityType.getDeclaredMethod(methodName, fieldType);
             } catch (NoSuchMethodException e) {
-                LogUtil.d(methodName + " not exist");
+                LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
             }
         }
 
@@ -103,17 +114,6 @@ public final class ColumnUtils {
             return findSetMethod(entityType.getSuperclass(), field);
         }
         return setMethod;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Object convert2DbValueIfNeeded(final Object value) {
-        Object result = value;
-        if (value != null) {
-            Class<?> valueType = value.getClass();
-            ColumnConverter converter = ColumnConverterFactory.getColumnConverter(valueType);
-            result = converter.fieldValue2DbValue(value);
-        }
-        return result;
     }
 
     private static Method findBooleanGetMethod(Class<?> entityType, final String fieldName) {
@@ -126,7 +126,7 @@ public final class ColumnUtils {
         try {
             return entityType.getDeclaredMethod(methodName);
         } catch (NoSuchMethodException e) {
-            LogUtil.d(methodName + " not exist");
+            LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
         }
         return null;
     }
@@ -141,7 +141,7 @@ public final class ColumnUtils {
         try {
             return entityType.getDeclaredMethod(methodName, fieldType);
         } catch (NoSuchMethodException e) {
-            LogUtil.d(methodName + " not exist");
+            LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
         }
         return null;
     }

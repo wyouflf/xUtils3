@@ -23,7 +23,7 @@ import org.xutils.db.table.DbModel;
 import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -97,7 +97,7 @@ public final class Selector<T> {
 
     public Selector<T> orderBy(String columnName) {
         if (orderByList == null) {
-            orderByList = new LinkedList<OrderBy>();
+            orderByList = new ArrayList<OrderBy>(5);
         }
         orderByList.add(new OrderBy(columnName));
         return this;
@@ -105,7 +105,7 @@ public final class Selector<T> {
 
     public Selector<T> orderBy(String columnName, boolean desc) {
         if (orderByList == null) {
-            orderByList = new LinkedList<OrderBy>();
+            orderByList = new ArrayList<OrderBy>(5);
         }
         orderByList.add(new OrderBy(columnName, desc));
         return this;
@@ -167,7 +167,7 @@ public final class Selector<T> {
         Cursor cursor = table.getDb().execQuery(this.toString());
         if (cursor != null) {
             try {
-                result = new LinkedList<T>();
+                result = new ArrayList<T>();
                 while (cursor.moveToNext()) {
                     T entity = CursorUtils.getEntity(table, cursor);
                     result.add(entity);

@@ -26,6 +26,7 @@ public class BaseException extends IOException {
     private static final long serialVersionUID = 1L;
 
     public BaseException() {
+        super();
     }
 
     public BaseException(String detailMessage) {

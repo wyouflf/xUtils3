@@ -5,7 +5,6 @@ import org.xutils.http.RequestParams;
 import org.xutils.http.annotation.HttpRequest;
 
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -24,11 +23,12 @@ public class DefaultParamsBuilder implements ParamsBuilder {
     /**
      * 根据@HttpRequest构建请求的url
      *
+     * @param params
      * @param httpRequest
      * @return
      */
     @Override
-    public String buildUri(HttpRequest httpRequest) {
+    public String buildUri(RequestParams params, HttpRequest httpRequest) {
         return httpRequest.host() + "/" + httpRequest.path();
     }
 
@@ -47,14 +47,11 @@ public class DefaultParamsBuilder implements ParamsBuilder {
 
             cacheKey = params.getUri() + "?";
 
-            // 添加cacheKeys对应的queryParams
-            HashMap<String, String> queryParams = params.getQueryStringParams();
-            if (queryParams != null) {
-                for (String key : cacheKeys) {
-                    String value = queryParams.get(key);
-                    if (value != null) {
-                        cacheKey += key + "=" + value + "&";
-                    }
+            // 添加cacheKeys对应的参数
+            for (String key : cacheKeys) {
+                String value = params.getStringParameter(key);
+                if (value != null) {
+                    cacheKey += key + "=" + value + "&";
                 }
             }
         }

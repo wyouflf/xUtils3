@@ -4,6 +4,7 @@ import org.xutils.DbManager;
 import org.xutils.common.Callback;
 import org.xutils.common.task.PriorityExecutor;
 import org.xutils.common.util.LogUtil;
+import org.xutils.db.converter.ColumnConverterFactory;
 import org.xutils.ex.DbException;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
@@ -21,12 +22,17 @@ import java.util.concurrent.Executor;
  */
 public final class DownloadManager {
 
+    static {
+        // 注册DownloadState在数据库中的值类型映射
+        ColumnConverterFactory.registerColumnConverter(DownloadState.class, new DownloadStateConverter());
+    }
+
     private static DownloadManager instance;
 
     private final static int MAX_DOWNLOAD_THREAD = 2; // 有效的值范围[1, 3], 设置为3时, 可能阻塞图片加载.
 
     private final DbManager db;
-    private final Executor executor = new PriorityExecutor(MAX_DOWNLOAD_THREAD);
+    private final Executor executor = new PriorityExecutor(MAX_DOWNLOAD_THREAD, true);
     private final List<DownloadInfo> downloadInfoList = new ArrayList<DownloadInfo>();
     private final ConcurrentHashMap<DownloadInfo, DownloadCallback>
             callbackMap = new ConcurrentHashMap<DownloadInfo, DownloadCallback>(5);
@@ -52,7 +58,7 @@ public final class DownloadManager {
     }
 
     /*package*/
-    static DownloadManager getInstance() {
+    public static DownloadManager getInstance() {
         if (instance == null) {
             synchronized (DownloadManager.class) {
                 if (instance == null) {
@@ -112,6 +118,8 @@ public final class DownloadManager {
         // start downloading
         if (viewHolder == null) {
             viewHolder = new DefaultDownloadViewHolder(null, downloadInfo);
+        } else {
+            viewHolder.update(downloadInfo);
         }
         DownloadCallback callback = new DownloadCallback(viewHolder);
         callback.setDownloadManager(this);
@@ -126,7 +134,11 @@ public final class DownloadManager {
         callback.setCancelable(cancelable);
         callbackMap.put(downloadInfo, callback);
 
-        if (!downloadInfoList.contains(downloadInfo)) {
+        if (downloadInfoList.contains(downloadInfo)) {
+            int index = downloadInfoList.indexOf(downloadInfo);
+            downloadInfoList.remove(downloadInfo);
+            downloadInfoList.add(index, downloadInfo);
+        } else {
             downloadInfoList.add(downloadInfo);
         }
     }

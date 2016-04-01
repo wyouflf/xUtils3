@@ -1,13 +1,10 @@
 package org.xutils.http;
 
-import android.text.TextUtils;
-
 import org.xutils.HttpManager;
 import org.xutils.common.Callback;
 import org.xutils.x;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
 
 /**
  * Created by wyouflf on 15/7/23.
@@ -17,7 +14,6 @@ public final class HttpManagerImpl implements HttpManager {
 
     private static final Object lock = new Object();
     private static HttpManagerImpl instance;
-    private static final HashMap<String, HttpTask<?>> DOWNLOAD_TASK = new HashMap<String, HttpTask<?>>(1);
 
     private HttpManagerImpl() {
     }
@@ -35,40 +31,7 @@ public final class HttpManagerImpl implements HttpManager {
 
     @Override
     public <T> Callback.Cancelable get(RequestParams entity, Callback.CommonCallback<T> callback) {
-        final String saveFilePath = entity.getSaveFilePath();
-        if (!TextUtils.isEmpty(saveFilePath)) {
-            HttpTask<?> task = DOWNLOAD_TASK.get(saveFilePath);
-            if (task != null) {
-                task.cancel();
-                task = null;
-            }
-        }
-        entity.setMethod(HttpMethod.GET);
-        Callback.Cancelable cancelable = null;
-        if (callback instanceof Callback.Cancelable) {
-            cancelable = (Callback.Cancelable) callback;
-        }
-        HttpTask<T> task = null;
-        if (!TextUtils.isEmpty(saveFilePath)) {
-            task = new HttpTask<T>(entity, cancelable, callback) {
-                @Override
-                protected void onFinished() {
-                    super.onFinished();
-                    synchronized (DOWNLOAD_TASK) {
-                        HttpTask<?> task = DOWNLOAD_TASK.get(saveFilePath);
-                        if (task == this) {
-                            DOWNLOAD_TASK.remove(saveFilePath);
-                        }
-                    }
-                }
-            };
-            synchronized (DOWNLOAD_TASK) {
-                DOWNLOAD_TASK.put(saveFilePath, task);
-            }
-        } else {
-            task = new HttpTask<T>(entity, cancelable, callback);
-        }
-        return x.task().start(task);
+        return request(HttpMethod.GET, entity, callback);
     }
 
     @Override
@@ -78,17 +41,13 @@ public final class HttpManagerImpl implements HttpManager {
 
     @Override
     public <T> Callback.Cancelable request(HttpMethod method, RequestParams entity, Callback.CommonCallback<T> callback) {
-        if (method == HttpMethod.GET) {
-            return get(entity, callback);
-        } else {
-            entity.setMethod(method);
-            Callback.Cancelable cancelable = null;
-            if (callback instanceof Callback.Cancelable) {
-                cancelable = (Callback.Cancelable) callback;
-            }
-            HttpTask<T> task = new HttpTask<T>(entity, cancelable, callback);
-            return x.task().start(task);
+        entity.setMethod(method);
+        Callback.Cancelable cancelable = null;
+        if (callback instanceof Callback.Cancelable) {
+            cancelable = (Callback.Cancelable) callback;
         }
+        HttpTask<T> task = new HttpTask<T>(entity, cancelable, callback);
+        return x.task().start(task);
     }
 
     @Override
@@ -103,22 +62,27 @@ public final class HttpManagerImpl implements HttpManager {
 
     @Override
     public <T> T requestSync(HttpMethod method, RequestParams entity, Class<T> resultType) throws Throwable {
+        DefaultSyncCallback<T> callback = new DefaultSyncCallback<T>(resultType);
+        return requestSync(method, entity, callback);
+    }
+
+    @Override
+    public <T> T requestSync(HttpMethod method, RequestParams entity, Callback.TypedCallback<T> callback) throws Throwable {
         entity.setMethod(method);
-        SyncCallback<T> callback = new SyncCallback<T>(resultType);
         HttpTask<T> task = new HttpTask<T>(entity, null, callback);
         return x.task().startSync(task);
     }
 
-    private class SyncCallback<T> implements Callback.TypedCallback<T> {
+    private class DefaultSyncCallback<T> implements Callback.TypedCallback<T> {
 
         private final Class<T> resultType;
 
-        public SyncCallback(Class<T> resultType) {
+        public DefaultSyncCallback(Class<T> resultType) {
             this.resultType = resultType;
         }
 
         @Override
-        public Type getResultType() {
+        public Type getLoadType() {
             return resultType;
         }
 

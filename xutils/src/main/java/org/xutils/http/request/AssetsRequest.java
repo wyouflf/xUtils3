@@ -5,7 +5,6 @@ import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
-import org.xutils.http.loader.InputStreamLoader;
 import org.xutils.x;
 
 import java.io.File;
@@ -46,9 +45,6 @@ public class AssetsRequest extends UriRequest {
 
     @Override
     public Object loadResult() throws Throwable {
-        if (loader instanceof InputStreamLoader) {
-            return getInputStream();
-        }
         return this.loader.load(this);
     }
 
@@ -89,6 +85,7 @@ public class AssetsRequest extends UriRequest {
     @Override
     public void close() throws IOException {
         IOUtil.closeQuietly(inputStream);
+        inputStream = null;
     }
 
     @Override

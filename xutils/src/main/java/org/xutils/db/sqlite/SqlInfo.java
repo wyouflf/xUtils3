@@ -18,10 +18,12 @@ package org.xutils.db.sqlite;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
+import org.xutils.common.util.KeyValue;
 import org.xutils.db.converter.ColumnConverter;
 import org.xutils.db.converter.ColumnConverterFactory;
+import org.xutils.db.table.ColumnUtils;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class SqlInfo {
@@ -46,7 +48,7 @@ public final class SqlInfo {
 
     public void addBindArg(KeyValue kv) {
         if (bindArgs == null) {
-            bindArgs = new LinkedList<KeyValue>();
+            bindArgs = new ArrayList<KeyValue>();
         }
         bindArgs.add(kv);
     }
@@ -64,7 +66,7 @@ public final class SqlInfo {
         if (bindArgs != null) {
             for (int i = 1; i < bindArgs.size() + 1; i++) {
                 KeyValue kv = bindArgs.get(i - 1);
-                Object value = kv.value;
+                Object value = ColumnUtils.convert2DbValueIfNeeded(kv.value);
                 if (value == null) {
                     result.bindNull(i);
                 } else {
@@ -98,7 +100,7 @@ public final class SqlInfo {
         if (bindArgs != null) {
             result = new Object[bindArgs.size()];
             for (int i = 0; i < bindArgs.size(); i++) {
-                result[i] = bindArgs.get(i).value;
+                result[i] = ColumnUtils.convert2DbValueIfNeeded(bindArgs.get(i).value);
             }
         }
         return result;
@@ -109,7 +111,7 @@ public final class SqlInfo {
         if (bindArgs != null) {
             result = new String[bindArgs.size()];
             for (int i = 0; i < bindArgs.size(); i++) {
-                Object value = bindArgs.get(i).value;
+                Object value = ColumnUtils.convert2DbValueIfNeeded(bindArgs.get(i).value);
                 result[i] = value == null ? null : value.toString();
             }
         }

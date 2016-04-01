@@ -109,7 +109,7 @@ public final class DiskCacheEntity {
     }
 
     public long getLastAccess() {
-        return lastAccess;
+        return lastAccess == 0 ? System.currentTimeMillis() : lastAccess;
     }
 
     public void setLastAccess(long lastAccess) {

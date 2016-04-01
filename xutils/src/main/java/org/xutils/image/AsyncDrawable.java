@@ -2,6 +2,7 @@ package org.xutils.image;
 
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Region;
@@ -25,6 +26,9 @@ public final class AsyncDrawable extends Drawable {
             throw new IllegalArgumentException("imageLoader may not be null");
         }
         baseDrawable = drawable;
+        while (baseDrawable instanceof AsyncDrawable) {
+            baseDrawable = ((AsyncDrawable) baseDrawable).baseDrawable;
+        }
         imageLoaderReference = new WeakReference<ImageLoader>(imageLoader);
     }
 
@@ -63,7 +67,7 @@ public final class AsyncDrawable extends Drawable {
 
     @Override
     public int getOpacity() {
-        return baseDrawable == null ? Byte.MAX_VALUE : baseDrawable.getOpacity();
+        return baseDrawable == null ? PixelFormat.TRANSLUCENT : baseDrawable.getOpacity();
     }
 
     @Override

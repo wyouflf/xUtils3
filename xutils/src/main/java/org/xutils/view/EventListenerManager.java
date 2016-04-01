@@ -18,6 +18,7 @@ package org.xutils.view;
 import android.text.TextUtils;
 import android.view.View;
 
+import org.xutils.common.util.DoubleKeyValueMap;
 import org.xutils.common.util.LogUtil;
 import org.xutils.view.annotation.Event;
 
@@ -27,10 +28,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /*package*/ final class EventListenerManager {
 
-    private final static long QUICK_EVENT_TIME_SPAN = 400;
+    private final static long QUICK_EVENT_TIME_SPAN = 300;
     private final static HashSet<String> AVOID_QUICK_EVENT_SET = new HashSet<String>(2);
 
     static {
@@ -147,14 +149,18 @@ import java.util.HashSet;
             if (handler != null) {
 
                 String eventMethod = method.getName();
+                if ("toString".equals(eventMethod)) {
+                    return DynamicHandler.class.getSimpleName();
+                }
 
-                if (methodMap.size() == 1) {
-                    for (Method v : methodMap.values()) {
-                        method = v;
+                method = methodMap.get(eventMethod);
+                if (method == null && methodMap.size() == 1) {
+                    for (Map.Entry<String, Method> entry : methodMap.entrySet()) {
+                        if (TextUtils.isEmpty(entry.getKey())) {
+                            method = entry.getValue();
+                        }
                         break;
                     }
-                } else {
-                    method = methodMap.get(eventMethod);
                 }
 
                 if (method != null) {
@@ -172,8 +178,10 @@ import java.util.HashSet;
                         return method.invoke(handler, args);
                     } catch (Throwable ex) {
                         throw new RuntimeException("invoke method error:" +
-                                handler.getClass().getName() + "#" + eventMethod, ex);
+                                handler.getClass().getName() + "#" + method.getName(), ex);
                     }
+                } else {
+                    LogUtil.w("method not impl: " + eventMethod + "(" + handler.getClass().getSimpleName() + ")");
                 }
             }
             return null;

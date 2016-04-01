@@ -60,11 +60,13 @@ import java.net.URI;
         this.discard = cookie.getDiscard();
         this.domain = cookie.getDomain();
         long maxAge = cookie.getMaxAge();
-        if (maxAge != -1L) {
+        if (maxAge != -1L && maxAge > 0) {
             this.expiry = (maxAge * 1000L) + System.currentTimeMillis();
-            if (this.expiry < 0L) {
+            if (this.expiry < 0L) { // 计算溢出?
                 this.expiry = MAX_EXPIRY;
             }
+        } else {
+            this.expiry = -1L;
         }
         this.path = cookie.getPath();
         if (!TextUtils.isEmpty(path) && path.length() > 1 && path.endsWith("/")) {
@@ -81,7 +83,11 @@ import java.net.URI;
         cookie.setCommentURL(commentURL);
         cookie.setDiscard(discard);
         cookie.setDomain(domain);
-        cookie.setMaxAge((expiry - System.currentTimeMillis()) / 1000L);
+        if (expiry == -1L) {
+            cookie.setMaxAge(-1L);
+        } else {
+            cookie.setMaxAge((expiry - System.currentTimeMillis()) / 1000L);
+        }
         cookie.setPath(path);
         cookie.setPortlist(portList);
         cookie.setSecure(secure);
@@ -103,5 +109,9 @@ import java.net.URI;
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public boolean isExpired() {
+        return expiry != -1L && expiry < System.currentTimeMillis();
     }
 }

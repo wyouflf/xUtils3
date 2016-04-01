@@ -9,8 +9,9 @@ import org.xutils.common.Callback;
 import org.xutils.ex.DbException;
 import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
-import org.xutils.sample.download.DownloadService;
+import org.xutils.sample.download.DownloadManager;
 import org.xutils.sample.http.BaiduParams;
+import org.xutils.sample.http.BaiduResponse;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
 import org.xutils.view.annotation.ViewInject;
@@ -19,6 +20,7 @@ import org.xutils.x;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 /**
  * Created by wyouflf on 15/11/4.
@@ -29,16 +31,9 @@ public class HttpFragment extends BaseFragment {
 
     /**
      * 1. 方法必须私有限定,
-     * 2. 方法以Click或Event结尾, 方便配置混淆编译参数 :
-     * -keepattributes *Annotation*
-     * -keepclassmembers class * {
-     * void *(android.view.View);
-     * *** *Click(...);
-     * *** *Event(...);
-     * }
-     * 3. 方法参数形式必须和type对应的Listener接口一致.
-     * 4. 注解参数value支持数组: value={id1, id2, id3}
-     * 5. 其它参数说明见{@link org.xutils.view.annotation.Event}类的说明.
+     * 2. 方法参数形式必须和type对应的Listener接口一致.
+     * 3. 注解参数value支持数组: value={id1, id2, id3}
+     * 4. 其它参数说明见{@link org.xutils.view.annotation.Event}类的说明.
      **/
     @Event(value = R.id.btn_test1,
             type = View.OnClickListener.class/*可选参数, 默认是View.OnClickListener.class*/)
@@ -76,6 +71,14 @@ public class HttpFragment extends BaseFragment {
                  * 如示例代码{@link org.xutils.sample.http.BaiduResponse}, 可直接使用BaiduResponse作为
                  * callback的泛型.
                  *
+                 * @HttpResponse 注解 和 ResponseParser接口仅适合做json, xml等文本类型数据的解析,
+                 * 如果需要其他数据类型的解析可参考:
+                 * {@link org.xutils.http.loader.LoaderFactory}
+                 * 和 {@link org.xutils.common.Callback.PrepareCallback}.
+                 * LoaderFactory提供PrepareCallback第一个泛型参数类型的自动转换,
+                 * 第二个泛型参数需要在prepare方法中实现.
+                 * (LoaderFactory中已经默认提供了部分常用类型的转换实现, 其他类型需要自己注册.)
+                 *
                  * 2. callback的组合:
                  * 可以用基类或接口组合个种类的Callback, 见{@link org.xutils.common.Callback}.
                  * 例如:
@@ -88,15 +91,15 @@ public class HttpFragment extends BaseFragment {
                  *
                  * 3. 请求过程拦截或记录日志: 参考 {@link org.xutils.http.app.RequestTracker}
                  *
-                 * 4. 请求Header获取: 参考 {@link org.xutils.http.app.InterceptRequestListener}
+                 * 4. 请求Header获取: 参考 {@link org.xutils.http.app.RequestInterceptListener}
                  *
                  * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
                  *
                  **/
-                new Callback.CommonCallback<String>() {
+                new Callback.CommonCallback<List<BaiduResponse>>() {
                     @Override
-                    public void onSuccess(String result) {
-                        Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+                    public void onSuccess(List<BaiduResponse> result) {
+                        Toast.makeText(x.app(), result.get(0).toString(), Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -124,16 +127,12 @@ public class HttpFragment extends BaseFragment {
                     }
                 });
 
-        // cancelable.cancel(); // 取消
-        // 如果需要记录请求的日志, 可使用RequestTracker接口(优先级依次降低, 找到一个实现后会忽略后面的):
-        // 1. 自定义Callback同时实现RequestTracker接口;
-        // 2. 自定义ResponseParser同时实现RequestTracker接口;
-        // 3. 在LoaderFactory注册.
+        // cancelable.cancel(); // 取消请求
     }
 
     // 上传多文件示例
     @Event(value = R.id.btn_test2)
-    private void onTest2Click(View view) throws FileNotFoundException {
+    private void onTest2Click(View view) {
         RequestParams params = new RequestParams("http://192.168.0.13:8080/upload");
         // 加到url里的参数, http://xxxx/s?wd=xUtils
         params.addQueryStringParameter("wd", "xUtils");
@@ -146,12 +145,16 @@ public class HttpFragment extends BaseFragment {
                 "file",
                 new File("/sdcard/test.jpg"),
                 null); // 如果文件没有扩展名, 最好设置contentType参数.
-        params.addBodyParameter(
-                "file2",
-                new FileInputStream(new File("/sdcard/test2.jpg")),
-                "image/jpeg",
-                // 测试中文文件名
-                "你+& \" 好.jpg"); // InputStream参数获取不到文件名, 最好设置, 除非服务端不关心这个参数.
+        try {
+            params.addBodyParameter(
+                    "file2",
+                    new FileInputStream(new File("/sdcard/test2.jpg")),
+                    "image/jpeg",
+                    // 测试中文文件名
+                    "你+& \" 好.jpg"); // InputStream参数获取不到文件名, 最好设置, 除非服务端不关心这个参数.
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
         x.http().post(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
@@ -181,10 +184,10 @@ public class HttpFragment extends BaseFragment {
     // 添加到下载列表
     @Event(value = R.id.btn_test3)
     private void onTest3Click(View view) throws DbException {
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 5; i++) {
             String url = et_url.getText().toString();
             String label = i + "xUtils_" + System.nanoTime();
-            DownloadService.getDownloadManager().startDownload(
+            DownloadManager.getInstance().startDownload(
                     url, label,
                     "/sdcard/xUtils/" + label + ".aar", true, false, null);
         }
@@ -203,6 +206,8 @@ public class HttpFragment extends BaseFragment {
     private void onTest5Click(View view) throws FileNotFoundException {
         BaiduParams params = new BaiduParams();
         params.wd = "xUtils";
+        // 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
+        params.setCacheMaxAge(1000 * 60);
         Callback.Cancelable cancelable
                 // 使用CacheCallback, xUtils将为该请求缓存数据.
                 = x.http().get(params, new Callback.CacheCallback<String>() {
@@ -212,7 +217,8 @@ public class HttpFragment extends BaseFragment {
 
             @Override
             public boolean onCache(String result) {
-                // 得到缓存数据
+                // 得到缓存数据, 缓存过期后不会进入这个方法.
+                // 如果服务端没有返回过期时间, 参考params.setCacheMaxAge(maxAge)方法.
                 //
                 // * 客户端会根据服务端返回的 header 中 max-age 或 expires 来确定本地缓存是否给 onCache 方法.
                 //   如果服务端没有返回 max-age 或 expires, 那么缓存将一直保存, 除非这里自己定义了返回false的
@@ -223,7 +229,7 @@ public class HttpFragment extends BaseFragment {
                 //   如果服务端返回304, 则表示数据没有更新, 不继续加载数据.
                 //
                 this.result = result;
-                return false; // true: 信任缓存数据; false不信任缓存数据.
+                return false; // true: 信任缓存数据, 不在发起网络请求; false不信任缓存数据.
             }
 
             @Override

@@ -12,8 +12,8 @@ import org.xutils.common.util.MD5;
 import org.xutils.common.util.ProcessLock;
 import org.xutils.config.DbConfigs;
 import org.xutils.db.sqlite.WhereBuilder;
-import org.xutils.ex.CacheLockedException;
 import org.xutils.ex.DbException;
+import org.xutils.ex.FileLockedException;
 import org.xutils.x;
 
 import java.io.File;
@@ -36,12 +36,15 @@ public final class LruDiskCache {
     private static final int LOCK_WAIT = 1000 * 3; // 3s
     private static final String CACHE_DIR_NAME = "xUtils_cache";
     private static final String TEMP_FILE_SUFFIX = ".tmp";
-    private static final Executor trimExecutor = new PriorityExecutor(1);
 
     private boolean available = false;
     private final DbManager cacheDb;
     private File cacheDir;
     private long diskCacheSize = LIMIT_SIZE;
+    private final Executor trimExecutor = new PriorityExecutor(1, true);
+
+    private long lastTrimTime = 0L;
+    private static final long TRIM_TIME_SPAN = 1000;
 
     public synchronized static LruDiskCache getDiskCache(String dirName) {
         if (TextUtils.isEmpty(dirName)) dirName = CACHE_DIR_NAME;
@@ -77,8 +80,6 @@ public final class LruDiskCache {
     public DiskCacheEntity get(String key) {
         if (!available || TextUtils.isEmpty(key)) return null;
 
-        deleteExpiry();
-
         DiskCacheEntity result = null;
         try {
             result = this.cacheDb.selector(DiskCacheEntity.class)
@@ -87,22 +88,38 @@ public final class LruDiskCache {
             LogUtil.e(ex.getMessage(), ex);
         }
 
-        // update hint & lastAccess...
         if (result != null) {
-            result.setHits(result.getHits() + 1);
-            result.setLastAccess(System.currentTimeMillis());
-            try {
-                this.cacheDb.update(result, "hits", "lastAccess");
-            } catch (Throwable ex) {
-                LogUtil.e(ex.getMessage(), ex);
+
+            if (result.getExpires() < System.currentTimeMillis()) {
+                return null;
             }
+
+            { // update hint & lastAccess...
+                final DiskCacheEntity finalResult = result;
+                trimExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        finalResult.setHits(finalResult.getHits() + 1);
+                        finalResult.setLastAccess(System.currentTimeMillis());
+                        try {
+                            cacheDb.update(finalResult, "hits", "lastAccess");
+                        } catch (Throwable ex) {
+                            LogUtil.e(ex.getMessage(), ex);
+                        }
+                    }
+                });
+            }
+
         }
 
         return result;
     }
 
     public void put(DiskCacheEntity entity) {
-        if (!available || entity == null || TextUtils.isEmpty(entity.getTextContent())) {
+        if (!available
+                || entity == null
+                || TextUtils.isEmpty(entity.getTextContent())
+                || entity.getExpires() < System.currentTimeMillis()) {
             return;
         }
 
@@ -119,8 +136,6 @@ public final class LruDiskCache {
         if (!available || TextUtils.isEmpty(key)) {
             return null;
         }
-
-        deleteExpiry();
 
         DiskCacheFile result = null;
         DiskCacheEntity entity = get(key);
@@ -151,14 +166,14 @@ public final class LruDiskCache {
 
         entity.setPath(new File(this.cacheDir, MD5.md5(entity.getKey())).getAbsolutePath());
         String tempFilePath = entity.getPath() + TEMP_FILE_SUFFIX;
-        ProcessLock processLock = ProcessLock.tryLock(tempFilePath, true, LOCK_WAIT);
+        ProcessLock processLock = ProcessLock.tryLock(tempFilePath, true);
         if (processLock != null && processLock.isValid()) {
             result = new DiskCacheFile(entity, tempFilePath, processLock);
             if (!result.getParentFile().exists()) {
                 result.mkdirs();
             }
         } else {
-            throw new CacheLockedException(entity.getPath());
+            throw new FileLockedException(entity.getPath());
         }
 
         return result;
@@ -205,7 +220,7 @@ public final class LruDiskCache {
                         throw new IOException("rename:" + cacheFile.getAbsolutePath());
                     }
                 } else {
-                    throw new CacheLockedException(destPath);
+                    throw new FileLockedException(destPath);
                 }
             } finally {
                 if (result == null) {
@@ -230,6 +245,16 @@ public final class LruDiskCache {
             @Override
             public void run() {
                 if (available) {
+
+                    long current = System.currentTimeMillis();
+                    if (current - lastTrimTime < TRIM_TIME_SPAN) {
+                        return;
+                    } else {
+                        lastTrimTime = current;
+                    }
+
+                    // trim expires
+                    deleteExpiry();
 
                     // trim db
                     try {
@@ -288,16 +313,14 @@ public final class LruDiskCache {
         try {
             WhereBuilder whereBuilder = WhereBuilder.b("expires", "<", System.currentTimeMillis());
             List<DiskCacheEntity> rmList = cacheDb.selector(DiskCacheEntity.class).where(whereBuilder).findAll();
+            // delete db entities
+            cacheDb.delete(DiskCacheEntity.class, whereBuilder);
             if (rmList != null && rmList.size() > 0) {
                 // delete cache files
                 for (DiskCacheEntity entity : rmList) {
                     String path = entity.getPath();
                     if (!TextUtils.isEmpty(path)) {
-                        if (deleteFileWithLock(path)
-                                && deleteFileWithLock(path + TEMP_FILE_SUFFIX)) {
-                            // delete db entity
-                            cacheDb.delete(entity);
-                        }
+                        deleteFileWithLock(path);
                     }
                 }
             }

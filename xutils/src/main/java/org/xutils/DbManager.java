@@ -4,10 +4,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import org.xutils.common.util.KeyValue;
 import org.xutils.db.Selector;
 import org.xutils.db.sqlite.SqlInfo;
 import org.xutils.db.sqlite.WhereBuilder;
 import org.xutils.db.table.DbModel;
+import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;
 
 import java.io.Closeable;
@@ -65,12 +67,12 @@ public interface DbManager extends Closeable {
 
     void delete(Class<?> entityType) throws DbException;
 
-    void delete(Class<?> entityType, WhereBuilder whereBuilder) throws DbException;
+    int delete(Class<?> entityType, WhereBuilder whereBuilder) throws DbException;
 
     ///////////// update
     void update(Object entity, String... updateColumnNames) throws DbException;
 
-    void update(Object entity, WhereBuilder whereBuilder, String... updateColumnNames) throws DbException;
+    int update(Class<?> entityType, WhereBuilder whereBuilder, KeyValue... nameValuePairs) throws DbException;
 
     ///////////// find
     <T> T findById(Class<T> entityType, Object idValue) throws DbException;
@@ -86,6 +88,16 @@ public interface DbManager extends Closeable {
     List<DbModel> findDbModelAll(SqlInfo sqlInfo) throws DbException;
 
     ///////////// table
+
+    /**
+     * 获取表信息
+     *
+     * @param entityType
+     * @param <T>
+     * @return
+     * @throws DbException
+     */
+    <T> TableEntity<T> getTable(Class<T> entityType) throws DbException;
 
     /**
      * 删除表
@@ -123,6 +135,10 @@ public interface DbManager extends Closeable {
     void close() throws IOException;
 
     ///////////// custom
+    int executeUpdateDelete(SqlInfo sqlInfo) throws DbException;
+
+    int executeUpdateDelete(String sql) throws DbException;
+
     void execNonQuery(SqlInfo sqlInfo) throws DbException;
 
     void execNonQuery(String sql) throws DbException;
@@ -131,22 +147,32 @@ public interface DbManager extends Closeable {
 
     Cursor execQuery(String sql) throws DbException;
 
+    public interface DbOpenListener {
+        void onDbOpened(DbManager db);
+    }
+
     public interface DbUpgradeListener {
-        public void onUpgrade(DbManager db, int oldVersion, int newVersion);
+        void onUpgrade(DbManager db, int oldVersion, int newVersion);
+    }
+
+    public interface TableCreateListener {
+        void onTableCreated(DbManager db, TableEntity<?> table);
     }
 
     public static class DaoConfig {
+        private File dbDir;
         private String dbName = "xUtils.db"; // default db name
         private int dbVersion = 1;
         private boolean allowTransaction = true;
         private DbUpgradeListener dbUpgradeListener;
-        private File dbDir;
+        private TableCreateListener tableCreateListener;
+        private DbOpenListener dbOpenListener;
 
         public DaoConfig() {
         }
 
-        public DaoConfig setDbVersion(int dbVersion) {
-            this.dbVersion = dbVersion;
+        public DaoConfig setDbDir(File dbDir) {
+            this.dbDir = dbDir;
             return this;
         }
 
@@ -157,19 +183,37 @@ public interface DbManager extends Closeable {
             return this;
         }
 
-        public DaoConfig setDbUpgradeListener(DbUpgradeListener dbUpgradeListener) {
-            this.dbUpgradeListener = dbUpgradeListener;
-            return this;
-        }
-
-        public DaoConfig setDbDir(File dbDir) {
-            this.dbDir = dbDir;
+        public DaoConfig setDbVersion(int dbVersion) {
+            this.dbVersion = dbVersion;
             return this;
         }
 
         public DaoConfig setAllowTransaction(boolean allowTransaction) {
             this.allowTransaction = allowTransaction;
             return this;
+        }
+
+        public DaoConfig setDbOpenListener(DbOpenListener dbOpenListener) {
+            this.dbOpenListener = dbOpenListener;
+            return this;
+        }
+
+        public DaoConfig setDbUpgradeListener(DbUpgradeListener dbUpgradeListener) {
+            this.dbUpgradeListener = dbUpgradeListener;
+            return this;
+        }
+
+        public DaoConfig setTableCreateListener(TableCreateListener tableCreateListener) {
+            this.tableCreateListener = tableCreateListener;
+            return this;
+        }
+
+        public File getDbDir() {
+            return dbDir;
+        }
+
+        public String getDbName() {
+            return dbName;
         }
 
         public int getDbVersion() {
@@ -180,17 +224,39 @@ public interface DbManager extends Closeable {
             return allowTransaction;
         }
 
-        public String getDbName() {
-            return dbName;
+        public DbOpenListener getDbOpenListener() {
+            return dbOpenListener;
         }
 
         public DbUpgradeListener getDbUpgradeListener() {
             return dbUpgradeListener;
         }
 
-        public File getDbDir() {
-            return dbDir;
+        public TableCreateListener getTableCreateListener() {
+            return tableCreateListener;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            DaoConfig daoConfig = (DaoConfig) o;
+
+            if (!dbName.equals(daoConfig.dbName)) return false;
+            return dbDir == null ? daoConfig.dbDir == null : dbDir.equals(daoConfig.dbDir);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = dbName.hashCode();
+            result = 31 * result + (dbDir != null ? dbDir.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(dbDir) + "/" + dbName;
+        }
     }
 }

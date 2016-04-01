@@ -4,9 +4,10 @@ import android.text.TextUtils;
 
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.common.util.IOUtil;
+import org.xutils.common.util.ParameterizedTypeUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.http.annotation.HttpResponse;
-import org.xutils.http.app.RequestTracker;
+import org.xutils.http.app.InputStreamResponseParser;
 import org.xutils.http.app.ResponseParser;
 import org.xutils.http.request.UriRequest;
 
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.List;
 
 /**
  * Created by lei.jiao on 2014/6/27.
@@ -38,21 +40,45 @@ import java.lang.reflect.TypeVariable;
                 objectClass = (Class<?>) ((ParameterizedType) objectType).getRawType();
             } else if (objectType instanceof TypeVariable) {
                 throw new IllegalArgumentException(
-                        "not support callback type" + objectType.toString());
+                        "not support callback type " + objectType.toString());
             } else {
                 objectClass = (Class<?>) objectType;
             }
         }
 
-        HttpResponse response = objectClass.getAnnotation(HttpResponse.class);
-        if (response != null) {
-            try {
-                this.parser = response.parser().newInstance();
-            } catch (Throwable ex) {
-                throw new RuntimeException("create parser error", ex);
+        if (List.class.equals(objectClass)) {
+            Type itemType = ParameterizedTypeUtil.getParameterizedType(this.objectType, List.class, 0);
+            Class<?> itemClass = null;
+            if (itemType instanceof ParameterizedType) {
+                itemClass = (Class<?>) ((ParameterizedType) itemType).getRawType();
+            } else if (itemType instanceof TypeVariable) {
+                throw new IllegalArgumentException(
+                        "not support callback type " + itemType.toString());
+            } else {
+                itemClass = (Class<?>) itemType;
+            }
+
+            HttpResponse response = itemClass.getAnnotation(HttpResponse.class);
+            if (response != null) {
+                try {
+                    this.parser = response.parser().newInstance();
+                } catch (Throwable ex) {
+                    throw new RuntimeException("create parser error", ex);
+                }
+            } else {
+                throw new IllegalArgumentException("not found @HttpResponse from " + itemType);
             }
         } else {
-            throw new IllegalArgumentException("not found @HttpResponse from " + objectClass.getName());
+            HttpResponse response = objectClass.getAnnotation(HttpResponse.class);
+            if (response != null) {
+                try {
+                    this.parser = response.parser().newInstance();
+                } catch (Throwable ex) {
+                    throw new RuntimeException("create parser error", ex);
+                }
+            } else {
+                throw new IllegalArgumentException("not found @HttpResponse from " + this.objectType);
+            }
         }
     }
 
@@ -73,14 +99,23 @@ import java.lang.reflect.TypeVariable;
 
     @Override
     public Object load(final InputStream in) throws Throwable {
-        resultStr = IOUtil.readStr(in, charset);
-        return parser.parse(objectType, objectClass, resultStr);
+        Object result;
+        if (parser instanceof InputStreamResponseParser) {
+            result = ((InputStreamResponseParser) parser).parse(objectType, objectClass, in);
+        } else {
+            resultStr = IOUtil.readStr(in, charset);
+            result = parser.parse(objectType, objectClass, resultStr);
+        }
+        return result;
     }
 
     @Override
     public Object load(final UriRequest request) throws Throwable {
-        request.sendRequest();
-        parser.checkResponse(request);
+        try {
+            request.sendRequest();
+        } finally {
+            parser.checkResponse(request);
+        }
         return this.load(request.getInputStream());
     }
 
@@ -99,14 +134,5 @@ import java.lang.reflect.TypeVariable;
     @Override
     public void save2Cache(UriRequest request) {
         saveStringCache(request, resultStr);
-    }
-
-    @Override
-    public RequestTracker getResponseTracker() {
-        if (this.parser instanceof RequestTracker) {
-            return (RequestTracker) parser;
-        } else {
-            return tracker;
-        }
     }
 }

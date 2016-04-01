@@ -1,9 +1,14 @@
 package org.xutils.http.request;
 
+import android.text.TextUtils;
+
+import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
+import org.xutils.http.app.RequestTracker;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 
 /**
  * Created by wyouflf on 15/11/4.
@@ -11,31 +16,63 @@ import java.lang.reflect.Type;
  */
 public final class UriRequestFactory {
 
-    private static Class<? extends AssetsRequest> ASSETS_REQUEST_CLS;
+    private static Class<? extends RequestTracker> defaultTrackerCls;
+
+    private static final HashMap<String, Class<? extends UriRequest>>
+            SCHEME_CLS_MAP = new HashMap<String, Class<? extends UriRequest>>();
 
     private UriRequestFactory() {
     }
 
     public static UriRequest getUriRequest(RequestParams params, Type loadType) throws Throwable {
+
+        // get scheme
+        String scheme = null;
         String uri = params.getUri();
-        if (uri.startsWith("http")) {
-            return new HttpRequest(params, loadType);
-        } else if (uri.startsWith("assets://")) {
-            if (ASSETS_REQUEST_CLS != null) {
-                Constructor<? extends AssetsRequest> constructor
-                        = ASSETS_REQUEST_CLS.getConstructor(RequestParams.class, Class.class);
+        int index = uri.indexOf(":");
+        if (index > 0) {
+            scheme = uri.substring(0, index);
+        } else if (uri.startsWith("/")) {
+            scheme = "file";
+        }
+
+        // get UriRequest
+        if (!TextUtils.isEmpty(scheme)) {
+            Class<? extends UriRequest> cls = SCHEME_CLS_MAP.get(scheme);
+            if (cls != null) {
+                Constructor<? extends UriRequest> constructor
+                        = cls.getConstructor(RequestParams.class, Class.class);
                 return constructor.newInstance(params, loadType);
             } else {
-                return new AssetsRequest(params, loadType);
+                if (scheme.startsWith("http")) {
+                    return new HttpRequest(params, loadType);
+                } else if (scheme.equals("assets")) {
+                    return new AssetsRequest(params, loadType);
+                } else if (scheme.equals("file")) {
+                    return new LocalFileRequest(params, loadType);
+                } else {
+                    throw new IllegalArgumentException("The url not be support: " + uri);
+                }
             }
-        } else if (uri.startsWith("file:") || uri.startsWith("/")) {
-            return new LocalFileRequest(params, loadType);
         } else {
             throw new IllegalArgumentException("The url not be support: " + uri);
         }
     }
 
-    public static void registerAssetsRequestClass(Class<? extends AssetsRequest> assetsRequestCls) {
-        ASSETS_REQUEST_CLS = assetsRequestCls;
+    public static void registerDefaultTrackerClass(Class<? extends RequestTracker> trackerCls) {
+        UriRequestFactory.defaultTrackerCls = trackerCls;
+    }
+
+    public static RequestTracker getDefaultTracker() {
+        try {
+            return defaultTrackerCls == null ? null : defaultTrackerCls.newInstance();
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    public static void registerRequestClass(String scheme, Class<? extends UriRequest> uriRequestCls) {
+        SCHEME_CLS_MAP.put(scheme, uriRequestCls);
     }
 }

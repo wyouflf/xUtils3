@@ -47,7 +47,7 @@ public final class ImageDecoder {
     private final static byte[] GIF_HEADER = new byte[]{'G', 'I', 'F'};
     private final static byte[] WEBP_HEADER = new byte[]{'W', 'E', 'B', 'P'};
 
-    private final static Executor THUMB_CACHE_EXECUTOR = new PriorityExecutor(1);
+    private final static Executor THUMB_CACHE_EXECUTOR = new PriorityExecutor(1, true);
     private final static LruDiskCache THUMB_CACHE = LruDiskCache.getDiskCache("xUtils_img_thumb");
 
     static {
@@ -78,7 +78,7 @@ public final class ImageDecoder {
                                        final Callback.Cancelable cancelable) throws IOException {
         if (file == null || !file.exists() || file.length() < 1) return null;
         if (cancelable != null && cancelable.isCancelled()) {
-            return null;
+            throw new Callback.CancelledException("cancelled during decode image");
         }
 
         Drawable result = null;
@@ -88,24 +88,26 @@ public final class ImageDecoder {
                 movie = decodeGif(file, options, cancelable);
             }
             if (movie != null) {
-                result = new ReusableGifDrawable(movie, (int) file.length());
+                result = new GifDrawable(movie, (int) file.length());
             }
         } else {
             Bitmap bitmap = null;
             { // decode with lock
-                while (bitmapDecodeWorker.get() >= BITMAP_DECODE_MAX_WORKER
-                        && (cancelable == null || !cancelable.isCancelled())) {
-                    synchronized (bitmapDecodeLock) {
-                        try {
-                            bitmapDecodeLock.wait();
-                        } catch (Throwable ignored) {
+                try {
+                    while (bitmapDecodeWorker.get() >= BITMAP_DECODE_MAX_WORKER
+                            && (cancelable == null || !cancelable.isCancelled())) {
+                        synchronized (bitmapDecodeLock) {
+                            try {
+                                bitmapDecodeLock.wait();
+                            } catch (Throwable ignored) {
+                            }
                         }
                     }
-                }
-                if (cancelable != null && cancelable.isCancelled()) {
-                    return null;
-                }
-                try {
+
+                    if (cancelable != null && cancelable.isCancelled()) {
+                        throw new Callback.CancelledException("cancelled during decode image");
+                    }
+
                     bitmapDecodeWorker.incrementAndGet();
                     // get from thumb cache
                     if (options.isCompress()) {
@@ -113,6 +115,16 @@ public final class ImageDecoder {
                     }
                     if (bitmap == null) {
                         bitmap = decodeBitmap(file, options, cancelable);
+                        // save to thumb cache
+                        if (bitmap != null && options.isCompress()) {
+                            final Bitmap finalBitmap = bitmap;
+                            THUMB_CACHE_EXECUTOR.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    saveThumbCache(file, options, finalBitmap);
+                                }
+                            });
+                        }
                     }
                 } finally {
                     bitmapDecodeWorker.decrementAndGet();
@@ -123,16 +135,6 @@ public final class ImageDecoder {
             }
             if (bitmap != null) {
                 result = new ReusableBitmapDrawable(x.app().getResources(), bitmap);
-                // save to thumb cache
-                if (options.isCompress()) {
-                    final Bitmap finalBitmap = bitmap;
-                    THUMB_CACHE_EXECUTOR.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            saveThumbCache(file, options, finalBitmap);
-                        }
-                    });
-                }
             }
         }
         return result;
@@ -178,19 +180,20 @@ public final class ImageDecoder {
      * @throws IOException
      */
     public static Bitmap decodeBitmap(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
-        // check params
-        if (file == null || !file.exists() || file.length() < 1) return null;
-        if (options == null) {
-            options = ImageOptions.DEFAULT;
-        }
-        if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
-            options.optimizeMaxSize(null);
+        {// check params
+            if (file == null || !file.exists() || file.length() < 1) return null;
+            if (options == null) {
+                options = ImageOptions.DEFAULT;
+            }
+            if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
+                options.optimizeMaxSize(null);
+            }
         }
 
         Bitmap result = null;
         try {
             if (cancelable != null && cancelable.isCancelled()) {
-                return null;
+                throw new Callback.CancelledException("cancelled during decode image");
             }
 
             // prepare bitmap options
@@ -227,13 +230,13 @@ public final class ImageDecoder {
                     options.getMaxWidth(), options.getMaxHeight());
 
             if (cancelable != null && cancelable.isCancelled()) {
-                return null;
+                throw new Callback.CancelledException("cancelled during decode image");
             }
 
             // decode file
             Bitmap bitmap = null;
             if (isWebP(file)) {
-                bitmap = WebPFactory.nativeDecodeFile(file.getAbsolutePath(), bitmapOps);
+                bitmap = WebPFactory.decodeFile(file.getAbsolutePath(), bitmapOps);
             }
             if (bitmap == null) {
                 bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), bitmapOps);
@@ -244,13 +247,13 @@ public final class ImageDecoder {
 
             { // 旋转和缩放处理
                 if (cancelable != null && cancelable.isCancelled()) {
-                    return null;
+                    throw new Callback.CancelledException("cancelled during decode image");
                 }
                 if (rotateAngle != 0) {
                     bitmap = rotate(bitmap, rotateAngle, true);
                 }
                 if (cancelable != null && cancelable.isCancelled()) {
-                    return null;
+                    throw new Callback.CancelledException("cancelled during decode image");
                 }
                 if (options.isCrop() && optionWith > 0 && optionHeight > 0) {
                     bitmap = cut2ScaleSize(bitmap, optionWith, optionHeight, true);
@@ -263,7 +266,7 @@ public final class ImageDecoder {
 
             { // 圆角和方块处理
                 if (cancelable != null && cancelable.isCancelled()) {
-                    return null;
+                    throw new Callback.CancelledException("cancelled during decode image");
                 }
                 if (options.isCircular()) {
                     bitmap = cut2Circular(bitmap, true);
@@ -299,21 +302,24 @@ public final class ImageDecoder {
      * @throws IOException
      */
     public static Movie decodeGif(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
-        // check params
-        if (file == null || !file.exists() || file.length() < 1) return null;
-        //if (options == null) {
-        //    options = ImageOptions.DEFAULT; // not use
-        //}
-        //if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
-        //    options.optimizeMaxSize(null);
-        //}
+        {// check params
+            if (file == null || !file.exists() || file.length() < 1) return null;
+            /*if (options == null) {
+                options = ImageOptions.DEFAULT; // not use
+            }
+            if (options.getMaxWidth() <= 0 || options.getMaxHeight() <= 0) {
+                options.optimizeMaxSize(null);
+            }*/
+        }
 
         InputStream in = null;
         try {
             if (cancelable != null && cancelable.isCancelled()) {
-                return null;
+                throw new Callback.CancelledException("cancelled during decode image");
             }
-            in = new BufferedInputStream(new FileInputStream(file));
+            int buffSize = 1024 * 16;
+            in = new BufferedInputStream(new FileInputStream(file), buffSize);
+            in.mark(buffSize);
             Movie movie = Movie.decodeStream(in);
             if (movie == null) {
                 throw new IOException("decode image error");
@@ -590,7 +596,7 @@ public final class ImageDecoder {
      */
     public static void compress(Bitmap bitmap, Bitmap.CompressFormat format, int quality, OutputStream out) throws IOException {
         if (format == Bitmap.CompressFormat.WEBP) {
-            byte[] data = WebPFactory.nativeEncodeBitmap(bitmap, quality);
+            byte[] data = WebPFactory.encodeBitmap(bitmap, quality);
             out.write(data);
         } else {
             bitmap.compress(format, quality, out);
@@ -605,6 +611,8 @@ public final class ImageDecoder {
      * @param thumbBitmap
      */
     private static void saveThumbCache(File file, ImageOptions options, Bitmap thumbBitmap) {
+        if (!WebPFactory.available()) return;
+
         DiskCacheEntity entity = new DiskCacheEntity();
         entity.setKey(
                 file.getAbsolutePath() + "@" + file.lastModified() + options.toString());
@@ -614,7 +622,7 @@ public final class ImageDecoder {
             cacheFile = THUMB_CACHE.createDiskCacheFile(entity);
             if (cacheFile != null) {
                 out = new FileOutputStream(cacheFile);
-                byte[] encoded = WebPFactory.nativeEncodeBitmap(thumbBitmap, 80);
+                byte[] encoded = WebPFactory.encodeBitmap(thumbBitmap, 80);
                 out.write(encoded);
                 out.flush();
                 cacheFile = cacheFile.commit();
@@ -636,6 +644,8 @@ public final class ImageDecoder {
      * @return
      */
     private static Bitmap getThumbCache(File file, ImageOptions options) {
+        if (!WebPFactory.available()) return null;
+
         DiskCacheFile cacheFile = null;
         try {
             cacheFile = THUMB_CACHE.getDiskCacheFile(
@@ -646,7 +656,7 @@ public final class ImageDecoder {
                 bitmapOps.inPurgeable = true;
                 bitmapOps.inInputShareable = true;
                 bitmapOps.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                return WebPFactory.nativeDecodeFile(cacheFile.getAbsolutePath(), bitmapOps);
+                return WebPFactory.decodeFile(cacheFile.getAbsolutePath(), bitmapOps);
             }
         } catch (Throwable ex) {
             LogUtil.w(ex.getMessage(), ex);

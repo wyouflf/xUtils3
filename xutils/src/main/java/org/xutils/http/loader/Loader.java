@@ -7,7 +7,6 @@ import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.http.ProgressHandler;
 import org.xutils.http.RequestParams;
-import org.xutils.http.app.RequestTracker;
 import org.xutils.http.request.UriRequest;
 
 import java.io.InputStream;
@@ -20,7 +19,6 @@ import java.util.Date;
 public abstract class Loader<T> {
 
     protected RequestParams params;
-    protected RequestTracker tracker;
     protected ProgressHandler progressHandler;
 
     public void setParams(final RequestParams params) {
@@ -29,14 +27,6 @@ public abstract class Loader<T> {
 
     public void setProgressHandler(final ProgressHandler callbackHandler) {
         this.progressHandler = callbackHandler;
-    }
-
-    public void setResponseTracker(RequestTracker tracker) {
-        this.tracker = tracker;
-    }
-
-    public RequestTracker getResponseTracker() {
-        return this.tracker;
     }
 
     protected void saveStringCache(UriRequest request, String resultStr) {

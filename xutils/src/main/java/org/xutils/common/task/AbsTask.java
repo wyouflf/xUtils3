@@ -69,19 +69,31 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
     protected void cancelWorks() {
     }
 
+    /**
+     * 取消任务时是否不等待任务彻底结束, 立即收到取消的通知.
+     *
+     * @return
+     */
+    protected boolean isCancelFast() {
+        return false;
+    }
+
     @Override
-    public final void cancel() {
+    public final synchronized void cancel() {
         if (!this.isCancelled) {
-            cancelWorks();
             this.isCancelled = true;
-            this.state = State.CANCELLED;
+            cancelWorks();
             if (cancelHandler != null && !cancelHandler.isCancelled()) {
                 cancelHandler.cancel();
             }
-            if (taskProxy != null) {
-                taskProxy.onCancelled(new Callback.CancelledException("cancelled by user"));
-            } else if (this instanceof TaskProxy) {
-                this.onCancelled(new Callback.CancelledException("cancelled by user"));
+            if (this.state == State.WAITING || (this.state == State.STARTED && isCancelFast())) {
+                if (taskProxy != null) {
+                    taskProxy.onCancelled(new Callback.CancelledException("cancelled by user"));
+                    taskProxy.onFinished();
+                } else if (this instanceof TaskProxy) {
+                    this.onCancelled(new Callback.CancelledException("cancelled by user"));
+                    this.onFinished();
+                }
             }
         }
     }
@@ -105,23 +117,18 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
     }
 
     /*package*/
+    void setState(State state) {
+        this.state = state;
+    }
+
+    /*package*/
     final void setTaskProxy(TaskProxy taskProxy) {
         this.taskProxy = taskProxy;
     }
 
     /*package*/
-    final void setState(State state) {
-        this.state = state;
-    }
-
-    /*package*/
     final void setResult(ResultType result) {
         this.result = result;
-    }
-
-    /*package*/
-    final Callback.Cancelable getCancelHandler() {
-        return cancelHandler;
     }
 
     public enum State {

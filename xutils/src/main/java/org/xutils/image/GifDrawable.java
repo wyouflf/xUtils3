@@ -8,21 +8,26 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 
-public class GifDrawable extends Drawable implements Runnable, Animatable {
-    private Movie movie;
-    private int byteCount = 0;
+import org.xutils.common.util.LogUtil;
 
-    private long begin = SystemClock.uptimeMillis();
-    private int duration;
-    private boolean running;
+public class GifDrawable extends Drawable implements Runnable, Animatable {
+
+    private int byteCount;
+    private int rate = 300;
+    private volatile boolean running;
+
+    private final Movie movie;
+    private final int duration;
+    private final long begin = SystemClock.uptimeMillis();
 
     public GifDrawable(Movie movie, int byteCount) {
         this.movie = movie;
         this.byteCount = byteCount;
         this.duration = movie.duration();
-        if (this.duration == 0) {
-            this.duration = 100;
-        }
+    }
+
+    public int getDuration() {
+        return duration;
     }
 
     public Movie getMovie() {
@@ -36,13 +41,23 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
         return byteCount;
     }
 
+    public int getRate() {
+        return rate;
+    }
+
+    public void setRate(int rate) {
+        this.rate = rate;
+    }
+
     @Override
     public void draw(Canvas canvas) {
-        int ms = (int) (SystemClock.uptimeMillis() - begin) % duration;
-        movie.setTime(ms);
-        movie.draw(canvas, 0, 0);
-        if (duration > 0) {
+        try {
+            int time = duration > 0 ? (int) (SystemClock.uptimeMillis() - begin) % duration : 0;
+            movie.setTime(time);
+            movie.draw(canvas, 0, 0);
             start();
+        } catch (Throwable ex) {
+            LogUtil.e(ex.getMessage(), ex);
         }
     }
 
@@ -57,19 +72,21 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
     @Override
     public void stop() {
         if (isRunning()) {
-            unscheduleSelf(this);
+            this.unscheduleSelf(this);
         }
     }
 
     @Override
     public boolean isRunning() {
-        return running;
+        return running && duration > 0;
     }
 
     @Override
     public void run() {
-        this.invalidateSelf();
-        scheduleSelf(this, SystemClock.uptimeMillis() + 300); // scheduleSelf(runnable, when)
+        if (duration > 0) {
+            this.invalidateSelf();
+            this.scheduleSelf(this, SystemClock.uptimeMillis() + rate);
+        }
     }
 
     @Override
@@ -93,7 +110,7 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
 
     @Override
     public int getOpacity() {
-        return PixelFormat.OPAQUE;
+        return movie.isOpaque() ? PixelFormat.OPAQUE : PixelFormat.TRANSLUCENT;
     }
 
 }

@@ -14,7 +14,6 @@ import java.io.File;
  */
 public final class ImageManagerImpl implements ImageManager {
 
-
     private static final Object lock = new Object();
     private static ImageManagerImpl instance;
 
@@ -79,8 +78,13 @@ public final class ImageManagerImpl implements ImageManager {
     }
 
     @Override
-    public Callback.Cancelable loadFile(String url, ImageOptions options, Callback.CommonCallback<File> callback) {
+    public Callback.Cancelable loadFile(String url, ImageOptions options, Callback.CacheCallback<File> callback) {
         return ImageLoader.doLoadFile(url, options, callback);
+    }
+
+    @Override
+    public void clearMemCache() {
+        ImageLoader.clearMemCache();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.xutils.http.app;
 
+import org.xutils.http.RequestParams;
 import org.xutils.http.request.UriRequest;
 
 /**
@@ -8,21 +9,23 @@ import org.xutils.http.request.UriRequest;
  * 所有回调方法都在主线程进行.
  * <p>
  * 用法:
- * 1. 请的callback参数同时实现RequestTracker;
- * 2. 自定义的ResponseParser实现RequestTracker;
- * 3. 注册给LoaderFactory.
+ * 1. 将RequestTracker实例设置给请求参数RequestParams.
+ * 2. 请的callback参数同时实现RequestTracker接口;
+ * 3. 注册给UriRequestFactory的默认RequestTracker.
  * 注意: 请求回调RequestTracker时优先级按照上面的顺序,
  * 找到一个RequestTracker的实现会忽略其他.
  */
 public interface RequestTracker {
 
-    void onWaiting(UriRequest request);
+    void onWaiting(RequestParams params);
 
-    void onStart(UriRequest request);
+    void onStart(RequestParams params);
 
-    void onCache(UriRequest request);
+    void onRequestCreated(UriRequest request);
 
-    void onSuccess(UriRequest request);
+    void onCache(UriRequest request, Object result);
+
+    void onSuccess(UriRequest request, Object result);
 
     void onCancelled(UriRequest request);
 

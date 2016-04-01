@@ -3,7 +3,6 @@ package org.xutils.http.request;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.ProgressHandler;
 import org.xutils.http.RequestParams;
-import org.xutils.http.app.RequestTracker;
 import org.xutils.http.loader.Loader;
 import org.xutils.http.loader.LoaderFactory;
 import org.xutils.x;
@@ -66,10 +65,6 @@ public abstract class UriRequest implements Closeable {
     public abstract boolean isLoading();
 
     public abstract String getCacheKey();
-
-    public RequestTracker getResponseTracker() {
-        return loader.getResponseTracker();
-    }
 
     /**
      * 由loader发起请求, 拿到结果.

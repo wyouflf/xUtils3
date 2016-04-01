@@ -26,6 +26,7 @@ public class IOUtil {
             try {
                 closeable.close();
             } catch (Throwable ignored) {
+                LogUtil.d(ignored.getMessage(), ignored);
             }
         }
     }
@@ -35,6 +36,7 @@ public class IOUtil {
             try {
                 cursor.close();
             } catch (Throwable ignored) {
+                LogUtil.d(ignored.getMessage(), ignored);
             }
         }
     }
@@ -51,10 +53,10 @@ public class IOUtil {
             while ((len = in.read(buf)) != -1) {
                 out.write(buf, 0, len);
             }
+            return out.toByteArray();
         } finally {
             closeQuietly(out);
         }
-        return out.toByteArray();
     }
 
     public static byte[] readBytes(InputStream in, long skip, long size) throws IOException {
@@ -70,10 +72,10 @@ public class IOUtil {
             for (int i = 0; i < size; i++) {
                 out.write(in.read());
             }
+            return out.toByteArray();
         } finally {
             closeQuietly(out);
         }
-        return out.toByteArray();
     }
 
     public static String readStr(InputStream in) throws IOException {
@@ -93,7 +95,7 @@ public class IOUtil {
         while ((len = reader.read(buf)) >= 0) {
             sb.append(buf, 0, len);
         }
-        return sb.toString().trim();
+        return sb.toString();
     }
 
     public static void writeStr(OutputStream out, String str) throws IOException {

@@ -9,11 +9,10 @@ import java.lang.annotation.Target;
 
 /**
  * 事件注解.
- * 被注解的方法必须具备一下形式:
+ * 被注解的方法必须具备以下形式:
  * 1. private 修饰
  * 2. 返回值类型没有要求
- * 3. 方法名以Click或Event结尾, 否则可能被混淆编译时删除. (方法签名形式为void *(android.view.View)也可以)
- * 4. 参数签名和type的接口要求的参数签名一致.
+ * 3. 参数签名和type的接口要求的参数签名一致.
  * Author: wyouflf
  * Date: 13-9-9
  * Time: 下午12:43

@@ -16,7 +16,6 @@ import org.xutils.common.Callback;
 import org.xutils.ex.DbException;
 import org.xutils.sample.download.DownloadInfo;
 import org.xutils.sample.download.DownloadManager;
-import org.xutils.sample.download.DownloadService;
 import org.xutils.sample.download.DownloadState;
 import org.xutils.sample.download.DownloadViewHolder;
 import org.xutils.view.annotation.ContentView;
@@ -39,7 +38,7 @@ public class DownloadActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        downloadManager = DownloadService.getDownloadManager();
+        downloadManager = DownloadManager.getInstance();
         downloadListAdapter = new DownloadListAdapter();
         downloadList.setAdapter(downloadListAdapter);
     }

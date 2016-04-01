@@ -6,18 +6,18 @@ import android.text.TextUtils;
  * Created by wyouflf on 15/8/13.
  * Wrapper for RequestBody value.
  */
-public final class BodyEntityWrapper<T> {
+public final class BodyItemWrapper {
 
-    private final T object;
+    private final Object value;
     private final String fileName;
     private final String contentType;
 
-    public BodyEntityWrapper(T object, String contentType) {
-        this(object, contentType, null);
+    public BodyItemWrapper(Object value, String contentType) {
+        this(value, contentType, null);
     }
 
-    public BodyEntityWrapper(T object, String contentType, String fileName) {
-        this.object = object;
+    public BodyItemWrapper(Object value, String contentType, String fileName) {
+        this.value = value;
         if (TextUtils.isEmpty(contentType)) {
             this.contentType = "application/octet-stream";
         } else {
@@ -26,8 +26,8 @@ public final class BodyEntityWrapper<T> {
         this.fileName = fileName;
     }
 
-    public T getObject() {
-        return object;
+    public Object getValue() {
+        return value;
     }
 
     public String getFileName() {

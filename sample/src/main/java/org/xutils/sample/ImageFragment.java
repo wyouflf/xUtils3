@@ -51,10 +51,10 @@ public class ImageFragment extends BaseFragment {
         imageOptions = new ImageOptions.Builder()
                 .setSize(DensityUtil.dip2px(120), DensityUtil.dip2px(120))
                 .setRadius(DensityUtil.dip2px(5))
-                        // 如果ImageView的大小不是定义为wrap_content, 不要crop.
-                .setCrop(true)
-                        // 加载中或错误图片的ScaleType
-                        //.setPlaceholderScaleType(ImageView.ScaleType.MATRIX)
+                // 如果ImageView的大小不是定义为wrap_content, 不要crop.
+                .setCrop(true) // 很多时候设置了合适的scaleType也不需要它.
+                // 加载中或错误图片的ScaleType
+                //.setPlaceholderScaleType(ImageView.ScaleType.MATRIX)
                 .setImageScaleType(ImageView.ScaleType.CENTER_CROP)
                 .setLoadingDrawableId(R.mipmap.ic_launcher)
                 .setFailureDrawableId(R.mipmap.ic_launcher)
@@ -142,7 +142,7 @@ public class ImageFragment extends BaseFragment {
         public View getView(final int position, View view, ViewGroup parent) {
             ImageItemHolder holder = null;
             if (view == null) {
-                view = mInflater.inflate(R.layout.image_item, null);
+                view = mInflater.inflate(R.layout.image_item, parent, false);
                 holder = new ImageItemHolder();
                 x.view().inject(holder, view);
                 view.setTag(holder);
@@ -221,6 +221,7 @@ public class ImageFragment extends BaseFragment {
             String src = m_image.group(1);
             if (src.length() < 100) {
                 pics.add("http://" + src + ".jpg");
+                //pics.add("http://f.hiphotos.baidu.com/zhidao/pic/item/2fdda3cc7cd98d104cc21595203fb80e7bec907b.jpg");
             }
         }
         return pics;

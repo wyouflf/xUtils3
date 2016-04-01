@@ -39,6 +39,12 @@ public final class ViewInjectorImpl implements ViewInjector {
     static {
         IGNORED.add(Object.class);
         IGNORED.add(Activity.class);
+        IGNORED.add(android.app.Fragment.class);
+        try {
+            IGNORED.add(Class.forName("android.support.v4.app.Fragment"));
+            IGNORED.add(Class.forName("android.support.v4.app.FragmentActivity"));
+        } catch (Throwable ignored) {
+        }
     }
 
     private static final Object lock = new Object();
@@ -132,19 +138,20 @@ public final class ViewInjectorImpl implements ViewInjector {
             return;
         }
 
+        // 从父类到子类递归
+        injectObject(handler, handlerType.getSuperclass(), finder);
+
         // inject view
         Field[] fields = handlerType.getDeclaredFields();
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
 
                 Class<?> fieldType = field.getType();
-                if ( // 不注入静态字段
-                        Modifier.isStatic(field.getModifiers()) ||
-                                // 不注入final字段
-                                Modifier.isFinal(field.getModifiers()) ||
-                                // 仅注入view字段
-                                (!fieldType.isInterface() &&
-                                        !View.class.isAssignableFrom(fieldType))) {
+                if (
+                /* 不注入静态字段 */     Modifier.isStatic(field.getModifiers()) ||
+                /* 不注入final字段 */    Modifier.isFinal(field.getModifiers()) ||
+                /* 不注入基本类型字段 */  fieldType.isPrimitive() ||
+                /* 不注入数组类型字段 */  fieldType.isArray()) {
                     continue;
                 }
 
@@ -156,15 +163,15 @@ public final class ViewInjectorImpl implements ViewInjector {
                             field.setAccessible(true);
                             field.set(handler, view);
                         } else {
-                            throw new RuntimeException("Invalid id(" + viewInject.value() + ") for @ViewInject!"
-                                    + handlerType.getSimpleName());
+                            throw new RuntimeException("Invalid @ViewInject for "
+                                    + handlerType.getSimpleName() + "." + field.getName());
                         }
                     } catch (Throwable ex) {
                         LogUtil.e(ex.getMessage(), ex);
                     }
                 }
             }
-        }
+        } // end inject view
 
         // inject event
         Method[] methods = handlerType.getDeclaredMethods();
@@ -200,9 +207,8 @@ public final class ViewInjectorImpl implements ViewInjector {
                     }
                 }
             }
-        }
+        } // end inject event
 
-        injectObject(handler, handlerType.getSuperclass(), finder);
     }
 
 }

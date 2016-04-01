@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import org.xutils.common.Callback;
 import org.xutils.common.util.IOUtil;
+import org.xutils.common.util.KeyValue;
 import org.xutils.http.ProgressHandler;
 
 import java.io.File;
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -29,11 +30,11 @@ public class MultipartBody implements ProgressBody {
     private String contentType; // multipart/subtype; boundary=xxx...
     private String charset = "UTF-8";
 
-    private Map<String, Object> multipartParams;
+    private List<KeyValue> multipartParams;
     private long total = 0;
     private long current = 0;
 
-    public MultipartBody(Map<String, Object> multipartParams, String charset) {
+    public MultipartBody(List<KeyValue> multipartParams, String charset) {
         if (!TextUtils.isEmpty(charset)) {
             this.charset = charset;
         }
@@ -92,9 +93,9 @@ public class MultipartBody implements ProgressBody {
             throw new Callback.CancelledException("upload stopped!");
         }
 
-        for (Map.Entry<String, Object> kv : multipartParams.entrySet()) {
-            String name = kv.getKey();
-            Object value = kv.getValue();
+        for (KeyValue kv : multipartParams) {
+            String name = kv.key;
+            Object value = kv.value;
             if (!TextUtils.isEmpty(name) && value != null) {
                 writeEntry(out, name, value);
             }
@@ -120,9 +121,9 @@ public class MultipartBody implements ProgressBody {
 
         String fileName = "";
         String contentType = null;
-        if (value instanceof BodyEntityWrapper) {
-            BodyEntityWrapper wrapper = (BodyEntityWrapper) value;
-            value = wrapper.getObject();
+        if (value instanceof BodyItemWrapper) {
+            BodyItemWrapper wrapper = (BodyItemWrapper) value;
+            value = wrapper.getValue();
             fileName = wrapper.getFileName();
             contentType = wrapper.getContentType();
         }
@@ -213,7 +214,7 @@ public class MultipartBody implements ProgressBody {
         StringBuilder result = new StringBuilder("Content-Type: ");
         if (TextUtils.isEmpty(contentType)) {
             if (value instanceof String) {
-                contentType = "text/plain; charset:" + charset;
+                contentType = "text/plain; charset=" + charset;
             } else {
                 contentType = "application/octet-stream";
             }

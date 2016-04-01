@@ -5,6 +5,9 @@ package org.xutils.common.task;
  * 带有优先级的Runnable类型(仅在task包内可用)
  */
 /*package*/ class PriorityRunnable implements Runnable {
+
+    /*package*/ long SEQ;
+
     public final Priority priority;
     private final Runnable runnable;
 

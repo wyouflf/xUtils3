@@ -40,7 +40,7 @@ public interface TaskController {
     void run(Runnable runnable);
 
     /**
-     * 移除未执行的runnable
+     * 移除post或postDelayed提交的, 未执行的runnable
      *
      * @param runnable
      */

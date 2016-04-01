@@ -27,10 +27,6 @@ public class InputStreamBody implements ProgressBody {
 
     private ProgressHandler callBackHandler;
 
-    public InputStreamBody(BodyEntityWrapper<InputStream> wrapper) {
-        this(wrapper.getObject(), wrapper.getContentType());
-    }
-
     public InputStreamBody(InputStream inputStream) {
         this(inputStream, null);
     }

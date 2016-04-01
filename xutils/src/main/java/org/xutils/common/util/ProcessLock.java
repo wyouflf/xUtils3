@@ -125,7 +125,9 @@ public final class ProcessLock implements Closeable {
                         IOUtil.deleteFileOrDir(file);
                     }
 
-                    fileLock.release();
+                    if (fileLock.channel().isOpen()) {
+                        fileLock.release();
+                    }
                 } catch (Throwable ex) {
                     LogUtil.e(ex.getMessage(), ex);
                 } finally {

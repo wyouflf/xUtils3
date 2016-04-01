@@ -346,26 +346,24 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 retry = true;
                 LogUtil.w("Http Redirect:" + params.getUri());
             } catch (Throwable ex) {
-                if (this.request.getResponseCode() == 304) { // disk cache is valid.
-                    return null;
-                } else {
-                    exception = ex;
-                    if (this.isCancelled() && !(exception instanceof Callback.CancelledException)) {
-                        exception = new Callback.CancelledException("canceled by user");
+                switch (this.request.getResponseCode()) {
+                    case 204: // empty content
+                    case 205: // empty content
+                    case 304: // disk cache is valid.
+                        return null;
+                    default: {
+                        exception = ex;
+                        if (this.isCancelled() && !(exception instanceof Callback.CancelledException)) {
+                            exception = new Callback.CancelledException("canceled by user");
+                        }
+                        retry = retryHandler.canRetry(this.request, exception, ++retryCount);
                     }
-                    retry = retryHandler.canRetry(this.request, exception, ++retryCount);
                 }
             }
 
         }
 
         if (exception != null && result == null && !trustCache) {
-            if (exception instanceof HttpException) {
-                int errorCode = ((HttpException) exception).getCode();
-                if (errorCode == 204 || errorCode == 205) {
-                    return null; //  empty content
-                }
-            }
             hasException = true;
             throw exception;
         }

@@ -117,6 +117,7 @@ public class HttpRequest extends UriRequest {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public void sendRequest() throws IOException {
         isLoading = false;
+        responseCode = 0;
 
         URL url = new URL(queryUrl);
         { // init connection
@@ -228,7 +229,7 @@ public class HttpRequest extends UriRequest {
 
         // check response code
         responseCode = connection.getResponseCode();
-        if (responseCode == 204 || responseCode == 205) {
+        if (responseCode == 204 || responseCode == 205) { // empty content
             throw new HttpException(responseCode, this.getResponseMessage());
         } else if (responseCode >= 300) {
             HttpException httpException = new HttpException(responseCode, this.getResponseMessage());

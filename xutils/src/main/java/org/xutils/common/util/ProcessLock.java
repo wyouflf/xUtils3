@@ -39,9 +39,7 @@ public final class ProcessLock implements Closeable {
 
     static {
         File dir = x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE);
-        if (dir != null) {
-            dir.deleteOnExit();
-        }
+        IOUtil.deleteFileOrDir(dir);
     }
 
     private ProcessLock(String lockName, File file, FileLock fileLock, Closeable stream, boolean writeMode) {

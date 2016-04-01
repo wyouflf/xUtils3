@@ -97,6 +97,8 @@ public class FileLoader extends Loader<File> {
                             IOUtil.closeQuietly(fis); // 先关闭文件流, 否则文件删除会失败.
                             IOUtil.deleteFileOrDir(targetFile);
                             throw new RuntimeException("need retry");
+                        } else {
+                            contentLength -= CHECK_SIZE;
                         }
                     } else {
                         IOUtil.deleteFileOrDir(targetFile);

@@ -30,7 +30,6 @@ public final class ProcessLock implements Closeable {
     private final boolean mWriteMode;
 
     private final static String LOCK_FILE_DIR = "process_lock";
-    private final static int PID = android.os.Process.myPid();
     /**
      * key1: lockName
      * key2: fileLock.hashCode()
@@ -101,7 +100,7 @@ public final class ProcessLock implements Closeable {
      * 释放锁
      */
     public void release() {
-        release(mLockName, mFileLock, mStream);
+        release(mLockName, mFileLock, mFile, mStream);
     }
 
     /**
@@ -116,14 +115,19 @@ public final class ProcessLock implements Closeable {
         return fileLock != null && fileLock.isValid();
     }
 
-    private static void release(String lockName, FileLock fileLock, Closeable stream) {
+    private static void release(String lockName, FileLock fileLock, File file, Closeable stream) {
         synchronized (LOCK_MAP) {
             if (fileLock != null) {
                 try {
                     LOCK_MAP.remove(lockName, fileLock.hashCode());
+                    ConcurrentHashMap<Integer, ProcessLock> locks = LOCK_MAP.get(lockName);
+                    if (locks == null || locks.isEmpty()) {
+                        IOUtil.deleteFileOrDir(file);
+                    }
+
                     fileLock.release();
-                    LogUtil.d("released: " + lockName + ":" + PID);
-                } catch (Throwable ignored) {
+                } catch (Throwable ex) {
+                    LogUtil.e(ex.getMessage(), ex);
                 } finally {
                     IOUtil.closeQuietly(fileLock.channel());
                 }
@@ -169,33 +173,31 @@ public final class ProcessLock implements Closeable {
                 }
             }
 
-            FileInputStream in = null;
-            FileOutputStream out = null;
             FileChannel channel = null;
+            Closeable stream = null;
             try {
                 File file = new File(
                         x.app().getDir(LOCK_FILE_DIR, Context.MODE_PRIVATE),
                         hash);
                 if (file.exists() || file.createNewFile()) {
-                    Closeable stream = null;
+
                     if (writeMode) {
-                        out = new FileOutputStream(file, false);
+                        FileOutputStream out = new FileOutputStream(file, false);
                         channel = out.getChannel();
                         stream = out;
                     } else {
-                        in = new FileInputStream(file);
+                        FileInputStream in = new FileInputStream(file);
                         channel = in.getChannel();
                         stream = in;
                     }
                     if (channel != null) {
                         FileLock fileLock = channel.tryLock(0L, Long.MAX_VALUE, !writeMode);
                         if (isValid(fileLock)) {
-                            LogUtil.d("lock: " + lockName + ":" + PID);
                             ProcessLock result = new ProcessLock(lockName, file, fileLock, stream, writeMode);
                             LOCK_MAP.put(lockName, fileLock.hashCode(), result);
                             return result;
                         } else {
-                            release(lockName, fileLock, out);
+                            release(lockName, fileLock, file, stream);
                         }
                     } else {
                         throw new IOException("can not get file channel:" + file.getAbsolutePath());
@@ -203,8 +205,7 @@ public final class ProcessLock implements Closeable {
                 }
             } catch (Throwable ignored) {
                 LogUtil.d("tryLock: " + lockName + ", " + ignored.getMessage());
-                IOUtil.closeQuietly(in);
-                IOUtil.closeQuietly(out);
+                IOUtil.closeQuietly(stream);
                 IOUtil.closeQuietly(channel);
             }
         }

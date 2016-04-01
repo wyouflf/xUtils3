@@ -360,6 +360,12 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         }
 
         if (exception != null && result == null && !trustCache) {
+            if (exception instanceof HttpException) {
+                int errorCode = ((HttpException) exception).getCode();
+                if (errorCode == 204 || errorCode == 205) {
+                    return null; //  empty content
+                }
+            }
             hasException = true;
             throw exception;
         }

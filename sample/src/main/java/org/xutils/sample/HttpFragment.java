@@ -100,13 +100,7 @@ public class HttpFragment extends BaseFragment {
                 new Callback.CommonCallback<List<BaiduResponse>>() {
                     @Override
                     public void onSuccess(List<BaiduResponse> result) {
-
-                        String name = "\"123\"";
-                        if (name.startsWith("\"") && name.endsWith("\"")) {
-                            name = name.substring(1, name.length() - 1);
-                        }
-
-                        Toast.makeText(x.app(), "(" + name + ")" + result.get(0).toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(x.app(), result.get(0).toString(), Toast.LENGTH_LONG).show();
                     }
 
                     @Override

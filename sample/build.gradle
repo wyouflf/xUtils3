@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "org.xutils.sample"
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 22 // 不使用api23的动态权限策略
         versionCode 1
         versionName "1.0"
     }

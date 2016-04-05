@@ -234,9 +234,10 @@ public class HttpFragment extends BaseFragment {
 
             @Override
             public void onSuccess(String result) {
-                // 注意: 如果服务返回304或 onCache 选择了信任缓存, 这里将不会被调用,
-                // 但是 onFinished 总会被调用.
-                this.result = result;
+                // 注意: 如果服务返回304 或 onCache 选择了信任缓存, 这时result为null.
+                if (result != null) {
+                    this.result = result;
+                }
             }
 
             @Override

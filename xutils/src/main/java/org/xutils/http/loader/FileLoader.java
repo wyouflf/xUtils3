@@ -310,9 +310,13 @@ public class FileLoader extends Loader<File> {
                 }
                 if (endIndex > startIndex) {
                     try {
-                        return URLDecoder.decode(
+                        String name = URLDecoder.decode(
                                 disposition.substring(startIndex, endIndex),
                                 request.getParams().getCharset());
+                        if (name.startsWith("\"") && name.endsWith("\"")) {
+                            name = name.substring(1, name.length() - 1);
+                        }
+                        return name;
                     } catch (UnsupportedEncodingException ex) {
                         LogUtil.e(ex.getMessage(), ex);
                     }

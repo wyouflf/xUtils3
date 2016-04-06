@@ -18,7 +18,7 @@ public final class TaskControllerImpl implements TaskController {
     private TaskControllerImpl() {
     }
 
-    private static TaskController instance;
+    private static volatile TaskController instance;
 
     public static void registerInstance() {
         if (instance == null) {

@@ -132,7 +132,7 @@ public final class LruDiskCache {
         trimSize();
     }
 
-    public DiskCacheFile getDiskCacheFile(String key) {
+    public DiskCacheFile getDiskCacheFile(String key) throws InterruptedException {
         if (!available || TextUtils.isEmpty(key)) {
             return null;
         }
@@ -222,6 +222,9 @@ public final class LruDiskCache {
                 } else {
                     throw new FileLockedException(destPath);
                 }
+            } catch (InterruptedException ex) {
+                result = cacheFile;
+                LogUtil.e(ex.getMessage(), ex);
             } finally {
                 if (result == null) {
                     result = cacheFile;

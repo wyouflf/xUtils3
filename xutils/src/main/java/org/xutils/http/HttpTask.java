@@ -254,6 +254,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                         synchronized (cacheLock) {
                             try {
                                 cacheLock.wait();
+                            } catch (InterruptedException iex) {
+                                throw new Callback.CancelledException("cancelled before request");
                             } catch (Throwable ignored) {
                             }
                         }
@@ -586,12 +588,16 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
         public void run() {
             try {
+                boolean interrupted = false;
                 if (File.class == loadType) {
                     while (sCurrFileLoadCount.get() >= MAX_FILE_LOAD_WORKER
                             && !HttpTask.this.isCancelled()) {
                         synchronized (sCurrFileLoadCount) {
                             try {
-                                sCurrFileLoadCount.wait(100);
+                                sCurrFileLoadCount.wait();
+                            } catch (InterruptedException iex) {
+                                interrupted = true;
+                                break;
                             } catch (Throwable ignored) {
                             }
                         }
@@ -599,8 +605,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                     sCurrFileLoadCount.incrementAndGet();
                 }
 
-                if (HttpTask.this.isCancelled()) {
-                    throw new Callback.CancelledException("cancelled before request");
+                if (interrupted || HttpTask.this.isCancelled()) {
+                    throw new Callback.CancelledException("cancelled before request" + (interrupted ? "(interrupted)" : ""));
                 }
 
                 // intercept response

@@ -99,6 +99,8 @@ public final class ImageDecoder {
                         synchronized (bitmapDecodeLock) {
                             try {
                                 bitmapDecodeLock.wait();
+                            } catch (InterruptedException iex) {
+                                throw new Callback.CancelledException("cancelled during decode image");
                             } catch (Throwable ignored) {
                             }
                         }

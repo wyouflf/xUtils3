@@ -79,6 +79,8 @@ public final class ProcessLock implements Closeable {
             } else {
                 try {
                     Thread.sleep(1); // milliseconds
+                } catch (InterruptedException iex) {
+                    break;
                 } catch (Throwable ignored) {
                 }
             }

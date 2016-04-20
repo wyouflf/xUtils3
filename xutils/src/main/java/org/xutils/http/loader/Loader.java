@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.Date;
 
 /**
+ * 数据加载器(根据本地文件流或服务器数据流中解析成特定实体类)
  * Author: wyouflf
  * Time: 2014/05/26
  */
@@ -44,8 +45,20 @@ public abstract class Loader<T> {
 
     public abstract Loader<T> newInstance();
 
+    /**
+     * 通过输入流加载
+     * @param in 输入流
+     * @return 实体对象
+     * @throws Throwable
+     */
     public abstract T load(final InputStream in) throws Throwable;
 
+    /**
+     * 通过Uri请求加载, 一般做些特殊处理后 转成InputStream交给Load(InputStream)处理
+     * @param request
+     * @return
+     * @throws Throwable
+     */
     public abstract T load(final UriRequest request) throws Throwable;
 
     public abstract T loadFromCache(final DiskCacheEntity cacheEntity) throws Throwable;

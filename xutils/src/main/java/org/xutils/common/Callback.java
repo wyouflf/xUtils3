@@ -8,13 +8,33 @@ import java.lang.reflect.Type;
  */
 public interface Callback {
 
+    /**
+     * 基础回调接口
+     * @param <ResultType> 实体类
+     */
     public interface CommonCallback<ResultType> extends Callback {
+        /**
+         * 请求成功
+         * @param result 返回结果
+         */
         void onSuccess(ResultType result);
 
+        /**
+         * 请求失败
+         * @param ex
+         * @param isOnCallback
+         */
         void onError(Throwable ex, boolean isOnCallback);
 
+        /**
+         * 请求关闭
+         * @param cex
+         */
         void onCancelled(CancelledException cex);
 
+        /**
+         * 请求结束
+         */
         void onFinished();
     }
 
@@ -23,22 +43,51 @@ public interface Callback {
     }
 
     public interface CacheCallback<ResultType> extends CommonCallback<ResultType> {
+        /**
+         * 是否信任缓存数据
+         * @param result 缓存结果
+         * @return boolean 是否信任缓存
+         */
         boolean onCache(ResultType result);
     }
 
     public interface ProxyCacheCallback<ResultType> extends CacheCallback<ResultType> {
+        /**
+         * 是否只读缓存
+         * @return boolean true:都不到缓存缓存情况回调onSuccess(null) false 发起网络请求
+         */
         boolean onlyCache();
     }
 
+    /**
+     * 自定义解析数据
+     * @param <PrepareType> 源数据
+     * @param <ResultType> 解析后数据
+     */
     public interface PrepareCallback<PrepareType, ResultType> extends CommonCallback<ResultType> {
         ResultType prepare(PrepareType rawData);
     }
 
+    /**
+     * 带进度回调
+     */
     public interface ProgressCallback<ResultType> extends CommonCallback<ResultType> {
+        /**
+         * 等待空闲线程
+         */
         void onWaiting();
 
+        /**
+         * 开始执行
+         */
         void onStarted();
 
+        /**
+         * 进行中
+         * @param total 文件总大小(由服务器返回，默认为0)
+         * @param current 当前加载进度
+         * @param isDownloading 是否正在下载
+         */
         void onLoading(long total, long current, boolean isDownloading);
     }
 

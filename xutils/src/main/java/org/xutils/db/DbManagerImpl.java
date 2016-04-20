@@ -418,6 +418,8 @@ public final class DbManagerImpl extends DbBase {
     //***************************** private operations with out transaction *****************************
     private void saveOrUpdateWithoutTransaction(TableEntity<?> table, Object entity) throws DbException {
         ColumnEntity id = table.getId();
+        if(id == null)
+            throw new DbException(String.format("%s have not Id column", entity.getClass().getSimpleName()));
         if (id.isAutoId()) {
             if (id.getColumnValue(entity) != null) {
                 execNonQuery(SqlInfoBuilder.buildUpdateSqlInfo(table, entity));
@@ -431,6 +433,8 @@ public final class DbManagerImpl extends DbBase {
 
     private boolean saveBindingIdWithoutTransaction(TableEntity<?> table, Object entity) throws DbException {
         ColumnEntity id = table.getId();
+        if(id == null)
+            throw new DbException(String.format("%s have not Id column", entity.getClass().getSimpleName()));
         if (id.isAutoId()) {
             execNonQuery(SqlInfoBuilder.buildInsertSqlInfo(table, entity));
             long idValue = getLastAutoIncrementId(table.getName());

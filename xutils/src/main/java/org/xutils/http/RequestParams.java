@@ -385,7 +385,7 @@ public class RequestParams extends BaseParams {
         }
         String url = this.getUri();
         return TextUtils.isEmpty(url) ?
-                super.toString() :
-                url + (url.contains("?") ? "&" : "?") + super.toString();
+                super.toJSONString() :
+                url +"params :"+ super.toJSONString();
     }
 }

@@ -595,20 +595,11 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                     throw new Callback.CancelledException("cancelled before request" + (interrupted ? "(interrupted)" : ""));
                 }
 
-                // intercept response
-                if (requestInterceptListener != null) {
-                    requestInterceptListener.beforeRequest(request);
-                }
-
                 try {
+                    request.setRequestInterceptListener(requestInterceptListener);
                     this.result = request.loadResult();
                 } catch (Throwable ex) {
                     this.ex = ex;
-                }
-
-                // intercept response
-                if (requestInterceptListener != null) {
-                    requestInterceptListener.afterRequest(request);
                 }
 
                 if (this.ex != null) {

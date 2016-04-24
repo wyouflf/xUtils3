@@ -302,12 +302,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                     // 开始请求工作
                     LogUtil.d("load: " + this.request.getRequestUri());
                     requestWorker = new RequestWorker();
-                    if (params.isCancelFast()) {
-                        requestWorker.start();
-                        requestWorker.join();
-                    } else {
-                        requestWorker.run();
-                    }
+                    requestWorker.request();
                     if (requestWorker.ex != null) {
                         throw requestWorker.ex;
                     }
@@ -507,13 +502,6 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
 
     private void closeRequestSync() {
         clearRawResult();
-        if (requestWorker != null && params.isCancelFast()) {
-            try {
-                requestWorker.interrupt();
-            } catch (Throwable ignored) {
-            }
-        }
-        // wtf: okhttp close the inputStream be locked by BufferedInputStream#read
         IOUtil.closeQuietly(request);
     }
 
@@ -576,17 +564,15 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
      * 该线程被join到HttpTask的工作线程去执行.
      * 它的主要作用是为了能强行中断请求的链接过程;
      * 并辅助限制同时下载文件的线程数.
-     * but:
-     * 创建一个Thread约耗时2毫秒, 优化?
      */
-    private final class RequestWorker extends Thread {
+    private final class RequestWorker {
         /*private*/ Object result;
         /*private*/ Throwable ex;
 
         private RequestWorker() {
         }
 
-        public void run() {
+        public void request() {
             try {
                 boolean interrupted = false;
                 if (File.class == loadType) {
@@ -594,7 +580,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                             && !HttpTask.this.isCancelled()) {
                         synchronized (sCurrFileLoadCount) {
                             try {
-                                sCurrFileLoadCount.wait();
+                                sCurrFileLoadCount.wait(10);
                             } catch (InterruptedException iex) {
                                 interrupted = true;
                                 break;

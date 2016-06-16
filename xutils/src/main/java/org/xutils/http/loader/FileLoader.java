@@ -79,7 +79,7 @@ public class FileLoader extends Loader<File> {
             if (!targetFile.exists()) {
                 File dir = targetFile.getParentFile();
                 if (dir.exists() || dir.mkdirs()) {
-                    targetFile.createNewFile();
+                    // targetFile.createNewFile();
                 }
             }
 

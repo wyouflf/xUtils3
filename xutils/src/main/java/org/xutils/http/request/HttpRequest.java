@@ -134,7 +134,7 @@ public class HttpRequest extends UriRequest {
             }
 
             connection.setReadTimeout(params.getConnectTimeout());
-            connection.setConnectTimeout(params.getConnectTimeout());
+            connection.setConnectTimeout(params.getReadTimeout());
             connection.setInstanceFollowRedirects(params.getRedirectHandler() == null);
             if (connection instanceof HttpsURLConnection) {
                 SSLSocketFactory sslSocketFactory = params.getSslSocketFactory();

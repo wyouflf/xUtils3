@@ -34,18 +34,18 @@ public class RequestParams extends BaseParams {
 
     // 扩展参数
     private Proxy proxy; // 代理
-    private volatile boolean useCookie = true; // 是否在请求过程中启用cookie
+    private boolean useCookie = true; // 是否在请求过程中启用cookie
     private String cacheDirName; // 缓存文件夹名称
     private long cacheSize; // 缓存文件夹大小
     private long cacheMaxAge; // 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
     private Executor executor; // 自定义线程池
     private Priority priority = Priority.DEFAULT; // 请求优先级
     private int connectTimeout = 1000 * 15; // 连接超时时间
-    private volatile boolean autoResume = true; // 是否在下载是自动断点续传
-    private volatile boolean autoRename = false; // 是否根据头信息自动命名文件
+    private boolean autoResume = true; // 是否在下载是自动断点续传
+    private boolean autoRename = false; // 是否根据头信息自动命名文件
     private int maxRetryCount = 2; // 最大请求错误重试次数
     private String saveFilePath; // 下载文件时文件保存的路径和文件名
-    private volatile boolean cancelFast = false; // 是否可以被立即停止, true: 为请求创建新的线程, 取消时请求线程被立即中断.
+    private boolean cancelFast = false; // 是否可以被立即停止, true: 为请求创建新的线程, 取消时请求线程被立即中断.
     private int loadingUpdateMaxTimeSpan = 300; // 进度刷新最大间隔时间(ms)
     private HttpRetryHandler httpRetryHandler; // 自定义HttpRetryHandler
     private RedirectHandler redirectHandler; // 自定义重定向接口, 默认系统自动重定向.

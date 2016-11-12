@@ -28,7 +28,7 @@ public class DefaultParamsBuilder implements ParamsBuilder {
      * @return
      */
     @Override
-    public String buildUri(RequestParams params, HttpRequest httpRequest) {
+    public String buildUri(RequestParams params, HttpRequest httpRequest) throws Throwable {
         return httpRequest.host() + "/" + httpRequest.path();
     }
 
@@ -64,7 +64,7 @@ public class DefaultParamsBuilder implements ParamsBuilder {
      * @return
      */
     @Override
-    public SSLSocketFactory getSSLSocketFactory() {
+    public SSLSocketFactory getSSLSocketFactory() throws Throwable {
         return getTrustAllSSLSocketFactory();
     }
 
@@ -74,7 +74,7 @@ public class DefaultParamsBuilder implements ParamsBuilder {
      * @param params
      */
     @Override
-    public void buildParams(RequestParams params) {
+    public void buildParams(RequestParams params) throws Throwable {
     }
 
     /**
@@ -84,7 +84,7 @@ public class DefaultParamsBuilder implements ParamsBuilder {
      * @param signs
      */
     @Override
-    public void buildSign(RequestParams params, String[] signs) {
+    public void buildSign(RequestParams params, String[] signs) throws Throwable {
 
     }
 

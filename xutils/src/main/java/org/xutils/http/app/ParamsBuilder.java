@@ -19,7 +19,7 @@ public interface ParamsBuilder {
      * @param httpRequest
      * @return
      */
-    String buildUri(RequestParams params, HttpRequest httpRequest);
+    String buildUri(RequestParams params, HttpRequest httpRequest) throws Throwable;
 
     /**
      * 根据注解的cacheKeys构建缓存的自定义key,
@@ -36,14 +36,14 @@ public interface ParamsBuilder {
      *
      * @return
      */
-    SSLSocketFactory getSSLSocketFactory();
+    SSLSocketFactory getSSLSocketFactory() throws Throwable;
 
     /**
      * 为请求添加通用参数等操作
      *
      * @param params
      */
-    void buildParams(RequestParams params);
+    void buildParams(RequestParams params) throws Throwable;
 
     /**
      * 自定义参数签名
@@ -51,5 +51,5 @@ public interface ParamsBuilder {
      * @param params
      * @param signs
      */
-    void buildSign(RequestParams params, String[] signs);
+    void buildSign(RequestParams params, String[] signs) throws Throwable;
 }

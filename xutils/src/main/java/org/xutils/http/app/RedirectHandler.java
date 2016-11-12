@@ -15,5 +15,5 @@ public interface RedirectHandler {
      * @param request
      * @return 返回不为null时进行重定向
      */
-    RequestParams getRedirectParams(UriRequest request);
+    RequestParams getRedirectParams(UriRequest request) throws Throwable;
 }

@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
  */
 public abstract class InputStreamResponseParser implements ResponseParser {
 
-    public abstract Object parse(Type resultType, Class<?> resultClass, InputStream result);
+    public abstract Object parse(Type resultType, Class<?> resultClass, InputStream result) throws Throwable;
 
     /**
      * Deprecated, see {@link InputStreamResponseParser#parse(Type, Class, InputStream)}

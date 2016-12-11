@@ -5,5 +5,5 @@
     <string name="remove">移除</string>
     <string name="stop">停止</string>
     <string name="start">开始下载</string>
-    <string name="test_download_url">http://dl.bintray.com/wyouflf/maven/org/xutils/xutils/3.3.36/xutils-3.3.36.aar</string>
+    <string name="test_download_url">http://dl.bintray.com/wyouflf/maven/org/xutils/xutils/3.3.40/xutils-3.3.40.aar</string>
 </resources>

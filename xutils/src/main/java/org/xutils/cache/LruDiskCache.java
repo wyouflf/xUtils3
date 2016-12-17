@@ -270,13 +270,11 @@ public final class LruDiskCache {
                                 // delete cache files
                                 for (DiskCacheEntity entity : rmList) {
                                     String path = entity.getPath();
-                                    if (!TextUtils.isEmpty(path)) {
-                                        if (deleteFileWithLock(path)
-                                                && deleteFileWithLock(path + TEMP_FILE_SUFFIX)) {
-                                            // delete db entity
-                                            cacheDb.delete(entity);
-                                        }
+                                    if (!TextUtils.isEmpty(path) && !deleteFileWithLock(path)) {
+                                        deleteFileWithLock(path + TEMP_FILE_SUFFIX);
                                     }
+                                    // delete db entity
+                                    cacheDb.delete(entity);
                                 }
 
                             }
@@ -294,13 +292,11 @@ public final class LruDiskCache {
                                 // delete cache files
                                 for (DiskCacheEntity entity : rmList) {
                                     String path = entity.getPath();
-                                    if (!TextUtils.isEmpty(path)) {
-                                        if (deleteFileWithLock(path)
-                                                && deleteFileWithLock(path + TEMP_FILE_SUFFIX)) {
-                                            // delete db entity
-                                            cacheDb.delete(entity);
-                                        }
+                                    if (!TextUtils.isEmpty(path) && !deleteFileWithLock(path)) {
+                                        deleteFileWithLock(path + TEMP_FILE_SUFFIX);
                                     }
+                                    // delete db entity
+                                    cacheDb.delete(entity);
                                 }
                             }
                         }

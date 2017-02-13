@@ -24,7 +24,7 @@ public class RequestParams extends BaseParams {
 
     // 注解及其扩展参数
     private HttpRequest httpRequest;
-    private final String uri;
+    private String uri;
     private final String[] signs;
     private final String[] cacheKeys;
     private ParamsBuilder builder;
@@ -115,6 +115,14 @@ public class RequestParams extends BaseParams {
 
     public String getUri() {
         return TextUtils.isEmpty(buildUri) ? uri : buildUri;
+    }
+
+    public void setUri(String uri){
+        if(TextUtils.isEmpty(buildUri)){
+            this.uri = uri;
+        }else {
+            this.buildUri = uri;
+        }
     }
 
     public String getCacheKey() {

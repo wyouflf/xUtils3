@@ -133,7 +133,7 @@ public class HttpRequest extends UriRequest {
                 connection.setRequestProperty("Connection", "close");
             }
 
-            connection.setReadTimeout(params.getConnectTimeout());
+            connection.setReadTimeout(params.getReadTimeout());
             connection.setConnectTimeout(params.getConnectTimeout());
             connection.setInstanceFollowRedirects(params.getRedirectHandler() == null);
             if (connection instanceof HttpsURLConnection) {

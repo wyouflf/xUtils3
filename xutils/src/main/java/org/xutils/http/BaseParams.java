@@ -445,7 +445,7 @@ import java.util.Map;
         return sb.toString();
     }
 
-    private void checkBodyParams() {
+    private synchronized void checkBodyParams() {
         if (bodyParams.isEmpty()) return;
 
         if (!HttpMethod.permitsRequestBody(method)

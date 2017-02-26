@@ -269,13 +269,17 @@ public final class LruDiskCache {
                             if (rmList != null && rmList.size() > 0) {
                                 // delete cache files
                                 for (DiskCacheEntity entity : rmList) {
-                                    String path = entity.getPath();
-                                    if (!TextUtils.isEmpty(path)) {
-                                        if (deleteFileWithLock(path)
-                                                && deleteFileWithLock(path + TEMP_FILE_SUFFIX)) {
-                                            // delete db entity
-                                            cacheDb.delete(entity);
+                                    try {
+                                        // delete db entity
+                                        cacheDb.delete(entity);
+                                        // delete cache files
+                                        String path = entity.getPath();
+                                        if (!TextUtils.isEmpty(path)) {
+                                            deleteFileWithLock(path);
+                                            deleteFileWithLock(path + TEMP_FILE_SUFFIX);
                                         }
+                                    } catch (DbException ex) {
+                                        LogUtil.e(ex.getMessage(), ex);
                                     }
                                 }
 
@@ -293,13 +297,17 @@ public final class LruDiskCache {
                             if (rmList != null && rmList.size() > 0) {
                                 // delete cache files
                                 for (DiskCacheEntity entity : rmList) {
-                                    String path = entity.getPath();
-                                    if (!TextUtils.isEmpty(path)) {
-                                        if (deleteFileWithLock(path)
-                                                && deleteFileWithLock(path + TEMP_FILE_SUFFIX)) {
-                                            // delete db entity
-                                            cacheDb.delete(entity);
+                                    try {
+                                        // delete db entity
+                                        cacheDb.delete(entity);
+                                        // delete cache files
+                                        String path = entity.getPath();
+                                        if (!TextUtils.isEmpty(path)) {
+                                            deleteFileWithLock(path);
+                                            deleteFileWithLock(path + TEMP_FILE_SUFFIX);
                                         }
+                                    } catch (DbException ex) {
+                                        LogUtil.e(ex.getMessage(), ex);
                                     }
                                 }
                             }

@@ -250,8 +250,8 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 if (cacheResult != null) {
                     // 同步等待是否信任缓存
                     this.update(FLAG_CACHE, cacheResult);
-                    while (trustCache == null) {
-                        synchronized (cacheLock) {
+                    synchronized (cacheLock) {
+                        while (trustCache == null) {
                             try {
                                 cacheLock.wait();
                             } catch (InterruptedException iex) {
@@ -576,9 +576,9 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             try {
                 boolean interrupted = false;
                 if (File.class == loadType) {
-                    while (sCurrFileLoadCount.get() >= MAX_FILE_LOAD_WORKER
-                            && !HttpTask.this.isCancelled()) {
-                        synchronized (sCurrFileLoadCount) {
+                    synchronized (sCurrFileLoadCount) {
+                        while (sCurrFileLoadCount.get() >= MAX_FILE_LOAD_WORKER
+                                && !HttpTask.this.isCancelled()) {
                             try {
                                 sCurrFileLoadCount.wait(10);
                             } catch (InterruptedException iex) {

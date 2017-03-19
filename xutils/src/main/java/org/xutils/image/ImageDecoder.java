@@ -94,9 +94,9 @@ public final class ImageDecoder {
             Bitmap bitmap = null;
             { // decode with lock
                 try {
-                    while (bitmapDecodeWorker.get() >= BITMAP_DECODE_MAX_WORKER
-                            && (cancelable == null || !cancelable.isCancelled())) {
-                        synchronized (bitmapDecodeLock) {
+                    synchronized (bitmapDecodeLock) {
+                        while (bitmapDecodeWorker.get() >= BITMAP_DECODE_MAX_WORKER
+                                && (cancelable == null || !cancelable.isCancelled())) {
                             try {
                                 bitmapDecodeLock.wait();
                             } catch (InterruptedException iex) {

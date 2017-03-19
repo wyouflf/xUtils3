@@ -272,6 +272,7 @@ ____
 * webp来自:https://github.com/webmproject/libwebp
 * webpbackport来自:https://github.com/alexey-pelykh/webp-android-backport
 * xUtils在使用webpbackport时为其添加了nativeDecodeFile的实现, 并修复其在Android 5.0及以上系统存在bug:
+对webpbackport的修改已经合并至https://github.com/alexey-pelykh/webp-android-backport
 jni代码见: https://github.com/wyouflf/webp-android-backport/commits/master
 
 ----

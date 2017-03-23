@@ -8,21 +8,23 @@ group = "org.xutils"
 version = "3.4.0"
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 25
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 20170324
         versionName version
     }
     buildTypes {
         debug {
             minifyEnabled false
+            debuggable true
         }
         release {
             minifyEnabled false
+            debuggable true
         }
     }
     sourceSets {
@@ -30,6 +32,10 @@ android {
             jniLibs.srcDirs = ['libs']
             java.srcDirs = ['src/main/java', 'src/main/java_compat']
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
     }
 }
 
@@ -69,28 +75,23 @@ install {
         }
     }
 }
-
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
 }
-
 task javadoc(type: Javadoc) {
     options.encoding = "UTF-8"
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 }
-
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
-
 artifacts {
     archives javadocJar
     archives sourcesJar
 }
-
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 bintray {

@@ -14,6 +14,7 @@ import org.xutils.http.app.RequestTracker;
 import java.net.Proxy;
 import java.util.concurrent.Executor;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -34,6 +35,7 @@ public class RequestParams extends BaseParams {
 
     // 扩展参数
     private Proxy proxy; // 代理
+    private HostnameVerifier hostnameVerifier; // https域名校验
     private boolean useCookie = true; // 是否在请求过程中启用cookie
     private String cacheDirName; // 缓存文件夹名称
     private long cacheSize; // 缓存文件夹大小
@@ -117,10 +119,10 @@ public class RequestParams extends BaseParams {
         return TextUtils.isEmpty(buildUri) ? uri : buildUri;
     }
 
-    public void setUri(String uri){
-        if(TextUtils.isEmpty(buildUri)){
+    public void setUri(String uri) {
+        if (TextUtils.isEmpty(buildUri)) {
             this.uri = uri;
-        }else {
+        } else {
             this.buildUri = uri;
         }
     }
@@ -143,6 +145,14 @@ public class RequestParams extends BaseParams {
 
     public SSLSocketFactory getSslSocketFactory() {
         return sslSocketFactory;
+    }
+
+    public HostnameVerifier getHostnameVerifier() {
+        return hostnameVerifier;
+    }
+
+    public void setHostnameVerifier(HostnameVerifier hostnameVerifier) {
+        this.hostnameVerifier = hostnameVerifier;
     }
 
     /**
@@ -189,10 +199,12 @@ public class RequestParams extends BaseParams {
         }
     }
 
-    public int getReadTimeout(){return readTimeout;}
+    public int getReadTimeout() {
+        return readTimeout;
+    }
 
-    public void setReadTimeout(int readTimeout){
-        if(readTimeout > 0){
+    public void setReadTimeout(int readTimeout) {
+        if (readTimeout > 0) {
             this.readTimeout = readTimeout;
         }
     }

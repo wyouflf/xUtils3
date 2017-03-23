@@ -133,8 +133,8 @@ import java.util.Map;
                         || value instanceof byte[]) {
                     this.fileParams.add(new KeyValue(name, value));
                 } else {
-                    if (value instanceof List) {
-                        for (Object item : (List) value) {
+                    if (value instanceof Iterable) {
+                        for (Object item : (Iterable) value) {
                             this.bodyParams.add(new ArrayItem(name, item));
                         }
                     } else if (value instanceof JSONArray) {
@@ -157,8 +157,8 @@ import java.util.Map;
             }
         } else {
             if (!TextUtils.isEmpty(name)) {
-                if (value instanceof List) {
-                    for (Object item : (List) value) {
+                if (value instanceof Iterable) {
+                    for (Object item : (Iterable) value) {
                         this.queryStringParams.add(new ArrayItem(name, item));
                     }
                 } else if (value.getClass().isArray()) {

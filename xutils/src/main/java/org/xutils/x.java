@@ -12,6 +12,9 @@ import org.xutils.view.ViewInjectorImpl;
 
 import java.lang.reflect.Method;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+
 
 /**
  * Created by wyouflf on 15/6/10.
@@ -110,6 +113,10 @@ public final class x {
 
         public static void setViewInjector(ViewInjector viewInjector) {
             Ext.viewInjector = viewInjector;
+        }
+
+        public static void setDefaultHostnameVerifier(HostnameVerifier hostnameVerifier) {
+            HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
         }
     }
 

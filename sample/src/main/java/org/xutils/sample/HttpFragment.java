@@ -6,6 +6,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.xutils.common.Callback;
+import org.xutils.common.util.LogUtil;
 import org.xutils.ex.DbException;
 import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
@@ -20,7 +21,6 @@ import org.xutils.x;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -100,7 +100,8 @@ public class HttpFragment extends BaseFragment {
                 new Callback.CommonCallback<List<BaiduResponse>>() {
                     @Override
                     public void onSuccess(List<BaiduResponse> result) {
-                        Toast.makeText(x.app(), result.get(0).toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(x.app(), "success", Toast.LENGTH_LONG).show();
+                        LogUtil.d(result.get(0).toString());
                     }
 
                     @Override

@@ -266,7 +266,7 @@ public class HttpFragment extends BaseFragment {
             public void onFinished() {
                 if (!hasError && result != null) {
                     // 成功获取数据
-                    Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+                    Toast.makeText(x.app(), "success", Toast.LENGTH_LONG).show();
                 }
             }
         });

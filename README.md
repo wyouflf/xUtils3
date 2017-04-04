@@ -1,19 +1,24 @@
 ## xUtils3简介
-* xUtils 包含了很多实用的android工具.
-* xUtils 支持超大文件(超过2G)上传，更全面的http请求协议支持(11种谓词)，拥有更加灵活的ORM，更多的事件注解支持且不受混淆影响...
-* xUtils 最低兼容Android 4.0 (api level 14). ([Android 2.3?](https://github.com/wyouflf/xUtils3/issues/8))
-* xUtils3变化较多所以建立了新的项目不在旧版(github.com/wyouflf/xUtils)上继续维护, 相对于旧版本:
-    1. HTTP实现替换HttpClient为UrlConnection, 自动解析回调泛型, 更安全的断点续传策略.
-    2. 支持标准的Cookie策略, 区分domain, path...
-    3. 事件注解去除不常用的功能, 提高性能.
-    4. 数据库api简化提高性能, 达到和greenDao一致的性能.
-    5. 图片绑定支持gif(受系统兼容性影响, 部分gif文件只能静态显示), webp; 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
+* xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(246K):
+  - `稳定的基石`: `AbsTask`和统一的回调接口`Callback`, 任何异常, 即使你的回调方法实现有异常都会进入`onError`, 任何情况下`onFinished`总会让你知道任务结束了.
+  - 基于高效稳定的`orm`工具, `http`模块得以更方便的实现cookie(支持domain, path, expiry等特性)和
+    缓存(支持Cache-Control, Last-Modified, ETag等特性)的支持.
+  - 有了强大的`http`及其下载缓存的支持, `image`模块的实现相当的简洁, 并且支持回收被view持有, 但被Mem Cache移除的图片, 减少页面回退时的闪烁..
+  - `view`注解模块仅仅400多行代码却灵活的支持了各种View注入和事件绑定, 包括拥有多了方法的listener的支持.
+
+### 其他特性
+* 支持超大文件(超过2G)上传
+* 更全面的http请求协议支持(11种谓词)
+* 拥有更加灵活的ORM, 和greenDao一致的性能
+* 更多的事件注解支持且不受混淆影响...
+* 图片绑定支持gif(受系统兼容性影响, 部分gif文件只能静态显示), webp; 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
+* 从3.5.0开始不再包含libwebpbackport.so, 需要在Android4.2一下设备兼容webp的请使用3.4.0版本.
 
 #### 使用Gradle构建时添加一下依赖即可:
 ```javascript
-compile 'org.xutils:xutils:3.4.0'
+compile 'org.xutils:xutils:3.5.0'
 ```
-##### 如果使用eclipse可以 [点击这里下载aar文件](http://dl.bintray.com/wyouflf/maven/org/xutils/xutils/), 然后用zip解压, 取出jar包和so文件.
+##### 如果使用eclipse可以 [点击这里下载aar文件](http://dl.bintray.com/wyouflf/maven/org/xutils/xutils/), 然后用zip解压, 取出jar文件.
 ##### 混淆配置参考示例项目sample的配置
 
 
@@ -180,7 +185,7 @@ params.wd = "xUtils";
 // 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
 params.setCacheMaxAge(1000 * 60);
 Callback.Cancelable cancelable
-		// 使用CacheCallback, xUtils将为该请求缓存数据.
+    	// 使用CacheCallback, xUtils将为该请求缓存数据.
 		= x.http().get(params, new Callback.CacheCallback<String>() {
 
 	private boolean hasError = false;
@@ -265,15 +270,6 @@ x.image().bind(imageView, url, imageOptions, new Callback.CommonCallback<Drawabl
 x.image().loadDrawable(url, imageOptions, new Callback.CommonCallback<Drawable>() {...});
 x.image().loadFile(url, imageOptions, new Callback.CommonCallback<File>() {...});
 ```
-
-____
-### 关于libwebpbackport
-* 部分4.x的机型对webp格式的支持仍然有问题, 需要借助webp.
-* webp来自:https://github.com/webmproject/libwebp
-* webpbackport来自:https://github.com/alexey-pelykh/webp-android-backport
-* xUtils在使用webpbackport时为其添加了nativeDecodeFile的实现, 并修复其在Android 5.0及以上系统存在bug:
-对webpbackport的修改已经合并至https://github.com/alexey-pelykh/webp-android-backport
-jni代码见: https://github.com/wyouflf/webp-android-backport/commits/master
 
 ----
 ### 关于作者

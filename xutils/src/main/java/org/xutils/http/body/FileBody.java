@@ -40,7 +40,13 @@ public class FileBody extends InputStreamBody {
 
     public static String getFileContentType(File file) {
         String filename = file.getName();
-        String contentType = HttpURLConnection.guessContentTypeFromName(filename);
+        String contentType = null;
+        try {
+          filename = Uri.encode(filename, "-![.:/,?&=]");
+          contentType = HttpURLConnection.guessContentTypeFromName(filename);
+        } catch (Exception e) {
+          LogUtil.e(e.toString());
+        }
         if (TextUtils.isEmpty(contentType)) {
             contentType = "application/octet-stream";
         } else {

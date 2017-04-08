@@ -15,7 +15,7 @@ import org.xutils.view.annotation.ViewInject;
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
-
+    // 测试代码，sorry
     @ViewInject(R.id.container)
     private ViewPager mViewPager;
 

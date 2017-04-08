@@ -49,6 +49,11 @@ public final class LoaderFactory {
         return result;
     }
 
+    /**
+     * 注册到LoaderFactory中
+     * @param type 实体类
+     * @param loader 实体类加载器
+     */
     public static <T> void registerLoader(Type type, Loader<T> loader) {
         converterHashMap.put(type, loader);
     }

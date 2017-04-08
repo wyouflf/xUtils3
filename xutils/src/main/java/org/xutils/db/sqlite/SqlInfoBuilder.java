@@ -240,7 +240,7 @@ public final class SqlInfoBuilder {
 
         Collection<ColumnEntity> columns = table.getColumnMap().values();
         for (ColumnEntity column : columns) {
-            if (column.isId()) continue;
+            if (!column.isId()) continue;
             builder.append("\"").append(column.getName()).append("\"");
             builder.append(' ').append(column.getColumnDbType());
             builder.append(' ').append(column.getProperty());

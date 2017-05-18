@@ -13,7 +13,7 @@ import java.lang.reflect.Type;
 public final class HttpManagerImpl implements HttpManager {
 
     private static final Object lock = new Object();
-    private static HttpManagerImpl instance;
+    private static volatile HttpManagerImpl instance;
 
     private HttpManagerImpl() {
     }

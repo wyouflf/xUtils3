@@ -25,7 +25,7 @@ public class LocalFileRequest extends UriRequest {
     }
 
     @Override
-    public void sendRequest() throws IOException {
+    public void sendRequest() throws Throwable {
 
     }
 

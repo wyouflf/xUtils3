@@ -48,7 +48,7 @@ public final class ViewInjectorImpl implements ViewInjector {
     }
 
     private static final Object lock = new Object();
-    private static ViewInjectorImpl instance;
+    private static volatile ViewInjectorImpl instance;
 
     private ViewInjectorImpl() {
     }

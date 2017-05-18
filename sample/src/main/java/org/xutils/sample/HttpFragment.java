@@ -6,6 +6,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.xutils.common.Callback;
+import org.xutils.common.util.LogUtil;
 import org.xutils.ex.DbException;
 import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
@@ -99,7 +100,8 @@ public class HttpFragment extends BaseFragment {
                 new Callback.CommonCallback<List<BaiduResponse>>() {
                     @Override
                     public void onSuccess(List<BaiduResponse> result) {
-                        Toast.makeText(x.app(), result.get(0).toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(x.app(), "success", Toast.LENGTH_LONG).show();
+                        LogUtil.d(result.get(0).toString());
                     }
 
                     @Override
@@ -234,9 +236,10 @@ public class HttpFragment extends BaseFragment {
 
             @Override
             public void onSuccess(String result) {
-                // 注意: 如果服务返回304或 onCache 选择了信任缓存, 这里将不会被调用,
-                // 但是 onFinished 总会被调用.
-                this.result = result;
+                // 注意: 如果服务返回304 或 onCache 选择了信任缓存, 这时result为null.
+                if (result != null) {
+                    this.result = result;
+                }
             }
 
             @Override
@@ -263,7 +266,7 @@ public class HttpFragment extends BaseFragment {
             public void onFinished() {
                 if (!hasError && result != null) {
                     // 成功获取数据
-                    Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+                    Toast.makeText(x.app(), "success", Toast.LENGTH_LONG).show();
                 }
             }
         });

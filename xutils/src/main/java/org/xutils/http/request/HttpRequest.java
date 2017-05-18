@@ -115,8 +115,9 @@ public class HttpRequest extends UriRequest {
      */
     @Override
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public void sendRequest() throws IOException {
+    public void sendRequest() throws Throwable {
         isLoading = false;
+        responseCode = 0;
 
         URL url = new URL(queryUrl);
         { // init connection
@@ -132,7 +133,7 @@ public class HttpRequest extends UriRequest {
                 connection.setRequestProperty("Connection", "close");
             }
 
-            connection.setReadTimeout(params.getConnectTimeout());
+            connection.setReadTimeout(params.getReadTimeout());
             connection.setConnectTimeout(params.getConnectTimeout());
             connection.setInstanceFollowRedirects(params.getRedirectHandler() == null);
             if (connection instanceof HttpsURLConnection) {
@@ -171,6 +172,11 @@ public class HttpRequest extends UriRequest {
                     }
                 }
             }
+        }
+
+        // intercept response
+        if (requestInterceptListener != null) {
+            requestInterceptListener.beforeRequest(this);
         }
 
         { // write body
@@ -228,7 +234,13 @@ public class HttpRequest extends UriRequest {
 
         // check response code
         responseCode = connection.getResponseCode();
-        if (responseCode >= 300) {
+        // intercept response
+        if (requestInterceptListener != null) {
+            requestInterceptListener.afterRequest(this);
+        }
+        if (responseCode == 204 || responseCode == 205) { // empty content
+            throw new HttpException(responseCode, this.getResponseMessage());
+        } else if (responseCode >= 300) {
             HttpException httpException = new HttpException(responseCode, this.getResponseMessage());
             try {
                 httpException.setResult(IOUtil.readStr(this.getInputStream(), params.getCharset()));

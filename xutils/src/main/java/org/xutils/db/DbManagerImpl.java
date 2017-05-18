@@ -18,6 +18,7 @@ package org.xutils.db;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.os.Build;
 
 import org.xutils.DbManager;
 import org.xutils.common.util.IOUtil;
@@ -475,7 +476,11 @@ public final class DbManagerImpl extends DbBase {
 
     private void beginTransaction() {
         if (allowTransaction) {
-            database.beginTransaction();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && database.isWriteAheadLoggingEnabled()) {
+                database.beginTransactionNonExclusive();
+            } else {
+                database.beginTransaction();
+            }
         }
     }
 

@@ -27,7 +27,7 @@ public final class DownloadManager {
         ColumnConverterFactory.registerColumnConverter(DownloadState.class, new DownloadStateConverter());
     }
 
-    private static DownloadManager instance;
+    private static volatile DownloadManager instance;
 
     private final static int MAX_DOWNLOAD_THREAD = 2; // 有效的值范围[1, 3], 设置为3时, 可能阻塞图片加载.
 

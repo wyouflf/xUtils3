@@ -132,7 +132,7 @@ public final class LruDiskCache {
         trimSize();
     }
 
-    public DiskCacheFile getDiskCacheFile(String key) {
+    public DiskCacheFile getDiskCacheFile(String key) throws InterruptedException {
         if (!available || TextUtils.isEmpty(key)) {
             return null;
         }
@@ -222,6 +222,9 @@ public final class LruDiskCache {
                 } else {
                     throw new FileLockedException(destPath);
                 }
+            } catch (InterruptedException ex) {
+                result = cacheFile;
+                LogUtil.e(ex.getMessage(), ex);
             } finally {
                 if (result == null) {
                     result = cacheFile;
@@ -266,13 +269,17 @@ public final class LruDiskCache {
                             if (rmList != null && rmList.size() > 0) {
                                 // delete cache files
                                 for (DiskCacheEntity entity : rmList) {
-                                    String path = entity.getPath();
-                                    if (!TextUtils.isEmpty(path)) {
-                                        if (deleteFileWithLock(path)
-                                                && deleteFileWithLock(path + TEMP_FILE_SUFFIX)) {
-                                            // delete db entity
-                                            cacheDb.delete(entity);
+                                    try {
+                                        // delete db entity
+                                        cacheDb.delete(entity);
+                                        // delete cache files
+                                        String path = entity.getPath();
+                                        if (!TextUtils.isEmpty(path)) {
+                                            deleteFileWithLock(path);
+                                            deleteFileWithLock(path + TEMP_FILE_SUFFIX);
                                         }
+                                    } catch (DbException ex) {
+                                        LogUtil.e(ex.getMessage(), ex);
                                     }
                                 }
 
@@ -290,13 +297,17 @@ public final class LruDiskCache {
                             if (rmList != null && rmList.size() > 0) {
                                 // delete cache files
                                 for (DiskCacheEntity entity : rmList) {
-                                    String path = entity.getPath();
-                                    if (!TextUtils.isEmpty(path)) {
-                                        if (deleteFileWithLock(path)
-                                                && deleteFileWithLock(path + TEMP_FILE_SUFFIX)) {
-                                            // delete db entity
-                                            cacheDb.delete(entity);
+                                    try {
+                                        // delete db entity
+                                        cacheDb.delete(entity);
+                                        // delete cache files
+                                        String path = entity.getPath();
+                                        if (!TextUtils.isEmpty(path)) {
+                                            deleteFileWithLock(path);
+                                            deleteFileWithLock(path + TEMP_FILE_SUFFIX);
                                         }
+                                    } catch (DbException ex) {
+                                        LogUtil.e(ex.getMessage(), ex);
                                     }
                                 }
                             }

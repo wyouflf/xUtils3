@@ -78,8 +78,8 @@ public class FileLoader extends Loader<File> {
             }
             if (!targetFile.exists()) {
                 File dir = targetFile.getParentFile();
-                if (dir.exists() || dir.mkdirs()) {
-                    targetFile.createNewFile();
+                if (!dir.exists() && !dir.mkdirs()) {
+                    throw new IOException("can not create dir: " + dir.getAbsolutePath());
                 }
             }
 
@@ -97,6 +97,8 @@ public class FileLoader extends Loader<File> {
                             IOUtil.closeQuietly(fis); // 先关闭文件流, 否则文件删除会失败.
                             IOUtil.deleteFileOrDir(targetFile);
                             throw new RuntimeException("need retry");
+                        } else {
+                            contentLength -= CHECK_SIZE;
                         }
                     } else {
                         IOUtil.deleteFileOrDir(targetFile);
@@ -308,9 +310,13 @@ public class FileLoader extends Loader<File> {
                 }
                 if (endIndex > startIndex) {
                     try {
-                        return URLDecoder.decode(
+                        String name = URLDecoder.decode(
                                 disposition.substring(startIndex, endIndex),
                                 request.getParams().getCharset());
+                        if (name.startsWith("\"") && name.endsWith("\"")) {
+                            name = name.substring(1, name.length() - 1);
+                        }
+                        return name;
                     } catch (UnsupportedEncodingException ex) {
                         LogUtil.e(ex.getMessage(), ex);
                     }

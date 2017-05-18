@@ -10,7 +10,6 @@ import org.xutils.common.util.LogUtil;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,9 +72,9 @@ import java.util.Map;
                 array.put(parseJSONObject(Array.get(value, i)));
             }
             result = array;
-        } else if (value instanceof List) {
+        } else if (value instanceof Iterable) {
             JSONArray array = new JSONArray();
-            List<?> list = (List<?>) value;
+            Iterable<?> list = (Iterable<?>) value;
             for (Object item : list) {
                 array.put(parseJSONObject(item));
             }

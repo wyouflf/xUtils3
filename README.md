@@ -1,4 +1,5 @@
 ## xUtils3简介
+作者不是我   我只是随便改了试试Github的功能，谢谢！
 * xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(246K), 并且特性强大, 方便扩展:
   - `稳定的基石`: `AbsTask`和统一的回调接口`Callback`, 任何异常, 即使你的回调方法实现有异常都会进入`onError`, 任何情况下`onFinished`总会让你知道任务结束了.
   - 基于高效稳定的`orm`工具, `http`模块得以更方便的实现cookie(支持domain, path, expiry等特性)和

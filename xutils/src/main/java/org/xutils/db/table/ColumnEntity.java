@@ -16,6 +16,7 @@
 package org.xutils.db.table;
 
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import org.xutils.common.util.LogUtil;
 import org.xutils.db.annotation.Column;
@@ -42,6 +43,10 @@ public final class ColumnEntity {
     /* package */ ColumnEntity(Class<?> entityType, Field field, Column column) {
         field.setAccessible(true);
 
+        if (TextUtils.isEmpty(column.name())) {
+            throw new IllegalArgumentException("Column name must not be null or empty!");
+        }
+
         this.columnField = field;
         this.name = column.name();
         this.property = column.property();
@@ -51,12 +56,11 @@ public final class ColumnEntity {
         this.isAutoId = this.isId && column.autoGen() && ColumnUtils.isAutoIdType(fieldType);
         this.columnConverter = ColumnConverterFactory.getColumnConverter(fieldType);
 
-
-        this.getMethod = ColumnUtils.findGetMethod(entityType, field);
+        this.getMethod = ColumnUtils.findGetMethod(entityType, field, column.name());
         if (this.getMethod != null && !this.getMethod.isAccessible()) {
             this.getMethod.setAccessible(true);
         }
-        this.setMethod = ColumnUtils.findSetMethod(entityType, field);
+        this.setMethod = ColumnUtils.findSetMethod(entityType, field, column.name());
         if (this.setMethod != null && !this.setMethod.isAccessible()) {
             this.setMethod.setAccessible(true);
         }

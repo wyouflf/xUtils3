@@ -15,6 +15,8 @@
 
 package org.xutils.db.table;
 
+import android.text.TextUtils;
+
 import org.xutils.common.util.LogUtil;
 import org.xutils.db.converter.ColumnConverter;
 import org.xutils.db.converter.ColumnConverterFactory;
@@ -68,14 +70,24 @@ public final class ColumnUtils {
     }
 
     /* package */
-    static Method findGetMethod(Class<?> entityType, Field field) {
+    static Method findGetMethod(Class<?> entityType, Field field, String colName) {
         if (Object.class.equals(entityType)) return null;
 
         String fieldName = field.getName();
         Method getMethod = null;
         if (isBoolean(field.getType())) {
-            getMethod = findBooleanGetMethod(entityType, fieldName);
+            getMethod = findBooleanGetMethod(entityType, fieldName, colName);
         }
+
+        if (getMethod == null && !TextUtils.isEmpty(colName)) {
+            String methodName = "get" + colName.substring(0, 1).toUpperCase() + colName.substring(1);
+            try {
+                getMethod = entityType.getDeclaredMethod(methodName);
+            } catch (NoSuchMethodException e) {
+                LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
+            }
+        }
+
         if (getMethod == null) {
             String methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
             try {
@@ -86,21 +98,31 @@ public final class ColumnUtils {
         }
 
         if (getMethod == null) {
-            return findGetMethod(entityType.getSuperclass(), field);
+            return findGetMethod(entityType.getSuperclass(), field, colName);
         }
         return getMethod;
     }
 
     /* package */
-    static Method findSetMethod(Class<?> entityType, Field field) {
+    static Method findSetMethod(Class<?> entityType, Field field, String colName) {
         if (Object.class.equals(entityType)) return null;
 
         String fieldName = field.getName();
         Class<?> fieldType = field.getType();
         Method setMethod = null;
         if (isBoolean(fieldType)) {
-            setMethod = findBooleanSetMethod(entityType, fieldName, fieldType);
+            setMethod = findBooleanSetMethod(entityType, fieldName, fieldType, colName);
         }
+
+        if (setMethod == null && !TextUtils.isEmpty(colName)) {
+            String methodName = "set" + colName.substring(0, 1).toUpperCase() + colName.substring(1);
+            try {
+                setMethod = entityType.getDeclaredMethod(methodName, fieldType);
+            } catch (NoSuchMethodException e) {
+                LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
+            }
+        }
+
         if (setMethod == null) {
             String methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
             try {
@@ -111,39 +133,75 @@ public final class ColumnUtils {
         }
 
         if (setMethod == null) {
-            return findSetMethod(entityType.getSuperclass(), field);
+            return findSetMethod(entityType.getSuperclass(), field, colName);
         }
         return setMethod;
     }
 
-    private static Method findBooleanGetMethod(Class<?> entityType, final String fieldName) {
-        String methodName = null;
-        if (fieldName.startsWith("is")) {
-            methodName = fieldName;
-        } else {
-            methodName = "is" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    private static Method findBooleanGetMethod(Class<?> entityType, final String fieldName, String colName) {
+        Method getMethod = null;
+        String methodName;
+
+        if (!TextUtils.isEmpty(colName)) {
+            if (colName.startsWith("is")) {
+                methodName = colName;
+            } else {
+                methodName = "is" + colName.substring(0, 1).toUpperCase() + colName.substring(1);
+            }
+            try {
+                getMethod = entityType.getDeclaredMethod(methodName);
+            } catch (NoSuchMethodException e) {
+                LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
+            }
         }
-        try {
-            return entityType.getDeclaredMethod(methodName);
-        } catch (NoSuchMethodException e) {
-            LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
+
+        if (getMethod == null) {
+            if (fieldName.startsWith("is")) {
+                methodName = fieldName;
+            } else {
+                methodName = "is" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            }
+            try {
+                getMethod = entityType.getDeclaredMethod(methodName);
+            } catch (NoSuchMethodException e) {
+                LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
+            }
         }
-        return null;
+
+        return getMethod;
     }
 
-    private static Method findBooleanSetMethod(Class<?> entityType, final String fieldName, Class<?> fieldType) {
-        String methodName = null;
-        if (fieldName.startsWith("is")) {
-            methodName = "set" + fieldName.substring(2, 3).toUpperCase() + fieldName.substring(3);
-        } else {
-            methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    private static Method findBooleanSetMethod(Class<?> entityType, final String fieldName, Class<?> fieldType, String colName) {
+        Method setMethod = null;
+        String methodName;
+
+        if (!TextUtils.isEmpty(colName)) {
+            if (colName.startsWith("is") && colName.length() > 2) {
+                methodName = "set" + colName.substring(2, 3).toUpperCase() + colName.substring(3);
+            } else {
+                methodName = "set" + colName.substring(0, 1).toUpperCase() + colName.substring(1);
+            }
+            try {
+                setMethod = entityType.getDeclaredMethod(methodName, fieldType);
+            } catch (NoSuchMethodException e) {
+                LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
+            }
         }
-        try {
-            return entityType.getDeclaredMethod(methodName, fieldType);
-        } catch (NoSuchMethodException e) {
-            LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
+
+        if (setMethod == null) {
+            if (fieldName.startsWith("is") && colName.length() > 2) {
+                methodName = "set" + fieldName.substring(2, 3).toUpperCase() + fieldName.substring(3);
+            } else {
+                methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            }
+            try {
+                setMethod = entityType.getDeclaredMethod(methodName, fieldType);
+            } catch (NoSuchMethodException e) {
+                LogUtil.d(entityType.getName() + "#" + methodName + " not exist");
+            }
         }
-        return null;
+
+        return setMethod;
     }
 
 }

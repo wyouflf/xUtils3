@@ -37,6 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
@@ -129,10 +130,12 @@ public class HttpRequest extends UriRequest {
             }
 
             // try to fix bug: accidental EOFException before API 19
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                connection.setRequestProperty("Connection", "close");
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+                connection.setRequestProperty("Connection", "Close");
+            }else{
+                connection.setRequestProperty("Connection", "Keep-Alive");
             }
-
+            connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
             connection.setReadTimeout(params.getReadTimeout());
             connection.setConnectTimeout(params.getConnectTimeout());
             connection.setInstanceFollowRedirects(params.getRedirectHandler() == null);
@@ -316,9 +319,16 @@ public class HttpRequest extends UriRequest {
     @Override
     public InputStream getInputStream() throws IOException {
         if (connection != null && inputStream == null) {
-            inputStream = connection.getResponseCode() >= 400 ?
-                    connection.getErrorStream() : connection.getInputStream();
+            if(connection.getResponseCode() >=400){
+                inputStream = connection.getErrorStream();
+            }else{
+                String contenEncoding = connection.getContentEncoding();
+                boolean gzip = contenEncoding !=null && !contenEncoding.equals("") && contenEncoding.contains("gzip");
+                LogUtil.d("response content gzip："+gzip);
+                inputStream = gzip? new GZIPInputStream(connection.getInputStream()) : connection.getInputStream();
+            }
         }
+
         return inputStream;
     }
 

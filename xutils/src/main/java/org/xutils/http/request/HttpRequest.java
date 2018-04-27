@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -140,6 +141,11 @@ public class HttpRequest extends UriRequest {
                 SSLSocketFactory sslSocketFactory = params.getSslSocketFactory();
                 if (sslSocketFactory != null) {
                     ((HttpsURLConnection) connection).setSSLSocketFactory(sslSocketFactory);
+                }
+
+                HostnameVerifier hostnameVerifier = params.getHostnameVerifier();
+                if (hostnameVerifier != null) {
+                    ((HttpsURLConnection) connection).setHostnameVerifier(hostnameVerifier);
                 }
             }
         }

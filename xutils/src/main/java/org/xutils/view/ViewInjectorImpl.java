@@ -78,8 +78,7 @@ public final class ViewInjectorImpl implements ViewInjector {
             if (contentView != null) {
                 int viewId = contentView.value();
                 if (viewId > 0) {
-                    Method setContentViewMethod = handlerType.getMethod("setContentView", int.class);
-                    setContentViewMethod.invoke(activity, viewId);
+                    activity.setContentView(viewId);
                 }
             }
         } catch (Throwable ex) {

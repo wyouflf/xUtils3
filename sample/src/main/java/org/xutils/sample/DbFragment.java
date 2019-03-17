@@ -118,7 +118,7 @@ public class DbFragment extends BaseFragment {
             }
 
             // test update
-            parent.name = "hahaha123";
+            parent.name = "hahaha123" + System.currentTimeMillis();
             parent.setEmail("wyouflf@gmail.com");
             db.update(parent);
             db.update(parent, "name", "email");

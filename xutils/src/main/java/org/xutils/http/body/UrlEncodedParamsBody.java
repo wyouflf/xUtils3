@@ -1,12 +1,12 @@
 package org.xutils.http.body;
 
-import android.net.Uri;
 import android.text.TextUtils;
 
 import org.xutils.common.util.KeyValue;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -31,9 +31,9 @@ public class UrlEncodedParamsBody implements RequestBody {
                     if (contentSb.length() > 0) {
                         contentSb.append("&");
                     }
-                    contentSb.append(Uri.encode(name, this.charset))
+                    contentSb.append(URLEncoder.encode(name, this.charset).replaceAll("\\+","%20"))
                             .append("=")
-                            .append(Uri.encode(value, this.charset));
+                            .append(URLEncoder.encode(value, this.charset).replaceAll("\\+","%20"));
                 }
             }
         }

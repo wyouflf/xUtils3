@@ -1,7 +1,6 @@
 package org.xutils.http.request;
 
 import android.annotation.TargetApi;
-import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -28,6 +27,7 @@ import java.net.ProtocolException;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -64,7 +64,7 @@ public class HttpRequest extends UriRequest {
 
     // build query
     @Override
-    protected String buildQueryUrl(RequestParams params) {
+    protected String buildQueryUrl(RequestParams params) throws IOException {
         String uri = params.getUri();
         StringBuilder queryBuilder = new StringBuilder(uri);
         if (!uri.contains("?")) {
@@ -78,10 +78,9 @@ public class HttpRequest extends UriRequest {
                 String name = kv.key;
                 String value = kv.getValueStr();
                 if (!TextUtils.isEmpty(name) && value != null) {
-                    queryBuilder.append(
-                            Uri.encode(name, params.getCharset()))
+                    queryBuilder.append(URLEncoder.encode(name, params.getCharset()).replaceAll("\\+","%20"))
                             .append("=")
-                            .append(Uri.encode(value, params.getCharset()))
+                            .append(URLEncoder.encode(value, params.getCharset()).replaceAll("\\+","%20"))
                             .append("&");
                 }
             }

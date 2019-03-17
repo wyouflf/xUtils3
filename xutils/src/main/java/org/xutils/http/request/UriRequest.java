@@ -36,7 +36,7 @@ public abstract class UriRequest implements Closeable {
     }
 
     // build query
-    protected String buildQueryUrl(RequestParams params) {
+    protected String buildQueryUrl(RequestParams params) throws IOException {
         return params.getUri();
     }
 

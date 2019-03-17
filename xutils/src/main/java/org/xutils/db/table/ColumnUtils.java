@@ -77,7 +77,10 @@ public final class ColumnUtils {
             getMethod = findBooleanGetMethod(entityType, fieldName);
         }
         if (getMethod == null) {
-            String methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            String methodName = "get" + fieldName.substring(0, 1).toUpperCase();
+            if (fieldName.length() > 1) {
+                methodName += fieldName.substring(1);
+            }
             try {
                 getMethod = entityType.getDeclaredMethod(methodName);
             } catch (NoSuchMethodException e) {
@@ -102,7 +105,10 @@ public final class ColumnUtils {
             setMethod = findBooleanSetMethod(entityType, fieldName, fieldType);
         }
         if (setMethod == null) {
-            String methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            String methodName = "set" + fieldName.substring(0, 1).toUpperCase();
+            if (fieldName.length() > 1) {
+                methodName += fieldName.substring(1);
+            }
             try {
                 setMethod = entityType.getDeclaredMethod(methodName, fieldType);
             } catch (NoSuchMethodException e) {
@@ -121,7 +127,10 @@ public final class ColumnUtils {
         if (fieldName.startsWith("is")) {
             methodName = fieldName;
         } else {
-            methodName = "is" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            methodName = "is" + fieldName.substring(0, 1).toUpperCase();
+            if (fieldName.length() > 1) {
+                methodName += fieldName.substring(1);
+            }
         }
         try {
             return entityType.getDeclaredMethod(methodName);
@@ -133,10 +142,16 @@ public final class ColumnUtils {
 
     private static Method findBooleanSetMethod(Class<?> entityType, final String fieldName, Class<?> fieldType) {
         String methodName = null;
-        if (fieldName.startsWith("is")) {
-            methodName = "set" + fieldName.substring(2, 3).toUpperCase() + fieldName.substring(3);
+        if (fieldName.startsWith("is") && fieldName.length() > 2) {
+            methodName = "set" + fieldName.substring(2, 3).toUpperCase();
+            if (fieldName.length() > 3) {
+                methodName += fieldName.substring(3);
+            }
         } else {
-            methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            methodName = "set" + fieldName.substring(0, 1).toUpperCase();
+            if (fieldName.length() > 1) {
+                methodName += fieldName.substring(1);
+            }
         }
         try {
             return entityType.getDeclaredMethod(methodName, fieldType);

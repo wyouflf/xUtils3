@@ -1,6 +1,9 @@
 package org.xutils.http.body;
 
+import android.net.Uri;
 import android.text.TextUtils;
+
+import org.xutils.common.util.LogUtil;
 
 import java.io.File;
 import java.io.FileInputStream;

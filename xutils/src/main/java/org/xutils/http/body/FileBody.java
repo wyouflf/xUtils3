@@ -45,10 +45,10 @@ public class FileBody extends InputStreamBody {
         String filename = file.getName();
         String contentType = null;
         try {
-          filename = Uri.encode(filename, "-![.:/,?&=]");
-          contentType = HttpURLConnection.guessContentTypeFromName(filename);
+            filename = Uri.encode(filename, "-![.:/,?&=]");
+            contentType = HttpURLConnection.guessContentTypeFromName(filename);
         } catch (Exception e) {
-          LogUtil.e(e.toString());
+            LogUtil.e(e.toString());
         }
         if (TextUtils.isEmpty(contentType)) {
             contentType = "application/octet-stream";

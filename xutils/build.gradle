@@ -5,16 +5,16 @@ apply plugin: 'com.jfrog.bintray'
 def siteUrl = 'https://github.com/wyouflf/xUtils3'
 def gitUrl = 'https://github.com/wyouflf/xUtils3.git'
 group = "org.xutils"
-version = "3.5.0"
+version = "3.5.1"
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.0'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 25
-        versionCode 20170405
+        targetSdkVersion 27
+        versionCode 20190317
         versionName version
     }
     buildTypes {
@@ -34,8 +34,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 

@@ -33,7 +33,7 @@ compile 'org.xutils:xutils:3.5.1'
 ##### 需要的权限
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /><!-- 可选 -->
 ```
 ##### 初始化
 ```java

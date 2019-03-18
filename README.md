@@ -86,31 +86,34 @@ params.wd = "xUtils";
 Callback.Cancelable cancelable
        = x.http().get(params,
        /**
-        * 1. callback的泛型:
-        * callback参数默认支持的泛型类型参见{@link org.xutils.http.loader.LoaderFactory},
-        * 例如: 指定泛型为File则可实现文件下载, 使用params.setSaveFilePath(path)指定文件保存的全路径.
-        * 默认支持断点续传(采用了文件锁防止多线程/进程修改文件,及文件末端校验续传文件的一致性).
-        * 其他常用类型可以自己在LoaderFactory中注册,
-        * 也可以使用{@link org.xutils.http.annotation.HttpResponse}
-        * 将注解HttpResponse加到自定义返回值类型上, 实现自定义ResponseParser接口来统一转换.
-        * 如果返回值是json/protobuf等数据格式, 那么利用第三方的json/protobuf等工具将十分容易定义自己的ResponseParser.
-        * 如示例代码{@link org.xutils.sample.http.BaiduResponse}, 可直接使用BaiduResponse作为callback的泛型.
-        *
-        * 2. callback的组合:
-        * 可以用基类或接口组合个种类的Callback, 见{@link org.xutils.common.Callback}.
-        * 例如:
-        * a. 组合使用CacheCallback将使请求检测缓存或将结果存入缓存(仅GET请求生效).
-        * b. 组合使用PrepareCallback的prepare方法将为callback提供一次后台执行耗时任务的机会, 然后将结果给onCache或onSuccess.
-        * c. 组合使用ProgressCallback将提供进度回调.
-        * 可参考{@link org.xutils.image.ImageLoader} 或 示例代码中的 {@link org.xutils.sample.download.DownloadCallback}
-        *
-        * 3. 请求过程拦截或记录日志: 参考 {@link org.xutils.http.app.RequestTracker}
-        *
-        * 4. 请求Header获取: 参考 {@link org.xutils.http.app.RequestInterceptListener}
-        *
-        * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
-        *
-        **/
+       * 1. callback的泛型:
+       * callback参数默认支持的泛型类型参见{@link org.xutils.http.loader.LoaderFactory},
+       * 例如: 指定泛型为File则可实现文件下载, 使用params.setSaveFilePath(path)指定文件保存的全路径, 默认支持断点续传(采用了文件锁防止多线程/进程修改文件,及文件末端校验续传文件的一致性).
+       * 
+       * 自定义callback的泛型支持方案1, 自定义某一Class的转换(不够灵活): 
+       * 结合PrepareCallback的两个泛型参数, 第一个泛型参数类型使用LoaderFactory已经支持的, 第二个泛型参数作为最终输出, 需要在prepare方法中自己实现.
+       * 一个稍复杂的例子可以参考{@link org.xutils.image.ImageLoader}
+       *
+       * 自定义callback的泛型支持方案2, 自定义一类数据的自动转化: 
+       * 将注解@HttpResponse加到自定义返回值类型上, 实现自定义ResponseParser接口来统一转换.
+       * 如果返回值是json/xml/protobuf等数据格式, 那么利用第三方的json/xml/protobuf等工具将十分容易定义自己的ResponseParser/InputStreamResponseParser.
+       * 如示例代码{@link org.xutils.sample.http.BaiduResponse}, 可直接使用BaiduResponse作为callback的泛型.
+       *
+       * 2. callback的组合:
+       * 可以用基类或接口组合个种类的Callback, 见{@link org.xutils.common.Callback}.
+       * 例如:
+       * a. 组合使用CacheCallback将使请求检测缓存或将结果存入缓存(仅GET请求生效).
+       * b. 组合使用PrepareCallback的prepare方法将为callback提供一次后台执行耗时任务的机会, 然后将结果给onCache或onSuccess.
+       * c. 组合使用ProgressCallback将提供进度回调.
+       * 可参考{@link org.xutils.image.ImageLoader} 或 示例代码中的 {@link org.xutils.sample.download.DownloadCallback}
+       *
+       * 3. 请求过程拦截或记录日志: 参考 {@link org.xutils.http.app.RequestTracker}
+       *
+       * 4. 请求Header获取: 参考 {@link org.xutils.http.app.RequestInterceptListener}
+       *
+       * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
+       *
+       **/
        new Callback.CommonCallback<String>() {
            @Override
            public void onSuccess(String result) {

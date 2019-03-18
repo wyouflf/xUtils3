@@ -89,23 +89,20 @@ Callback.Cancelable cancelable
         * 1. callback的泛型:
         * callback参数默认支持的泛型类型参见{@link org.xutils.http.loader.LoaderFactory},
         * 例如: 指定泛型为File则可实现文件下载, 使用params.setSaveFilePath(path)指定文件保存的全路径.
-        * 默认支持断点续传(采用了文件锁和尾端校验续传文件的一致性).
+        * 默认支持断点续传(采用了文件锁防止多线程/进程修改文件,及文件末端校验续传文件的一致性).
         * 其他常用类型可以自己在LoaderFactory中注册,
         * 也可以使用{@link org.xutils.http.annotation.HttpResponse}
         * 将注解HttpResponse加到自定义返回值类型上, 实现自定义ResponseParser接口来统一转换.
-        * 如果返回值是json形式, 那么利用第三方的json工具将十分容易定义自己的ResponseParser.
-        * 如示例代码{@link org.xutils.sample.http.BaiduResponse}, 可直接使用BaiduResponse作为
-        * callback的泛型.
+        * 如果返回值是json/protobuf等数据格式, 那么利用第三方的json/protobuf等工具将十分容易定义自己的ResponseParser.
+        * 如示例代码{@link org.xutils.sample.http.BaiduResponse}, 可直接使用BaiduResponse作为callback的泛型.
         *
         * 2. callback的组合:
         * 可以用基类或接口组合个种类的Callback, 见{@link org.xutils.common.Callback}.
         * 例如:
         * a. 组合使用CacheCallback将使请求检测缓存或将结果存入缓存(仅GET请求生效).
-        * b. 组合使用PrepareCallback的prepare方法将为callback提供一次后台执行耗时任务的机会,
-        * 然后将结果给onCache或onSuccess.
+        * b. 组合使用PrepareCallback的prepare方法将为callback提供一次后台执行耗时任务的机会, 然后将结果给onCache或onSuccess.
         * c. 组合使用ProgressCallback将提供进度回调.
-        * ...(可参考{@link org.xutils.image.ImageLoader}
-        * 或 示例代码中的 {@link org.xutils.sample.download.DownloadCallback})
+        * 可参考{@link org.xutils.image.ImageLoader} 或 示例代码中的 {@link org.xutils.sample.download.DownloadCallback}
         *
         * 3. 请求过程拦截或记录日志: 参考 {@link org.xutils.http.app.RequestTracker}
         *

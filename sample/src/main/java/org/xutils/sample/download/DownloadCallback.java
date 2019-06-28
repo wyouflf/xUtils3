@@ -93,8 +93,10 @@ import java.lang.ref.WeakReference;
         if (isDownloading) {
             try {
                 downloadInfo.setState(DownloadState.STARTED);
-                downloadInfo.setFileLength(total);
-                downloadInfo.setProgress((int) (current * 100 / total));
+                if (total > 0) {
+                    downloadInfo.setFileLength(total);
+                    downloadInfo.setProgress((int) (current * 100 / total));
+                }
                 downloadManager.updateDownloadInfo(downloadInfo);
             } catch (DbException ex) {
                 LogUtil.e(ex.getMessage(), ex);

@@ -185,7 +185,9 @@ public class ImageFragment extends BaseFragment {
 
         @Override
         public void onLoading(long total, long current, boolean isDownloading) {
-            this.holder.imgPb.setProgress((int) (current * 100 / total));
+            if (total > 0) {
+                this.holder.imgPb.setProgress((int) (current * 100 / total));
+            }
         }
 
         @Override

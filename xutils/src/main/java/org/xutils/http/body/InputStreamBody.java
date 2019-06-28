@@ -76,7 +76,7 @@ public class InputStreamBody implements ProgressBody {
             out.flush();
 
             if (callBackHandler != null) {
-                callBackHandler.updateProgress(total, total, true);
+                callBackHandler.updateProgress(total, current, true);
             }
         } finally {
             IOUtil.closeQuietly(content);

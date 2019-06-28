@@ -78,9 +78,9 @@ public class HttpRequest extends UriRequest {
                 String name = kv.key;
                 String value = kv.getValueStr();
                 if (!TextUtils.isEmpty(name) && value != null) {
-                    queryBuilder.append(URLEncoder.encode(name, params.getCharset()).replaceAll("\\+","%20"))
+                    queryBuilder.append(URLEncoder.encode(name, params.getCharset()).replaceAll("\\+", "%20"))
                             .append("=")
-                            .append(URLEncoder.encode(value, params.getCharset()).replaceAll("\\+","%20"))
+                            .append(URLEncoder.encode(value, params.getCharset()).replaceAll("\\+", "%20"))
                             .append("&");
                 }
             }
@@ -341,10 +341,11 @@ public class HttpRequest extends UriRequest {
 
     @Override
     public long getContentLength() {
-        long result = 0;
+        long result = -1;
         if (connection != null) {
             try {
-                result = connection.getContentLength();
+                String value = connection.getHeaderField("content-length");
+                result = Long.parseLong(value);
             } catch (Throwable ex) {
                 LogUtil.e(ex.getMessage(), ex);
             }

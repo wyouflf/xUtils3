@@ -114,4 +114,20 @@ public class FileUtil {
         }
         return result;
     }
+
+    public static boolean deleteFileOrDir(File path) {
+        if (path == null || !path.exists()) {
+            return true;
+        }
+        if (path.isFile()) {
+            return path.delete();
+        }
+        File[] files = path.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                deleteFileOrDir(file);
+            }
+        }
+        return path.delete();
+    }
 }

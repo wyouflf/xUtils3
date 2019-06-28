@@ -104,7 +104,7 @@ public class MultipartBody implements ProgressBody {
         out.flush();
 
         if (callBackHandler != null) {
-            callBackHandler.updateProgress(total, total, true);
+            callBackHandler.updateProgress(total, current, true);
         }
     }
 

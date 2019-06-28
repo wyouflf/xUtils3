@@ -532,8 +532,10 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
             return false;
         }
 
-        if (progressCallback != null && request != null && total > 0) {
-            if (total < current) {
+        if (progressCallback != null && request != null && current > 0) {
+            if (total < 0) {
+                total = -1;
+            } else if (total < current) {
                 total = current;
             }
             if (forceUpdateUI) {

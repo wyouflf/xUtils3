@@ -588,7 +588,7 @@ import java.util.concurrent.atomic.AtomicLong;
         });
     }
 
-    @SuppressLint("ViewConstructor")
+    @SuppressLint({"ViewConstructor", "AppCompatCustomView"})
     private final static class FakeImageView extends ImageView {
 
         private Drawable drawable;

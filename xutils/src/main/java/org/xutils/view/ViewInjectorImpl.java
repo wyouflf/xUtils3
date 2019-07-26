@@ -120,7 +120,7 @@ public final class ViewInjectorImpl implements ViewInjector {
      * 从父类获取注解View
      */
     private static ContentView findContentView(Class<?> thisCls) {
-        if (thisCls == null || IGNORED.contains(thisCls)) {
+        if (thisCls == null || IGNORED.contains(thisCls) || thisCls.getName().startsWith("andriodx.")) {
             return null;
         }
         ContentView contentView = thisCls.getAnnotation(ContentView.class);
@@ -133,7 +133,7 @@ public final class ViewInjectorImpl implements ViewInjector {
     @SuppressWarnings("ConstantConditions")
     private static void injectObject(Object handler, Class<?> handlerType, ViewFinder finder) {
 
-        if (handlerType == null || IGNORED.contains(handlerType)) {
+        if (handlerType == null || IGNORED.contains(handlerType) || handlerType.getName().startsWith("andriodx.")) {
             return;
         }
 
@@ -147,10 +147,10 @@ public final class ViewInjectorImpl implements ViewInjector {
 
                 Class<?> fieldType = field.getType();
                 if (
-                /* 不注入静态字段 */     Modifier.isStatic(field.getModifiers()) ||
-                /* 不注入final字段 */    Modifier.isFinal(field.getModifiers()) ||
-                /* 不注入基本类型字段 */  fieldType.isPrimitive() ||
-                /* 不注入数组类型字段 */  fieldType.isArray()) {
+                    /* 不注入静态字段 */     Modifier.isStatic(field.getModifiers()) ||
+                        /* 不注入final字段 */    Modifier.isFinal(field.getModifiers()) ||
+                        /* 不注入基本类型字段 */  fieldType.isPrimitive() ||
+                        /* 不注入数组类型字段 */  fieldType.isArray()) {
                     continue;
                 }
 

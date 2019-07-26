@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "org.xutils.sample"
         minSdkVersion 14
-        targetSdkVersion 22 // 不使用api23的动态权限策略
+        targetSdkVersion 28 // 不使用api23的动态权限策略
         versionCode 1
         versionName "1.0"
     }
@@ -31,10 +31,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:25.3.0'
-    compile 'com.android.support:support-v4:25.3.0'
-    compile 'com.android.support:recyclerview-v7:25.3.0'
-    compile 'com.android.support:design:25.3.0'
-    compile project(':xutils')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation project(':xutils')
 }

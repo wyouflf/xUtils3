@@ -1,14 +1,13 @@
 package org.xutils.sample;
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.ViewInject;
@@ -19,22 +18,14 @@ public class MainActivity extends BaseActivity {
     @ViewInject(R.id.container)
     private ViewPager mViewPager;
 
-    @ViewInject(R.id.toolbar)
-    private Toolbar toolbar;
-
-    @ViewInject(R.id.tabs)
-    private TabLayout tabLayout;
-
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setSupportActionBar(toolbar);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        tabLayout.setupWithViewPager(mViewPager);
     }
 
 

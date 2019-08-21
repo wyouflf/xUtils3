@@ -260,6 +260,9 @@ x.image().bind(imageView, url, imageOptions);
 // assets file
 x.image().bind(imageView, "assets://test.gif", imageOptions);
 
+// resources file
+x.image().bind(imageView, "res://" + R.minimap.test, imageOptions);
+
 // local file
 x.image().bind(imageView, new File("/sdcard/test.gif").toURI().toString(), imageOptions);
 x.image().bind(imageView, "/sdcard/test.gif", imageOptions);

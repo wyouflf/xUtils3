@@ -8,7 +8,7 @@
 
 ### 其他特性
 * 支持超大文件(超过2G)上传
-* 更全面的http请求协议支持(11种谓词)
+* 更全面的http请求协议支持(11种谓词)，基于UrlConnection, Android4.4以后底层为okHttp实现
 * 拥有更加灵活的ORM, 和greenDao一致的性能
 * 更多的事件注解支持且不受混淆影响...
 * 图片绑定支持gif(受系统兼容性影响, 部分gif文件只能静态显示), webp; 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
@@ -16,7 +16,7 @@
 
 #### 使用Gradle构建时添加一下依赖即可:
 ```javascript
-compile 'org.xutils:xutils:3.5.2'
+compile 'org.xutils:xutils:3.5.3'
 ```
 ##### 如果使用eclipse可以 [点击这里下载aar文件](http://dl.bintray.com/wyouflf/maven/org/xutils/xutils/), 然后用zip解压, 取出jar文件.
 ##### 混淆配置参考示例项目sample的配置

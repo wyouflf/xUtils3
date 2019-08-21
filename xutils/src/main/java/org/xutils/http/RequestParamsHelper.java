@@ -40,7 +40,7 @@ import java.util.Map;
         Field[] fields = type.getDeclaredFields();
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
-                if (!Modifier.isTransient(field.getModifiers())
+                if (!Modifier.isTransient(field.getModifiers()) && !"serialVersionUID".equals(field.getName())
                         && field.getType() != Parcelable.Creator.class) {
                     field.setAccessible(true);
                     try {

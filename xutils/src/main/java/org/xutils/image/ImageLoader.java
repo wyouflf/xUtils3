@@ -261,8 +261,8 @@ import java.util.concurrent.atomic.AtomicLong;
                 if (trustMemCache && callback != null) {
                     try {
                         callback.onFinished();
-                    } catch (Throwable ignored) {
-                        LogUtil.e(ignored.getMessage(), ignored);
+                    } catch (Throwable ex) {
+                        LogUtil.e(ex.getMessage(), ex);
                     }
                 }
             }
@@ -578,16 +578,16 @@ import java.util.concurrent.atomic.AtomicLong;
                     if (callback != null) {
                         try {
                             callback.onError(ex, true);
-                        } catch (Throwable ignored) {
-                            LogUtil.e(ignored.getMessage(), ignored);
+                        } catch (Throwable throwable) {
+                            LogUtil.e(throwable.getMessage(), throwable);
                         }
                     }
                 } finally {
                     if (callback != null) {
                         try {
                             callback.onFinished();
-                        } catch (Throwable ignored) {
-                            LogUtil.e(ignored.getMessage(), ignored);
+                        } catch (Throwable throwable) {
+                            LogUtil.e(throwable.getMessage(), throwable);
                         }
                     }
                 }

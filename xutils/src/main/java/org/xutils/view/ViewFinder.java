@@ -45,10 +45,4 @@ import android.view.View;
         }
         return view;
     }
-
-    /*public Context getContext() {
-        if (view != null) return view.getContext();
-        if (activity != null) return activity;
-        return null;
-    }*/
 }

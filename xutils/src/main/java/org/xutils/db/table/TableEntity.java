@@ -47,6 +47,9 @@ public final class TableEntity<T> {
         this.constructor = entityType.getConstructor();
         this.constructor.setAccessible(true);
         Table table = entityType.getAnnotation(Table.class);
+        if (table == null) {
+            throw new DbException("missing @Table on " + entityType.getName());
+        }
         this.name = table.name();
         this.onCreated = table.onCreated();
         this.columnMap = TableUtils.findColumnMap(entityType);

@@ -37,7 +37,6 @@ public final class LoaderFactory {
         converterHashMap.put(Integer.class, integerLoader);
     }
 
-    @SuppressWarnings("unchecked")
     public static Loader<?> getLoader(Type type, RequestParams params) {
         Loader<?> result = converterHashMap.get(type);
         if (result == null) {

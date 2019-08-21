@@ -67,6 +67,7 @@ public final class ProcessLock implements Closeable {
      * @param writeMode         是否写入模式(支持读并发).
      * @param maxWaitTimeMillis 最大值 1000 * 60
      * @return null 或 进程锁, 如果锁已经被占用, 则在超时时间内继续尝试获取该锁.
+     * @throws InterruptedException
      */
     public static ProcessLock tryLock(final String lockName, final boolean writeMode, final long maxWaitTimeMillis) throws InterruptedException {
         ProcessLock lock = null;
@@ -207,8 +208,8 @@ public final class ProcessLock implements Closeable {
                         throw new IOException("can not get file channel:" + file.getAbsolutePath());
                     }
                 }
-            } catch (Throwable ignored) {
-                LogUtil.d("tryLock: " + lockName + ", " + ignored.getMessage());
+            } catch (Throwable ex) {
+                LogUtil.d("tryLock: " + lockName + ", " + ex.getMessage());
                 IOUtil.closeQuietly(stream);
                 IOUtil.closeQuietly(channel);
             }

@@ -60,7 +60,7 @@ import java.net.URI;
         this.discard = cookie.getDiscard();
         this.domain = cookie.getDomain();
         long maxAge = cookie.getMaxAge();
-        if (maxAge != -1L && maxAge > 0) {
+        if (maxAge > 0) {
             this.expiry = (maxAge * 1000L) + System.currentTimeMillis();
             if (this.expiry < 0L) { // 计算溢出?
                 this.expiry = MAX_EXPIRY;

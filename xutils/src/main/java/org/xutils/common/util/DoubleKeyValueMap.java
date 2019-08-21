@@ -76,9 +76,12 @@ public class DoubleKeyValueMap<K1, K2, V> {
         if (k1Set != null) {
             result = new ArrayList<V>();
             for (K1 k1 : k1Set) {
-                Collection<V> values = k1_k2V_map.get(k1).values();
-                if (values != null) {
-                    result.addAll(values);
+                ConcurrentHashMap<K2, V> value1 = k1_k2V_map.get(k1);
+                if (value1 != null) {
+                    Collection<V> values = value1.values();
+                    if (values != null) {
+                        result.addAll(values);
+                    }
                 }
             }
         }
@@ -87,7 +90,10 @@ public class DoubleKeyValueMap<K1, K2, V> {
 
     public boolean containsKey(K1 key1, K2 key2) {
         if (k1_k2V_map.containsKey(key1)) {
-            return k1_k2V_map.get(key1).containsKey(key2);
+            ConcurrentHashMap<K2, V> value1 = k1_k2V_map.get(key1);
+            if (value1 != null) {
+                return value1.containsKey(key2);
+            }
         }
         return false;
     }

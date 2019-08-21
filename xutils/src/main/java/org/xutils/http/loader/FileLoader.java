@@ -347,6 +347,6 @@ public class FileLoader extends Loader<File> {
 
     @Override
     public void save2Cache(final UriRequest request) {
-        // already saved by diskCacheFile#commit
+        // the file caches already saved by diskCacheFile#commit
     }
 }

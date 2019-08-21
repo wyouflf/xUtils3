@@ -176,8 +176,8 @@ public enum DbCookieStore implements CookieStore {
                             LogUtil.e(ex.getMessage(), ex);
                             try {
                                 db.delete(CookieEntity.class, WhereBuilder.b("uri", "=", uri));
-                            } catch (Throwable ignored) {
-                                LogUtil.e(ignored.getMessage(), ignored);
+                            } catch (Throwable throwable) {
+                                LogUtil.e(throwable.getMessage(), throwable);
                             }
                         }
                     }

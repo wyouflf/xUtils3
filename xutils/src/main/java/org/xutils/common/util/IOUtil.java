@@ -25,8 +25,8 @@ public class IOUtil {
         if (closeable != null) {
             try {
                 closeable.close();
-            } catch (Throwable ignored) {
-                LogUtil.d(ignored.getMessage(), ignored);
+            } catch (Throwable ex) {
+                LogUtil.d(ex.getMessage(), ex);
             }
         }
     }
@@ -35,8 +35,8 @@ public class IOUtil {
         if (cursor != null) {
             try {
                 cursor.close();
-            } catch (Throwable ignored) {
-                LogUtil.d(ignored.getMessage(), ignored);
+            } catch (Throwable ex) {
+                LogUtil.d(ex.getMessage(), ex);
             }
         }
     }

@@ -75,7 +75,7 @@ private void onTestBaidu1Click(View view) {
  *
  * 示例: 查看 org.xutils.sample.http 包里的代码
  */
-BaiduParams params = new BaiduParams();
+JsonDemoParams params = new JsonDemoParams();
 params.wd = "xUtils";
 // 有上传文件时使用multipart表单, 否则上传原始文件流.
 // params.setMultipart(true);
@@ -114,10 +114,10 @@ Callback.Cancelable cancelable
        * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
        *
        **/
-       new Callback.CommonCallback<String>() {
+       new Callback.CommonCallback<JsonDemoResponse>() {
            @Override
-           public void onSuccess(String result) {
-               Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+           public void onSuccess(JsonDemoResponse result) {
+               Toast.makeText(x.app(), result.toString(), Toast.LENGTH_LONG).show();
            }
 
            @Override
@@ -180,19 +180,19 @@ private void onTestBaidu2Click(View view) {
 ````
 #### 带有缓存的请求示例:
 ```java
-BaiduParams params = new BaiduParams();
+JsonDemoParams params = new JsonDemoParams();
 params.wd = "xUtils";
 // 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
 params.setCacheMaxAge(1000 * 60);
 Callback.Cancelable cancelable
     	// 使用CacheCallback, xUtils将为该请求缓存数据.
-		= x.http().get(params, new Callback.CacheCallback<String>() {
+		= x.http().get(params, new Callback.CacheCallback<JsonDemoResponse>() {
 
 	private boolean hasError = false;
 	private String result = null;
 
 	@Override
-	public boolean onCache(String result) {
+	public boolean onCache(JsonDemoResponse result) {
 		// 得到缓存数据, 缓存过期后不会进入这个方法.
 		// 如果服务端没有返回过期时间, 参考params.setCacheMaxAge(maxAge)方法.
         //
@@ -209,7 +209,7 @@ Callback.Cancelable cancelable
 	}
 
 	@Override
-	public void onSuccess(String result) {
+	public void onSuccess(JsonDemoResponse result) {
 		// 注意: 如果服务返回304 或 onCache 选择了信任缓存, 这时result为null.
         if (result != null) {
 		    this.result = result;

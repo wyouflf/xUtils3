@@ -9,8 +9,9 @@ import java.util.List;
 
 /**
  * Created by wyouflf on 15/11/5.
+ * 如果实现 InputStreamResponseParser, 可实现自定义流数据转换, 例如用于转换protobuff对象.
  */
-public class JsonResponseParser implements ResponseParser {// 如果实现 InputStreamResponseParser, 可实现自定义流数据转换.
+public class JsonResponseParser implements ResponseParser {
 
     @Override
     public void checkResponse(UriRequest request) throws Throwable {

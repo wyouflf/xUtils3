@@ -16,7 +16,7 @@ import org.xutils.http.annotation.HttpResponse;
  * (LoaderFactory中已经默认提供了部分常用类型的转换实现, 其他类型需要自己注册.)
  */
 @HttpResponse(parser = JsonResponseParser.class)
-public class BaiduResponse {
+public class JsonDemoResponse {
     // some properties
 
     private String test;

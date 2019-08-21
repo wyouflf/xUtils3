@@ -11,8 +11,8 @@ import org.xutils.ex.DbException;
 import org.xutils.ex.HttpException;
 import org.xutils.http.RequestParams;
 import org.xutils.sample.download.DownloadManager;
-import org.xutils.sample.http.BaiduParams;
-import org.xutils.sample.http.BaiduResponse;
+import org.xutils.sample.http.JsonDemoParams;
+import org.xutils.sample.http.JsonDemoResponse;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
 import org.xutils.view.annotation.ViewInject;
@@ -50,8 +50,8 @@ public class HttpFragment extends BaseFragment {
          *
          * 示例: 查看 org.xutils.sample.http 包里的代码
          */
-        BaiduParams params = new BaiduParams();
-        params.wd = "xUtils";
+        JsonDemoParams params = new JsonDemoParams();
+        params.paramStr = "xUtils";
         // 有上传文件时使用multipart表单, 否则上传原始文件流.
         // params.setMultipart(true);
         // 上传文件方式 1
@@ -89,9 +89,9 @@ public class HttpFragment extends BaseFragment {
                  * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
                  *
                  **/
-                new Callback.CommonCallback<List<BaiduResponse>>() {
+                new Callback.CommonCallback<List<JsonDemoResponse>>() {
                     @Override
-                    public void onSuccess(List<BaiduResponse> result) {
+                    public void onSuccess(List<JsonDemoResponse> result) {
                         Toast.makeText(x.app(), "success", Toast.LENGTH_LONG).show();
                         LogUtil.d(result.get(0).toString());
                     }
@@ -194,12 +194,12 @@ public class HttpFragment extends BaseFragment {
     }
 
     /**
-     * 缓存示例, 更复杂的例子参考 {@link org.xutils.image.ImageLoader}
+     * 缓存示例, 更复杂的例子参考 {@link org.xutils.image ImageLoader}
      */
     @Event(value = R.id.btn_test5)
     private void onTest5Click(View view) throws FileNotFoundException {
-        BaiduParams params = new BaiduParams();
-        params.wd = "xUtils";
+        JsonDemoParams params = new JsonDemoParams();
+        params.paramStr = "xUtils";
         // 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
         params.setCacheMaxAge(1000 * 60);
         Callback.Cancelable cancelable

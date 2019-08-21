@@ -63,7 +63,7 @@ public class InputStreamBody implements ProgressBody {
             throw new Callback.CancelledException("upload stopped!");
         }
 
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4096];
         try {
             int len = 0;
             while ((len = content.read(buffer)) != -1) {

@@ -1,20 +1,26 @@
 ## xUtils3简介
-* xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(249K), 并且特性强大, 方便扩展:
-  - `orm`: 高效稳定的orm工具, 使得http协议实现时更方便的支持cookie和缓存.
-   - 灵活的类似linq表达式的接口.
-   - 和greenDao一致的性能.
-  - `http(s)`: 基于UrlConnection, Android4.4以后底层为okHttp实现.
-   - 请求协议支持11种谓词: GET,POST,PUT,PATCH,HEAD,MOVE,COPY,DELETE,OPTIONS,TRACE,CONNECT
-   - 支持超大文件(超过2G)上传
-   - 支持断点下载
-   - 支持cookie(实现了domain, path, expiry等特性)
-   - 支持缓存(实现了Cache-Control, Last-Modified, ETag等特性)
-  - `image`: 有了强大的`http(s)`及其下载缓存的支持, `image`模块的实现相当的简洁.
-   - 支持内存缓存, 磁盘缓存(缩略图和原图), 并且支持回收被view持有, 但被Mem Cache移除的图片, 减少页面回退时的闪烁.
-   - 支持webp, gif(部分比较老的系统只展示静态图)
-   - 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
-  - `view注解`: view注解模块仅仅400多行代码却灵活的支持了各种View注入和事件绑定, 包括拥有多了方法的listener的支持.
-   - 事件注解支持且不受混淆影响...(参考sample的混淆配置)
+
+xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(249K), 并且特性强大, 方便扩展.
+
+#### 1. `orm`: 高效稳定的orm工具, 使得http接口实现时更方便的支持cookie和缓存.
+* 灵活的, 类似linq表达式的接口.
+* 和greenDao一致的性能.
+
+#### 2. `http(s)`: 基于UrlConnection, Android4.4以后底层为okHttp实现.
+* 请求协议支持11种谓词: GET,POST,PUT,PATCH,HEAD,MOVE,COPY,DELETE,OPTIONS,TRACE,CONNECT
+* 支持超大文件(超过2G)上传
+* 支持断点下载
+* 支持cookie(实现了domain, path, expiry等特性)
+* 支持缓存(实现了Cache-Control, Last-Modified, ETag等特性, 缓存内容过多时使用过期时间+LRU双重机制清理)
+
+#### 3. `image`: 有了`http(s)`及其下载缓存的支持, `image`模块的实现相当的简洁.
+* 支持内存缓存, 磁盘缓存(缩略图和原图), 并且支持回收被view持有, 但被MemCache移除的图片, 减少页面回退时的闪烁.
+* 支持webp, gif(部分比较老的系统只展示静态图)
+* 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
+
+#### 4. `view注解`: view注解模块仅仅400多行代码却灵活的支持了各种View注入和事件绑定.
+* 事件注解支持且不受混淆影响...(参考sample的混淆配置)
+* 支持绑定拥有多个方法的listener
 
 ### 其他特性
 * 从3.5.0开始不再包含libwebpbackport.so, 需要在Android4.2以下设备兼容webp的请使用3.4.0版本.
@@ -33,6 +39,7 @@ compile 'org.xutils:xutils:3.6.1'
 3. 关于query参数? http请求可以通过 header, url, body(请求体)传参; query参数是url中问号(?)后面的参数.
 4. 关于body参数? body参数只有PUT, POST, PATCH, DELETE(老版本RFC2616文档没有明确指出它是否支持, 所以暂时支持)请求支持.
 5. 自定义Http参数对象和结果解析: https://github.com/wyouflf/xUtils3/issues/191
+6. 设置了http超时时间为5s但任然等待15s左右: GET请求失败后默认会重试2次, 可以通过setMaxRetryCount(0)来防止请求自动重试.
 
 #### 使用前配置
 ##### 需要的权限

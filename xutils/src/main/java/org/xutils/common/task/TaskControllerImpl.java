@@ -90,7 +90,15 @@ public final class TaskControllerImpl implements TaskController {
             public void run() {
                 if (count.incrementAndGet() == total) {
                     if (groupCallback != null) {
-                        groupCallback.onAllFinished();
+                        try {
+                            groupCallback.onAllFinished();
+                        } catch (Throwable ex) {
+                            try {
+                                groupCallback.onError(null, ex, true);
+                            } catch (Throwable throwable) {
+                                LogUtil.e(throwable.getMessage(), throwable);
+                            }
+                        }
                     }
                 }
             }
@@ -105,7 +113,15 @@ public final class TaskControllerImpl implements TaskController {
                         @Override
                         public void run() {
                             if (groupCallback != null) {
-                                groupCallback.onSuccess(task);
+                                try {
+                                    groupCallback.onSuccess(task);
+                                } catch (Throwable ex) {
+                                    try {
+                                        groupCallback.onError(task, ex, true);
+                                    } catch (Throwable throwable) {
+                                        LogUtil.e(throwable.getMessage(), throwable);
+                                    }
+                                }
                             }
                         }
                     });
@@ -118,7 +134,15 @@ public final class TaskControllerImpl implements TaskController {
                         @Override
                         public void run() {
                             if (groupCallback != null) {
-                                groupCallback.onCancelled(task, cex);
+                                try {
+                                    groupCallback.onCancelled(task, cex);
+                                } catch (Throwable ex) {
+                                    try {
+                                        groupCallback.onError(task, ex, true);
+                                    } catch (Throwable throwable) {
+                                        LogUtil.e(throwable.getMessage(), throwable);
+                                    }
+                                }
                             }
                         }
                     });
@@ -131,7 +155,11 @@ public final class TaskControllerImpl implements TaskController {
                         @Override
                         public void run() {
                             if (groupCallback != null) {
-                                groupCallback.onError(task, ex, isCallbackError);
+                                try {
+                                    groupCallback.onError(task, ex, isCallbackError);
+                                } catch (Throwable ex) {
+                                    LogUtil.e(ex.getMessage(), ex);
+                                }
                             }
                         }
                     });
@@ -143,10 +171,19 @@ public final class TaskControllerImpl implements TaskController {
                     post(new Runnable() {
                         @Override
                         public void run() {
-                            if (groupCallback != null) {
-                                groupCallback.onFinished(task);
+                            try {
+                                if (groupCallback != null) {
+                                    groupCallback.onFinished(task);
+                                }
+                            } catch (Throwable ex) {
+                                try {
+                                    groupCallback.onError(task, ex, true);
+                                } catch (Throwable throwable) {
+                                    LogUtil.e(throwable.getMessage(), throwable);
+                                }
+                            } finally {
+                                callIfOnAllFinished.run();
                             }
-                            callIfOnAllFinished.run();
                         }
                     });
                 }

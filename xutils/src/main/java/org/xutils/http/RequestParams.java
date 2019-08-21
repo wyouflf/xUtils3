@@ -10,6 +10,7 @@ import org.xutils.http.app.HttpRetryHandler;
 import org.xutils.http.app.ParamsBuilder;
 import org.xutils.http.app.RedirectHandler;
 import org.xutils.http.app.RequestTracker;
+import org.xutils.http.request.UriRequest;
 
 import java.net.Proxy;
 import java.util.concurrent.Executor;
@@ -51,8 +52,25 @@ public class RequestParams extends BaseParams {
     private boolean cancelFast = false; // 是否可以被立即停止, true: 为请求创建新的线程, 取消时请求线程被立即中断.
     private int loadingUpdateMaxTimeSpan = 300; // 进度刷新最大间隔时间(ms)
     private HttpRetryHandler httpRetryHandler; // 自定义HttpRetryHandler
-    private RedirectHandler redirectHandler; // 自定义重定向接口, 默认系统自动重定向.
     private RequestTracker requestTracker; // 自定义日志记录接口.
+    private RedirectHandler redirectHandler = new RedirectHandler() { // 重定向接口.
+        @Override
+        public RequestParams getRedirectParams(UriRequest request) throws Throwable {
+            org.xutils.http.request.HttpRequest httpRequest = null;
+            RequestParams params = null;
+            if (request instanceof org.xutils.http.request.HttpRequest) {
+                httpRequest = (org.xutils.http.request.HttpRequest) request;
+                params = httpRequest.getParams();
+                String location = httpRequest.getResponseHeader("Location");
+                if (!TextUtils.isEmpty(location)) {
+                    params.setUri(location);
+                    return params;
+                }
+            }
+
+            return null;
+        }
+    };
 
     /**
      * 使用空构造创建时必须, 必须是带有@HttpRequest注解的子类.

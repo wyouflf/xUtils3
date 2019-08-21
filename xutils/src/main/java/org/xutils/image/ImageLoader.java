@@ -24,6 +24,7 @@ import org.xutils.http.RequestParams;
 import org.xutils.x;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
@@ -363,8 +364,12 @@ import java.util.concurrent.atomic.AtomicLong;
     }
 
     @Override
-    public Drawable prepare(File rawData) {
+    public Drawable prepare(File rawData) throws Throwable {
         if (!validView4Callback(true)) return null;
+
+        if (!rawData.exists()) {
+            throw new FileNotFoundException(rawData.getAbsolutePath());
+        }
 
         try {
             Drawable result = null;
@@ -383,9 +388,8 @@ import java.util.concurrent.atomic.AtomicLong;
             return result;
         } catch (IOException ex) {
             IOUtil.deleteFileOrDir(rawData);
-            LogUtil.w(ex.getMessage(), ex);
+            throw ex;
         }
-        return null;
     }
 
     private boolean hasCache = false;

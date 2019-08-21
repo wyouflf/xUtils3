@@ -31,7 +31,7 @@ public interface Callback {
     }
 
     public interface PrepareCallback<PrepareType, ResultType> extends CommonCallback<ResultType> {
-        ResultType prepare(PrepareType rawData);
+        ResultType prepare(PrepareType rawData) throws Throwable;
     }
 
     public interface ProgressCallback<ResultType> extends CommonCallback<ResultType> {

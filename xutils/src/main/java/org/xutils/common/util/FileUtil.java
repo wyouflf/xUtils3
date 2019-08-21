@@ -47,17 +47,22 @@ public class FileUtil {
     /**
      * 获取磁盘可用空间
      *
-     * @return byte 单位 kb
+     * @return byte
      */
     public static long getDiskAvailableSize() {
         if (!existsSdcard()) return 0;
         File path = Environment.getExternalStorageDirectory(); // 取得sdcard文件路径
         StatFs stat = new StatFs(path.getAbsolutePath());
-        long blockSize = stat.getBlockSize();
-        long availableBlocks = stat.getAvailableBlocks();
+        long blockSize = 0;
+        long availableBlocks = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            blockSize = stat.getBlockSizeLong();
+            availableBlocks = stat.getAvailableBlocksLong();
+        } else {
+            blockSize = stat.getBlockSize();
+            availableBlocks = stat.getAvailableBlocks();
+        }
         return availableBlocks * blockSize;
-        // (availableBlocks * blockSize)/1024 KIB 单位
-        // (availableBlocks * blockSize)/1024 /1024 MIB单位
     }
 
     public static Boolean existsSdcard() {

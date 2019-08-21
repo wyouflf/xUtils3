@@ -50,6 +50,8 @@ public final class UriRequestFactory {
                     return new AssetsRequest(params, loadType);
                 } else if (scheme.equals("file")) {
                     return new LocalFileRequest(params, loadType);
+                } else if (scheme.equals("res")) {
+                    return new ResRequest(params, loadType);
                 } else {
                     throw new IllegalArgumentException("The url not be support: " + uri);
                 }

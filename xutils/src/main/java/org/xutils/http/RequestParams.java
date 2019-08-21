@@ -1,5 +1,6 @@
 package org.xutils.http;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import org.xutils.common.task.Priority;
@@ -11,6 +12,7 @@ import org.xutils.http.app.ParamsBuilder;
 import org.xutils.http.app.RedirectHandler;
 import org.xutils.http.app.RequestTracker;
 import org.xutils.http.request.UriRequest;
+import org.xutils.x;
 
 import java.net.Proxy;
 import java.util.concurrent.Executor;
@@ -35,6 +37,7 @@ public class RequestParams extends BaseParams {
     private SSLSocketFactory sslSocketFactory;
 
     // 扩展参数
+    private Context context;
     private Proxy proxy; // 代理
     private HostnameVerifier hostnameVerifier; // https域名校验
     private boolean useCookie = true; // 是否在请求过程中启用cookie
@@ -100,6 +103,7 @@ public class RequestParams extends BaseParams {
         this.signs = signs;
         this.cacheKeys = cacheKeys;
         this.builder = builder;
+        this.context = x.app();
     }
 
     // invoke via HttpTask#createNewRequest
@@ -189,6 +193,14 @@ public class RequestParams extends BaseParams {
      */
     public void setUseCookie(boolean useCookie) {
         this.useCookie = useCookie;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
     }
 
     public Proxy getProxy() {

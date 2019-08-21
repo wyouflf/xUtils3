@@ -58,7 +58,7 @@ public class HttpRequest extends UriRequest {
     private static final CookieManager COOKIE_MANAGER =
             new CookieManager(DbCookieStore.INSTANCE, CookiePolicy.ACCEPT_ALL);
 
-    /*package*/ HttpRequest(RequestParams params, Type loadType) throws Throwable {
+    public HttpRequest(RequestParams params, Type loadType) throws Throwable {
         super(params, loadType);
     }
 

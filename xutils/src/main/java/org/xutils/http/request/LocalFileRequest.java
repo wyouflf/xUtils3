@@ -20,7 +20,7 @@ public class LocalFileRequest extends UriRequest {
 
     private InputStream inputStream;
 
-    LocalFileRequest(RequestParams params, Type loadType) throws Throwable {
+    public LocalFileRequest(RequestParams params, Type loadType) throws Throwable {
         super(params, loadType);
     }
 
@@ -36,7 +36,7 @@ public class LocalFileRequest extends UriRequest {
 
     @Override
     public String getCacheKey() {
-        return null;
+        return queryUrl;
     }
 
     @Override

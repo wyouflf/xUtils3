@@ -163,7 +163,7 @@ import java.util.concurrent.atomic.AtomicLong;
             return null;
         }
 
-        RequestParams params = createRequestParams(url, options);
+        RequestParams params = createRequestParams(null, url, options);
         return x.http().get(params, callback);
     }
 
@@ -312,7 +312,7 @@ import java.util.concurrent.atomic.AtomicLong;
         }
 
         // request
-        RequestParams params = createRequestParams(url, options);
+        RequestParams params = createRequestParams(view.getContext(), url, options);
         if (view instanceof FakeImageView) {
             synchronized (FAKE_IMG_MAP) {
                 FAKE_IMG_MAP.put(url, (FakeImageView) view);
@@ -475,8 +475,11 @@ import java.util.concurrent.atomic.AtomicLong;
         }
     }
 
-    private static RequestParams createRequestParams(String url, ImageOptions options) {
+    private static RequestParams createRequestParams(Context context, String url, ImageOptions options) {
         RequestParams params = new RequestParams(url);
+        if (context != null) {
+            params.setContext(context);
+        }
         params.setCacheDirName(DISK_CACHE_DIR_NAME);
         params.setConnectTimeout(1000 * 8);
         params.setPriority(Priority.BG_LOW);

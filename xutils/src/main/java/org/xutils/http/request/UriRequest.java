@@ -25,11 +25,10 @@ public abstract class UriRequest implements Closeable {
     protected final RequestParams params;
     protected final Loader<?> loader;
 
-    protected ClassLoader callingClassLoader = null;
     protected ProgressHandler progressHandler = null;
     protected RequestInterceptListener requestInterceptListener = null;
 
-    /*package*/ UriRequest(RequestParams params, Type loadType) throws Throwable {
+    public UriRequest(RequestParams params, Type loadType) throws Throwable {
         this.params = params;
         this.queryUrl = buildQueryUrl(params);
         this.loader = LoaderFactory.getLoader(loadType, params);
@@ -43,10 +42,6 @@ public abstract class UriRequest implements Closeable {
     public void setProgressHandler(ProgressHandler progressHandler) {
         this.progressHandler = progressHandler;
         this.loader.setProgressHandler(progressHandler);
-    }
-
-    public void setCallingClassLoader(ClassLoader callingClassLoader) {
-        this.callingClassLoader = callingClassLoader;
     }
 
     public void setRequestInterceptListener(RequestInterceptListener requestInterceptListener) {

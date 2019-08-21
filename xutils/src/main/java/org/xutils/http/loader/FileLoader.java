@@ -230,11 +230,15 @@ public class FileLoader extends Loader<File> {
             }
 
             if (diskCacheFile != null) {
-                DiskCacheEntity entity = diskCacheFile.getCacheEntity();
-                entity.setLastAccess(System.currentTimeMillis());
-                entity.setEtag(request.getETag());
-                entity.setExpires(request.getExpiration());
-                entity.setLastModify(new Date(request.getLastModified()));
+                try {
+                    DiskCacheEntity entity = diskCacheFile.getCacheEntity();
+                    entity.setLastAccess(System.currentTimeMillis());
+                    entity.setEtag(request.getETag());
+                    entity.setExpires(request.getExpiration());
+                    entity.setLastModify(new Date(request.getLastModified()));
+                } catch (Throwable ex) {
+                    LogUtil.e(ex.getMessage(), ex);
+                }
             }
             result = this.load(request.getInputStream());
         } catch (HttpException httpException) {

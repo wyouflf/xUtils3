@@ -137,7 +137,6 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
         // init request
         params.init();
         UriRequest result = UriRequestFactory.getUriRequest(params, loadType);
-        result.setCallingClassLoader(callback.getClass().getClassLoader());
         result.setProgressHandler(this);
         this.loadingUpdateMaxTimeSpan = params.getLoadingUpdateMaxTimeSpan();
         this.update(FLAG_REQUEST_CREATED, result);

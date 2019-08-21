@@ -104,10 +104,12 @@ public class DefaultParamsBuilder implements ParamsBuilder {
 
                         @Override
                         public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                            LogUtil.d("checkClientTrusted:" + authType);
                         }
 
                         @Override
                         public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                            LogUtil.d("checkServerTrusted:" + authType);
                         }
                     }};
                     try {

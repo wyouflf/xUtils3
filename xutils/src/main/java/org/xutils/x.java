@@ -1,5 +1,6 @@
 package org.xutils;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 
@@ -34,6 +35,7 @@ public final class x {
         if (Ext.app == null) {
             try {
                 // 在IDE进行布局预览时使用
+                @SuppressLint("PrivateApi")
                 Class<?> renderActionClass = Class.forName("com.android.layoutlib.bridge.impl.RenderAction");
                 Method method = renderActionClass.getDeclaredMethod("getCurrentContext");
                 Context context = (Context) method.invoke(null);

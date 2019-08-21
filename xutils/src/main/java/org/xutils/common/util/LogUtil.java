@@ -20,6 +20,8 @@ import android.util.Log;
 
 import org.xutils.x;
 
+import java.util.Locale;
+
 /**
  * Log工具，类似android.util.Log。
  * tag自动产生，格式: customTagPrefix:className.methodName(L:lineNumber),
@@ -40,7 +42,7 @@ public class LogUtil {
         String tag = "%s.%s(L:%d)";
         String callerClazzName = caller.getClassName();
         callerClazzName = callerClazzName.substring(callerClazzName.lastIndexOf(".") + 1);
-        tag = String.format(tag, callerClazzName, caller.getMethodName(), caller.getLineNumber());
+        tag = String.format(Locale.getDefault(), tag, callerClazzName, caller.getMethodName(), caller.getLineNumber());
         tag = TextUtils.isEmpty(customTagPrefix) ? tag : customTagPrefix + ":" + tag;
         return tag;
     }

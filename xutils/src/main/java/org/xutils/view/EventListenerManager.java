@@ -167,7 +167,7 @@ import java.util.Map;
 
                     if (AVOID_QUICK_EVENT_SET.contains(eventMethod)) {
                         long timeSpan = System.currentTimeMillis() - lastClickTime;
-                        if (timeSpan < QUICK_EVENT_TIME_SPAN) {
+                        if (timeSpan > 0 && timeSpan < QUICK_EVENT_TIME_SPAN) {
                             LogUtil.d("onClick cancelled: " + timeSpan);
                             return null;
                         }

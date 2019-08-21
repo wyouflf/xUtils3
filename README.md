@@ -1,22 +1,27 @@
 ## xUtils3简介
-* xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(246K), 并且特性强大, 方便扩展:
-  - `稳定的基石`: `AbsTask`和统一的回调接口`Callback`, 任何异常, 即使你的回调方法实现有异常都会进入`onError`, 任何情况下`onFinished`总会让你知道任务结束了.
-  - 基于高效稳定的`orm`工具, `http`模块得以更方便的实现cookie(支持domain, path, expiry等特性)和
-    缓存(支持Cache-Control, Last-Modified, ETag等特性)的支持.
-  - 有了强大的`http`及其下载缓存的支持, `image`模块的实现相当的简洁, 并且支持回收被view持有, 但被Mem Cache移除的图片, 减少页面回退时的闪烁..
-  - `view`注解模块仅仅400多行代码却灵活的支持了各种View注入和事件绑定, 包括拥有多了方法的listener的支持.
+* xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(249K), 并且特性强大, 方便扩展:
+  - `orm`: 高效稳定的orm工具, 使得http协议实现时更方便的支持cookie和缓存.
+   - 灵活的类似linq表达式的接口.
+   - 和greenDao一致的性能.
+  - `http(s)`: 基于UrlConnection, Android4.4以后底层为okHttp实现.
+   - 请求协议支持11种谓词: GET,POST,PUT,PATCH,HEAD,MOVE,COPY,DELETE,OPTIONS,TRACE,CONNECT
+   - 支持超大文件(超过2G)上传
+   - 支持断点下载
+   - 支持cookie(实现了domain, path, expiry等特性)
+   - 支持缓存(实现了Cache-Control, Last-Modified, ETag等特性)
+  - `image`: 有了强大的`http(s)`及其下载缓存的支持, `image`模块的实现相当的简洁.
+   - 支持内存缓存, 磁盘缓存(缩略图和原图), 并且支持回收被view持有, 但被Mem Cache移除的图片, 减少页面回退时的闪烁.
+   - 支持webp, gif(部分比较老的系统只展示静态图)
+   - 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
+  - `view注解`: view注解模块仅仅400多行代码却灵活的支持了各种View注入和事件绑定, 包括拥有多了方法的listener的支持.
+   - 事件注解支持且不受混淆影响...(参考sample的混淆配置)
 
 ### 其他特性
-* 支持超大文件(超过2G)上传
-* 更全面的http请求协议支持(11种谓词)，基于UrlConnection, Android4.4以后底层为okHttp实现
-* 拥有更加灵活的ORM, 和greenDao一致的性能
-* 更多的事件注解支持且不受混淆影响...
-* 图片绑定支持gif(受系统兼容性影响, 部分gif文件只能静态显示), webp; 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
 * 从3.5.0开始不再包含libwebpbackport.so, 需要在Android4.2以下设备兼容webp的请使用3.4.0版本.
 
 #### 使用Gradle构建时添加一下依赖即可:
 ```javascript
-compile 'org.xutils:xutils:3.6.0'
+compile 'org.xutils:xutils:3.6.1'
 ```
 ##### 如果使用eclipse可以 [点击这里下载aar文件](http://dl.bintray.com/wyouflf/maven/org/xutils/xutils/), 然后用zip解压, 取出jar文件.
 ##### 混淆配置参考示例项目sample的配置

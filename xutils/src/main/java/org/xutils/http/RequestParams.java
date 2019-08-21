@@ -233,6 +233,10 @@ public class RequestParams extends BaseParams {
         return readTimeout;
     }
 
+    /**
+     * 注意get请求失败后默认会重试2次, 可以通过setMaxRetryCount(0)来防止get请求自动重试.
+     * @param readTimeout
+     */
     public void setReadTimeout(int readTimeout) {
         if (readTimeout > 0) {
             this.readTimeout = readTimeout;

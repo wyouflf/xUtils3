@@ -45,7 +45,7 @@ public class JsonResponseParser implements ResponseParser {// 如果实现 Input
             baiduResponse.setTest(result);
             return baiduResponse;
             // fastjson 解析:
-            // return JSON.parseObject(result, resultClass);
+            // return JSON.parseObject(result, resultType);
         }
 
     }

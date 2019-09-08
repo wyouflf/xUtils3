@@ -53,6 +53,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
     private volatile boolean stopped = false;
     private volatile boolean cancelled = false;
+    private volatile boolean skipOnFinishedCallback = false;
     private Callback.Cancelable cancelable;
     private Callback.CommonCallback<Drawable> callback;
     private Callback.PrepareCallback<File, Drawable> prepareCallback;
@@ -430,9 +431,15 @@ import java.util.concurrent.atomic.AtomicLong;
             x.task().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    doBind(viewRef.get(), key.url, options, callback);
+                    ImageView imageView = viewRef.get();
+                    if (imageView != null) {
+                        doBind(imageView, key.url, options, callback);
+                    } else {
+                        ImageLoader.this.onFinished();
+                    }
                 }
             }, 10);
+            skipOnFinishedCallback = true;
             return;
         }
 
@@ -456,14 +463,14 @@ import java.util.concurrent.atomic.AtomicLong;
     @Override
     public void onFinished() {
         stopped = true;
+        if (skipOnFinishedCallback) return;
+
         ImageView view = viewRef.get();
         if (view instanceof FakeImageView) {
             synchronized (FAKE_IMG_MAP) {
                 FAKE_IMG_MAP.remove(view.hashCode() + key.url);
             }
         }
-
-        if (!validView4Callback(false)) return;
 
         if (callback != null) {
             callback.onFinished();

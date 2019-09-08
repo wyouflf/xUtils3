@@ -44,8 +44,6 @@ public abstract class Loader<T> {
 
     public abstract Loader<T> newInstance();
 
-    public abstract T load(final InputStream in) throws Throwable;
-
     public abstract T load(final UriRequest request) throws Throwable;
 
     public abstract T loadFromCache(final DiskCacheEntity cacheEntity) throws Throwable;

@@ -8,8 +8,6 @@ import org.xutils.common.util.IOUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.http.request.UriRequest;
 
-import java.io.InputStream;
-
 /**
  * Author: wyouflf
  * Time: 2014/06/16
@@ -35,15 +33,10 @@ import java.io.InputStream;
     }
 
     @Override
-    public JSONArray load(final InputStream in) throws Throwable {
-        resultStr = IOUtil.readStr(in, charset);
-        return new JSONArray(resultStr);
-    }
-
-    @Override
     public JSONArray load(final UriRequest request) throws Throwable {
         request.sendRequest();
-        return this.load(request.getInputStream());
+        resultStr = IOUtil.readStr(request.getInputStream(), charset);
+        return new JSONArray(resultStr);
     }
 
     @Override

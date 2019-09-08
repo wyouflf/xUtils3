@@ -65,8 +65,7 @@ public class FileLoader extends Loader<File> {
         }
     }
 
-    @Override
-    public File load(final InputStream in) throws Throwable {
+    protected File load(final InputStream in) throws Throwable {
         File targetFile = null;
         BufferedInputStream bis = null;
         BufferedOutputStream bos = null;

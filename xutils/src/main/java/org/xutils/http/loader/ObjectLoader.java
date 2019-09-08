@@ -98,8 +98,15 @@ import java.util.List;
     }
 
     @Override
-    public Object load(final InputStream in) throws Throwable {
+    public Object load(final UriRequest request) throws Throwable {
+        try {
+            request.sendRequest();
+        } finally {
+            parser.checkResponse(request);
+        }
+
         Object result;
+        InputStream in = request.getInputStream();
         if (parser instanceof InputStreamResponseParser) {
             result = ((InputStreamResponseParser) parser).parse(objectType, objectClass, in);
         } else {
@@ -107,16 +114,6 @@ import java.util.List;
             result = parser.parse(objectType, objectClass, resultStr);
         }
         return result;
-    }
-
-    @Override
-    public Object load(final UriRequest request) throws Throwable {
-        try {
-            request.sendRequest();
-        } finally {
-            parser.checkResponse(request);
-        }
-        return this.load(request.getInputStream());
     }
 
     @Override

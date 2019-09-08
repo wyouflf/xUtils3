@@ -27,7 +27,7 @@ xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(249K), �
 
 #### 使用Gradle构建时添加一下依赖即可:
 ```javascript
-compile 'org.xutils:xutils:3.6.2'
+compile 'org.xutils:xutils:3.6.3'
 ```
 ##### 如果使用eclipse可以 [点击这里下载aar文件](http://dl.bintray.com/wyouflf/maven/org/xutils/xutils/), 然后用zip解压, 取出jar文件.
 ##### 混淆配置参考示例项目sample的配置

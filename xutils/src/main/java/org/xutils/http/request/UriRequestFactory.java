@@ -30,10 +30,10 @@ public final class UriRequestFactory {
         String scheme = null;
         String uri = params.getUri();
         int index = uri.indexOf(":");
-        if (index > 0) {
-            scheme = uri.substring(0, index);
-        } else if (uri.startsWith("/")) {
+        if (uri.startsWith("/")) {
             scheme = "file";
+        } else if (index > 0) {
+            scheme = uri.substring(0, index);
         }
 
         // get UriRequest

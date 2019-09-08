@@ -30,6 +30,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -137,13 +138,7 @@ import java.util.concurrent.atomic.AtomicLong;
             return null;
         }
 
-        FakeImageView fakeImageView = null;
-        synchronized (FAKE_IMG_MAP) {
-            fakeImageView = FAKE_IMG_MAP.get(url);
-            if (fakeImageView == null) {
-                fakeImageView = new FakeImageView();
-            }
-        }
+        FakeImageView fakeImageView = new FakeImageView();
         return doBind(fakeImageView, url, options, callback);
     }
 
@@ -315,7 +310,7 @@ import java.util.concurrent.atomic.AtomicLong;
         RequestParams params = createRequestParams(view.getContext(), url, options);
         if (view instanceof FakeImageView) {
             synchronized (FAKE_IMG_MAP) {
-                FAKE_IMG_MAP.put(url, (FakeImageView) view);
+                FAKE_IMG_MAP.put(view.hashCode() + url, (FakeImageView) view);
             }
         }
         return cancelable = x.http().get(params, this);
@@ -464,7 +459,7 @@ import java.util.concurrent.atomic.AtomicLong;
         ImageView view = viewRef.get();
         if (view instanceof FakeImageView) {
             synchronized (FAKE_IMG_MAP) {
-                FAKE_IMG_MAP.remove(key.url);
+                FAKE_IMG_MAP.remove(view.hashCode() + key.url);
             }
         }
 
@@ -597,11 +592,18 @@ import java.util.concurrent.atomic.AtomicLong;
 
     @SuppressLint({"ViewConstructor", "AppCompatCustomView"})
     private final static class FakeImageView extends ImageView {
-
+        private final int hashCode;
         private Drawable drawable;
+        private final static AtomicInteger hashCodeSeed = new AtomicInteger(0);
 
         public FakeImageView() {
             super(x.app());
+            hashCode = hashCodeSeed.incrementAndGet();
+        }
+
+        @Override
+        public int hashCode() {
+            return hashCode;
         }
 
         @Override

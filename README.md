@@ -67,9 +67,9 @@ public void onCreate() {
  * 3. 注解参数value支持数组: value={id1, id2, id3}
  * 4. 其它参数说明见{@link org.xutils.event.annotation.Event}类的说明.
  **/
-@Event(value = R.id.btn_test_baidu1,
+@Event(value = R.id.btn_test1,
         type = View.OnClickListener.class/*可选参数, 默认是View.OnClickListener.class*/)
-private void onTestBaidu1Click(View view) {
+private void onTest1Click(View view) {
 ...
 }
 ```
@@ -109,7 +109,7 @@ Callback.Cancelable cancelable
        * 自定义callback的泛型支持方案2, 自定义一类数据的自动转化: 
        * 将注解@HttpResponse加到自定义返回值类型上, 实现自定义ResponseParser接口来统一转换.
        * 如果返回值是json/xml/protobuf等数据格式, 那么利用第三方的json/xml/protobuf等工具将十分容易定义自己的ResponseParser/InputStreamResponseParser.
-       * 如示例代码{@link org.xutils.sample.http.BaiduResponse}, 可直接使用BaiduResponse作为callback的泛型.
+       * 如示例代码{@link org.xutils.sample.http.JsonDemoResponse}, 可直接使用JsonDemoResponse作为callback的泛型.
        *
        * 2. callback的组合:
        * 可以用基类或接口组合个种类的Callback, 见{@link org.xutils.common.Callback}.
@@ -162,8 +162,8 @@ Callback.Cancelable cancelable
 ```
 #### 如果你只需要一个简单的版本:
 ```java
-@Event(value = R.id.btn_test_baidu2)
-private void onTestBaidu2Click(View view) {
+@Event(value = R.id.btn_test2)
+private void onTest2Click(View view) {
     RequestParams params = new RequestParams("https://www.baidu.com/s");
     params.setSslSocketFactory(...); // 设置ssl
     params.addQueryStringParameter("wd", "xUtils");

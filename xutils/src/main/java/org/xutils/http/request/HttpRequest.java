@@ -207,9 +207,11 @@ public class HttpRequest extends UriRequest {
                     if (!TextUtils.isEmpty(contentType)) {
                         connection.setRequestProperty("Content-Type", contentType);
                     }
+                    boolean isChunkedMode = false;
                     long contentLength = body.getContentLength();
                     if (contentLength < 0) {
                         connection.setChunkedStreamingMode(256 * 1024);
+                        isChunkedMode = true;
                     } else {
                         if (contentLength < Integer.MAX_VALUE) {
                             connection.setFixedLengthStreamingMode((int) contentLength);
@@ -217,9 +219,16 @@ public class HttpRequest extends UriRequest {
                             connection.setFixedLengthStreamingMode(contentLength);
                         } else {
                             connection.setChunkedStreamingMode(256 * 1024);
+                            isChunkedMode = true;
                         }
                     }
-                    connection.setRequestProperty("Content-Length", String.valueOf(contentLength));
+
+                    if (isChunkedMode) {
+                        connection.setRequestProperty("Transfer-Encoding", "chunked");
+                    } else {
+                        connection.setRequestProperty("Content-Length", String.valueOf(contentLength));
+                    }
+
                     connection.setDoOutput(true);
                     body.writeTo(connection.getOutputStream());
                 }

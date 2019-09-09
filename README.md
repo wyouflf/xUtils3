@@ -29,17 +29,19 @@ xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(249K), �
 ```javascript
 compile 'org.xutils:xutils:3.6.8'
 ```
+
+#### 混淆配置参考示例项目sample的配置
 ##### 如果使用eclipse可以 [点击这里下载aar文件](http://dl.bintray.com/wyouflf/maven/org/xutils/xutils/), 然后用zip解压, 取出jar文件.
-##### 混淆配置参考示例项目sample的配置
 
 
-#### 常见问题:
+### 常见问题:
 1. 更好的管理图片缓存: https://github.com/wyouflf/xUtils3/issues/149
 2. Cookie的使用: https://github.com/wyouflf/xUtils3/issues/125
 3. 关于query参数? http请求可以通过 header, url, body(请求体)传参; query参数是url中问号(?)后面的参数.
 4. 关于body参数? body参数只有PUT, POST, PATCH, DELETE(老版本RFC2616文档没有明确指出它是否支持, 所以暂时支持)请求支持.
 5. 自定义Http参数对象和结果解析: https://github.com/wyouflf/xUtils3/issues/191
 6. 设置了http超时时间为5s但任然等待15s左右: GET请求失败后默认会重试2次, 可以通过setMaxRetryCount(0)来防止请求自动重试.
+7. @Event注解同一个id子类的事件会覆盖父类, onClickListener和onItemClickListener默认屏蔽了双击这种手机上不常用操作, 如需要双击支持可以自己setOnClickListener.
 
 #### 使用前配置
 ##### 需要的权限

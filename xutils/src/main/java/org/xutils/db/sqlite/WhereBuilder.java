@@ -191,7 +191,9 @@ public class WhereBuilder {
                         }
                         inSb.append(",");
                     }
-                    inSb.deleteCharAt(inSb.length() - 1);
+                    if (inSb.length() > 1) {
+                        inSb.deleteCharAt(inSb.length() - 1);
+                    }
                     inSb.append(")");
                     builder.append(inSb.toString());
                 } else {

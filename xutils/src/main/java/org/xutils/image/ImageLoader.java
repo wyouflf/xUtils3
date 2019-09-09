@@ -297,15 +297,12 @@ import java.util.concurrent.atomic.AtomicLong;
         }
 
         // set loadingDrawable
-        Drawable loadingDrawable = null;
-        if (options.isForceLoadingDrawable()) {
+        Drawable loadingDrawable = view.getDrawable();
+        if (loadingDrawable == null || options.isForceLoadingDrawable()) {
             loadingDrawable = options.getLoadingDrawable(view);
             view.setScaleType(options.getPlaceholderScaleType());
-            view.setImageDrawable(new AsyncDrawable(this, loadingDrawable));
-        } else {
-            loadingDrawable = view.getDrawable();
-            view.setImageDrawable(new AsyncDrawable(this, loadingDrawable));
         }
+        view.setImageDrawable(new AsyncDrawable(this, loadingDrawable));
 
         // request
         RequestParams params = createRequestParams(view.getContext(), url, options);

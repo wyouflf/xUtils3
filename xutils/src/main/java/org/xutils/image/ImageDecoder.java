@@ -266,6 +266,8 @@ public final class ImageDecoder {
             }
 
             result = bitmap;
+        } catch (Callback.CancelledException ex) {
+            throw ex;
         } catch (IOException ex) {
             throw ex;
         } catch (Throwable ex) {
@@ -309,6 +311,8 @@ public final class ImageDecoder {
                 throw new IOException("decode image error");
             }
             return movie;
+        } catch (Callback.CancelledException ex) {
+            throw ex;
         } catch (IOException ex) {
             throw ex;
         } catch (Throwable ex) {

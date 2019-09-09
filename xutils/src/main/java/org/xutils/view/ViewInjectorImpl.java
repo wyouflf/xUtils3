@@ -120,7 +120,7 @@ public final class ViewInjectorImpl implements ViewInjector {
      * 从父类获取注解View
      */
     private static ContentView findContentView(Class<?> thisCls) {
-        if (thisCls == null || IGNORED.contains(thisCls) || thisCls.getName().startsWith("andriodx.")) {
+        if (thisCls == null || IGNORED.contains(thisCls) || thisCls.getName().startsWith("androidx.")) {
             return null;
         }
         ContentView contentView = thisCls.getAnnotation(ContentView.class);
@@ -133,7 +133,7 @@ public final class ViewInjectorImpl implements ViewInjector {
     @SuppressWarnings("ConstantConditions")
     private static void injectObject(Object handler, Class<?> handlerType, ViewFinder finder) {
 
-        if (handlerType == null || IGNORED.contains(handlerType) || handlerType.getName().startsWith("andriodx.")) {
+        if (handlerType == null || IGNORED.contains(handlerType) || handlerType.getName().startsWith("androidx.")) {
             return;
         }
 

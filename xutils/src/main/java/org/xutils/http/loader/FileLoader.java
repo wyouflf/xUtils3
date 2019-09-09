@@ -77,7 +77,7 @@ public class FileLoader extends Loader<File> {
             }
             if (!targetFile.exists()) {
                 File dir = targetFile.getParentFile();
-                if (!dir.exists() && !dir.mkdirs()) {
+                if ((!dir.exists() && !dir.mkdirs()) || !dir.isDirectory()) {
                     throw new IOException("can not create dir: " + dir.getAbsolutePath());
                 }
             }

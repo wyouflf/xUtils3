@@ -72,13 +72,12 @@ public class FileLoader extends Loader<File> {
         try {
             targetFile = new File(tempSaveFilePath);
             if (targetFile.isDirectory()) {
-                // 防止文件正在写入时, 父文件夹被删除, 继续写入时造成偶现文件节点异常问题.
-                IOUtil.deleteFileOrDir(targetFile);
+                throw new IOException("could not create the file: " + tempSaveFilePath);
             }
             if (!targetFile.exists()) {
                 File dir = targetFile.getParentFile();
                 if ((!dir.exists() && !dir.mkdirs()) || !dir.isDirectory()) {
-                    throw new IOException("can not create dir: " + dir.getAbsolutePath());
+                    throw new IOException("could not create the dir: " + dir.getAbsolutePath());
                 }
             }
 

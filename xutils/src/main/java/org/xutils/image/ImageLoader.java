@@ -505,12 +505,7 @@ import java.util.concurrent.atomic.AtomicLong;
                 ImageLoader otherLoader = ((AsyncDrawable) otherDrawable).getImageLoader();
                 if (otherLoader != null) {
                     if (otherLoader == this) {
-                        if (view.getVisibility() != View.VISIBLE) {
-                            otherLoader.cancel();
-                            return false;
-                        } else {
-                            return true;
-                        }
+                        return true;
                     } else {
                         if (this.seq > otherLoader.seq) {
                             otherLoader.cancel();

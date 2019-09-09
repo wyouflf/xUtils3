@@ -464,6 +464,10 @@ public final class DbManagerImpl extends DbBase {
         return id;
     }
 
+    /**
+     * xUtils对同一个库的链接是单实例的, 一般不需要关闭它.
+     * @throws IOException
+     */
     @Override
     public void close() throws IOException {
         if (DAO_MAP.containsKey(daoConfig)) {

@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * Created by wyouflf on 15/11/4.
- * Assets资源文件请求
+ * 本地资源文件请求
  */
 public class ResRequest extends UriRequest {
 

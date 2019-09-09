@@ -419,7 +419,6 @@ import java.util.Map;
 
     @Override
     public String toString() {
-        checkBodyParams();
         final StringBuilder sb = new StringBuilder();
         if (!queryStringParams.isEmpty()) {
             for (KeyValue kv : queryStringParams) {
@@ -428,19 +427,17 @@ import java.util.Map;
             sb.deleteCharAt(sb.length() - 1);
         }
 
-        if (HttpMethod.permitsRequestBody(this.method)) {
-            sb.append("<");
-            if (!TextUtils.isEmpty(bodyContent)) {
-                sb.append(bodyContent);
-            } else {
-                if (!bodyParams.isEmpty()) {
-                    for (KeyValue kv : bodyParams) {
-                        sb.append(kv.key).append("=").append(kv.value).append("&");
-                    }
-                    sb.deleteCharAt(sb.length() - 1);
+        if (!TextUtils.isEmpty(bodyContent)) {
+            sb.append("<").append(bodyContent).append(">");
+        } else {
+            if (!bodyParams.isEmpty()) {
+                sb.append("<");
+                for (KeyValue kv : bodyParams) {
+                    sb.append(kv.key).append("=").append(kv.value).append("&");
                 }
+                sb.deleteCharAt(sb.length() - 1);
+                sb.append(">");
             }
-            sb.append(">");
         }
         return sb.toString();
     }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import org.xutils.common.task.Priority;
-import org.xutils.common.util.LogUtil;
 import org.xutils.http.annotation.HttpRequest;
 import org.xutils.http.app.DefaultParamsBuilder;
 import org.xutils.http.app.HttpRetryHandler;
@@ -235,6 +234,7 @@ public class RequestParams extends BaseParams {
 
     /**
      * 注意get请求失败后默认会重试2次, 可以通过setMaxRetryCount(0)来防止get请求自动重试.
+     *
      * @param readTimeout
      */
     public void setReadTimeout(int readTimeout) {
@@ -441,11 +441,6 @@ public class RequestParams extends BaseParams {
      */
     @Override
     public String toString() {
-        try {
-            this.init();
-        } catch (Throwable ex) {
-            LogUtil.e(ex.getMessage(), ex);
-        }
         String url = this.getUri();
         return TextUtils.isEmpty(url) ?
                 super.toString() :

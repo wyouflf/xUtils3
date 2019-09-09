@@ -37,7 +37,8 @@ public enum HttpMethod {
     }
 
     public static boolean permitsRequestBody(HttpMethod method) {
-        return method == POST
+        return method == null
+                || method == POST
                 || method == PUT
                 || method == PATCH
                 || method == DELETE;

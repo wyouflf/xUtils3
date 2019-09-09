@@ -126,7 +126,7 @@ import java.util.Map;
     public void addParameter(String name, Object value) {
         if (value == null) return;
 
-        if (method == null || HttpMethod.permitsRequestBody(method)) {
+        if (HttpMethod.permitsRequestBody(method)) {
             if (!TextUtils.isEmpty(name)) {
                 if (value instanceof File
                         || value instanceof InputStream

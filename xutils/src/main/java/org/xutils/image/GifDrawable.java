@@ -72,6 +72,7 @@ public class GifDrawable extends Drawable implements Runnable, Animatable {
     @Override
     public void stop() {
         if (isRunning()) {
+            running = false;
             this.unscheduleSelf(this);
         }
     }

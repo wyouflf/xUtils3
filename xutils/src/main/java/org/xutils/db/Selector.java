@@ -74,7 +74,7 @@ public final class Selector<T> {
         return this;
     }
 
-    public Selector or(WhereBuilder where) {
+    public Selector<T> or(WhereBuilder where) {
         this.whereBuilder.or(where);
         return this;
     }

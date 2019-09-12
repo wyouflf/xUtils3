@@ -28,7 +28,7 @@ xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(249K), �
 
 #### 使用Gradle构建时添加一下依赖即可:
 ```javascript
-compile 'org.xutils:xutils:3.6.15'
+compile 'org.xutils:xutils:3.6.16'
 ```
 
 #### 混淆配置参考示例项目sample的配置

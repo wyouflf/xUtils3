@@ -40,16 +40,17 @@ import java.util.Map;
         Field[] fields = type.getDeclaredFields();
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
-                if (!Modifier.isTransient(field.getModifiers()) && !"serialVersionUID".equals(field.getName())
+                String name = field.getName();
+                if (!Modifier.isTransient(field.getModifiers())
+                        && !"serialVersionUID".equals(name)
                         && field.getType() != Parcelable.Creator.class) {
-                    field.setAccessible(true);
                     try {
-                        String name = field.getName();
+                        field.setAccessible(true);
                         Object value = field.get(entity);
                         if (value != null) {
                             listener.onParseKV(name, value);
                         }
-                    } catch (IllegalAccessException ex) {
+                    } catch (Throwable ex) {
                         LogUtil.e(ex.getMessage(), ex);
                     }
                 }

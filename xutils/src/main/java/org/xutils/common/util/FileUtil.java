@@ -15,16 +15,14 @@ public class FileUtil {
     }
 
     public static File getCacheDir(String dirName) {
-        File result;
-        if (existsSdcard()) {
+        File result = null;
+        if (isDiskAvailable()) {
             File cacheDir = x.app().getExternalCacheDir();
-            if (cacheDir == null) {
-                result = new File(Environment.getExternalStorageDirectory(),
-                        "Android/data/" + x.app().getPackageName() + "/cache/" + dirName);
-            } else {
+            if (cacheDir != null) {
                 result = new File(cacheDir, dirName);
             }
-        } else {
+        }
+        if (result == null) {
             result = new File(x.app().getCacheDir(), dirName);
         }
         if (result.exists() || result.mkdirs()) {
@@ -41,7 +39,7 @@ public class FileUtil {
      */
     public static boolean isDiskAvailable() {
         long size = getDiskAvailableSize();
-        return size > 10 * 1024 * 1024; // > 10bm
+        return size > 10 * 1024 * 1024L; // > 10bm
     }
 
     /**

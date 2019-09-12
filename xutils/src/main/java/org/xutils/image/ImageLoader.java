@@ -53,6 +53,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
     private volatile boolean stopped = false;
     private volatile boolean cancelled = false;
+    private volatile boolean skipOnWaitingCallback = false;
     private volatile boolean skipOnFinishedCallback = false;
     private Callback.Cancelable httpCancelable;
     private Callback.CommonCallback<Drawable> callback;
@@ -232,27 +233,50 @@ import java.util.concurrent.atomic.AtomicLong;
             boolean trustMemCache = false;
             try {
                 if (callback instanceof ProgressCallback) {
-                    ((ProgressCallback) callback).onWaiting();
-                }
-                // hit mem cache
-                view.setScaleType(localOptions.getImageScaleType());
-                view.setImageDrawable(memDrawable);
-                trustMemCache = true;
-                if (callback instanceof CacheCallback) {
-                    trustMemCache = ((CacheCallback<Drawable>) callback).onCache(memDrawable);
-                    if (!trustMemCache) {
-                        // not trust the cache
-                        // load from Network or DiskCache
-                        return new ImageLoader().doLoad(view, url, localOptions, callback);
+                    try {
+                        ((ProgressCallback) callback).onWaiting();
+                    } catch (Throwable ex) {
+                        LogUtil.e(ex.getMessage(), ex);
                     }
-                } else if (callback != null) {
-                    callback.onSuccess(memDrawable);
+                }
+
+                if (callback instanceof CacheCallback) {
+                    try {
+                        // 是否信任内存缓存. onStart 之后再次调用 onCache 时, 入参是磁盘缓存.
+                        trustMemCache = ((CacheCallback<Drawable>) callback).onCache(memDrawable);
+                    } catch (Throwable ex) {
+                        LogUtil.e(ex.getMessage(), ex);
+                    }
+                } else {
+                    trustMemCache = true;
+                }
+
+                // hit mem cache
+                if (trustMemCache) {
+                    view.setScaleType(localOptions.getImageScaleType());
+                    view.setImageDrawable(memDrawable);
+                    if (callback != null) {
+                        try {
+                            callback.onSuccess(memDrawable);
+                        } catch (Throwable ex) {
+                            callback.onError(ex, true);
+                        }
+                    }
+                    // goto finally
+                } else {
+                    // not trust the cache
+                    // load from Network or DiskCache
+                    ImageLoader loader = new ImageLoader();
+                    loader.skipOnWaitingCallback = true;
+                    return loader.doLoad(view, url, localOptions, callback);
                 }
             } catch (Throwable ex) {
                 LogUtil.e(ex.getMessage(), ex);
                 // try load from Network or DiskCache
                 trustMemCache = false;
-                return new ImageLoader().doLoad(view, url, localOptions, callback);
+                ImageLoader loader = new ImageLoader();
+                loader.skipOnWaitingCallback = true;
+                return loader.doLoad(view, url, localOptions, callback);
             } finally {
                 if (trustMemCache && callback != null) {
                     try {
@@ -262,7 +286,7 @@ import java.util.concurrent.atomic.AtomicLong;
                     }
                 }
             }
-        } else {
+        } else {  /* memDrawable == null */
             // load from Network or DiskCache
             return new ImageLoader().doLoad(view, url, localOptions, callback);
         }
@@ -330,7 +354,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
     @Override
     public void onWaiting() {
-        if (progressCallback != null) {
+        if (!skipOnWaitingCallback && progressCallback != null) {
             progressCallback.onWaiting();
         }
     }

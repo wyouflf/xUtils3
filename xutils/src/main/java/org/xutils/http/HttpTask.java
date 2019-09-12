@@ -38,8 +38,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     // 请求相关
     private RequestParams params;
     private UriRequest request;
-    private RequestWorker requestWorker;
-    private final Executor executor;
+    private Type loadType;
     private volatile boolean hasException = false;
     private final Callback.CommonCallback<ResultType> callback;
 
@@ -57,15 +56,13 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     // 日志追踪
     private RequestTracker tracker;
 
-    // 文件下载线程数限制
-    private Type loadType;
-    private final static int MAX_FILE_LOAD_WORKER = 3;
-    private final static AtomicInteger sCurrFileLoadCount = new AtomicInteger(0);
-
     // 文件下载任务
+    private final static AtomicInteger sCurrFileLoadCount = new AtomicInteger(0);
     private static final HashMap<String, WeakReference<HttpTask<?>>>
             DOWNLOAD_TASK = new HashMap<String, WeakReference<HttpTask<?>>>(1);
 
+    // 线程池
+    private final Executor executor;
     private static final PriorityExecutor HTTP_EXECUTOR = new PriorityExecutor(5, true);
     private static final PriorityExecutor CACHE_EXECUTOR = new PriorityExecutor(5, true);
 
@@ -151,10 +148,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 /*{
                     // 不处理缓存文件下载冲突,
                     // 缓存文件下载冲突会抛出FileLockedException异常,
-                    // 使用异常处理控制是否重新尝试下载.
-                    if (TextUtils.isEmpty(downloadTaskKey)) {
-                        downloadTaskKey = this.request.getCacheKey();
-                    }
+                    // 回调方法中处理控制是否重新尝试下载.
                 }*/
                 if (!TextUtils.isEmpty(downloadTaskKey)) {
                     WeakReference<HttpTask<?>> taskRef = DOWNLOAD_TASK.get(downloadTaskKey);
@@ -169,7 +163,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                     DOWNLOAD_TASK.put(downloadTaskKey, new WeakReference<HttpTask<?>>(this));
                 } // end if (!TextUtils.isEmpty(downloadTaskKey))
 
-                if (DOWNLOAD_TASK.size() > MAX_FILE_LOAD_WORKER) {
+                if (DOWNLOAD_TASK.size() > RequestParams.MAX_FILE_LOAD_WORKER) {
                     Iterator<Map.Entry<String, WeakReference<HttpTask<?>>>>
                             entryItr = DOWNLOAD_TASK.entrySet().iterator();
                     while (entryItr.hasNext()) {
@@ -300,7 +294,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                     clearRawResult();
                     // 开始请求工作
                     LogUtil.d("load: " + this.request.getRequestUri());
-                    requestWorker = new RequestWorker();
+                    RequestWorker requestWorker = new RequestWorker();
                     requestWorker.request();
                     if (requestWorker.ex != null) {
                         throw requestWorker.ex;
@@ -500,6 +494,11 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     }
 
     private void closeRequestSync() {
+        if (File.class == loadType) {
+            synchronized (sCurrFileLoadCount) {
+                sCurrFileLoadCount.notifyAll();
+            }
+        }
         clearRawResult();
         IOUtil.closeQuietly(request);
     }
@@ -578,7 +577,7 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
                 boolean interrupted = false;
                 if (File.class == loadType) {
                     synchronized (sCurrFileLoadCount) {
-                        while (sCurrFileLoadCount.get() >= MAX_FILE_LOAD_WORKER
+                        while (sCurrFileLoadCount.get() >= RequestParams.MAX_FILE_LOAD_WORKER
                                 && !HttpTask.this.isCancelled()) {
                             try {
                                 sCurrFileLoadCount.wait(10);

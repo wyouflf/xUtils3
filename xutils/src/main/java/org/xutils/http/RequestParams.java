@@ -25,6 +25,8 @@ import javax.net.ssl.SSLSocketFactory;
  */
 public class RequestParams extends BaseParams {
 
+    public final static int MAX_FILE_LOAD_WORKER = 10;
+
     // 注解及其扩展参数
     private HttpRequest httpRequest;
     private String uri;

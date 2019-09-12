@@ -54,7 +54,7 @@ import java.util.concurrent.atomic.AtomicLong;
     private volatile boolean stopped = false;
     private volatile boolean cancelled = false;
     private volatile boolean skipOnFinishedCallback = false;
-    private Callback.Cancelable cancelable;
+    private Callback.Cancelable httpCancelable;
     private Callback.CommonCallback<Drawable> callback;
     private Callback.PrepareCallback<File, Drawable> prepareCallback;
     private Callback.CacheCallback<Drawable> cacheCallback;
@@ -311,15 +311,15 @@ import java.util.concurrent.atomic.AtomicLong;
                 FAKE_IMG_MAP.put(view.hashCode() + url, (FakeImageView) view);
             }
         }
-        return cancelable = x.http().get(params, this);
+        return httpCancelable = x.http().get(params, this);
     }
 
     @Override
     public void cancel() {
         stopped = true;
         cancelled = true;
-        if (cancelable != null) {
-            cancelable.cancel();
+        if (httpCancelable != null) {
+            httpCancelable.cancel();
         }
     }
 

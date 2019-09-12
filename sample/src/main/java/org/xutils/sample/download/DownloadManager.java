@@ -29,7 +29,8 @@ public final class DownloadManager {
 
     private static volatile DownloadManager instance;
 
-    private final static int MAX_DOWNLOAD_THREAD = 2; // 有效的值范围[1, 3], 设置为3时, 可能阻塞图片加载.
+    // 有效的值范围[1, RequestParams.MAX_FILE_LOAD_WORKER], 下载线程太多会影响图片加载.
+    private final static int MAX_DOWNLOAD_THREAD = RequestParams.MAX_FILE_LOAD_WORKER - 3;
 
     private final DbManager db;
     private final Executor executor = new PriorityExecutor(MAX_DOWNLOAD_THREAD, true);

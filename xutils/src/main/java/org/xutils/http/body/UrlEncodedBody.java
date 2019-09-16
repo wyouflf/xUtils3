@@ -13,12 +13,12 @@ import java.util.List;
  * Author: wyouflf
  * Time: 2014/05/30
  */
-public class UrlEncodedParamsBody implements RequestBody {
+public class UrlEncodedBody implements RequestBody {
 
     private byte[] content;
     private String charset = "UTF-8";
 
-    public UrlEncodedParamsBody(List<KeyValue> params, String charset) throws IOException {
+    public UrlEncodedBody(List<KeyValue> params, String charset) throws IOException {
         if (!TextUtils.isEmpty(charset)) {
             this.charset = charset;
         }
@@ -31,9 +31,9 @@ public class UrlEncodedParamsBody implements RequestBody {
                     if (contentSb.length() > 0) {
                         contentSb.append("&");
                     }
-                    contentSb.append(URLEncoder.encode(name, this.charset).replaceAll("\\+","%20"))
+                    contentSb.append(URLEncoder.encode(name, this.charset).replaceAll("\\+", "%20"))
                             .append("=")
-                            .append(URLEncoder.encode(value, this.charset).replaceAll("\\+","%20"));
+                            .append(URLEncoder.encode(value, this.charset).replaceAll("\\+", "%20"));
                 }
             }
         }

@@ -13,7 +13,7 @@ import org.xutils.http.body.InputStreamBody;
 import org.xutils.http.body.MultipartBody;
 import org.xutils.http.body.RequestBody;
 import org.xutils.http.body.StringBody;
-import org.xutils.http.body.UrlEncodedParamsBody;
+import org.xutils.http.body.UrlEncodedBody;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -393,7 +393,7 @@ import java.util.Map;
                 result = new MultipartBody(fileParams, charset);
             }
         } else if (bodyParams.size() > 0) {
-            result = new UrlEncodedParamsBody(bodyParams, charset);
+            result = new UrlEncodedBody(bodyParams, charset);
         }
 
         return result;

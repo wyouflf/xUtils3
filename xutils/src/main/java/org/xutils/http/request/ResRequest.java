@@ -1,6 +1,7 @@
 package org.xutils.http.request;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.text.TextUtils;
 
 import org.xutils.cache.DiskCacheEntity;
@@ -9,6 +10,7 @@ import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -18,11 +20,11 @@ import java.util.Map;
 
 /**
  * Created by wyouflf on 15/11/4.
- * 本地资源文件请求
+ * 本地资源请求
  */
 public class ResRequest extends UriRequest {
 
-    private long lastModifiedTime = 0;
+    private static long lastModifiedTime = 0;
     protected long contentLength = 0;
     protected InputStream inputStream;
 
@@ -132,7 +134,20 @@ public class ResRequest extends UriRequest {
     @Override
     public long getLastModified() {
         if (lastModifiedTime == 0) {
-            lastModifiedTime = System.currentTimeMillis();
+            try {
+                Context context = params.getContext();
+                ApplicationInfo appInfo = context.getApplicationInfo();
+                File appFile = new File(appInfo.sourceDir);
+                if (appFile.exists()) {
+                    lastModifiedTime = appFile.lastModified();
+                }
+            } catch (Throwable ignored) {
+                lastModifiedTime = 0;
+            } finally {
+                if (lastModifiedTime == 0) {
+                    lastModifiedTime = System.currentTimeMillis();
+                }
+            }
         }
         return lastModifiedTime;
     }

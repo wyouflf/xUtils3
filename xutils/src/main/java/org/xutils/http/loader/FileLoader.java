@@ -205,8 +205,8 @@ public class FileLoader extends Loader<File> {
                         range = fileLen - CHECK_SIZE;
                     }
                 }
-                // retry 时需要覆盖RANGE参数
-                params.setHeader("RANGE", "bytes=" + range + "-");
+                // retry 时需要覆盖Range参数
+                params.setHeader("Range", "bytes=" + range + "-");
             }
 
             if (progressHandler != null && !progressHandler.updateProgress(0, 0, false)) {

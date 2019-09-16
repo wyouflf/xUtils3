@@ -9,9 +9,10 @@ xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(249K), �
 #### 2. `http(s)`: 基于UrlConnection, Android4.4以后底层为okHttp实现.
 * 请求协议支持11种谓词: GET,POST,PUT,PATCH,HEAD,MOVE,COPY,DELETE,OPTIONS,TRACE,CONNECT
 * 支持超大文件(超过2G)上传
-* 支持断点下载
+* 支持断点下载(如果服务端支持Range参数,客户端自动处理断点下载)
 * 支持cookie(实现了domain, path, expiry等特性)
 * 支持缓存(实现了Cache-Control, Last-Modified, ETag等特性, 缓存内容过多时使用过期时间+LRU双重机制清理)
+* 支持异步和同步(可结合RxJava使用)调用
 
 #### 3. `image`: 有了`http(s)`及其下载缓存的支持, `image`模块的实现相当的简洁.
 * 支持内存缓存, 磁盘缓存(缩略图和原图), 并且支持回收被view持有, 但被MemCache移除的图片, 减少页面回退时的闪烁.

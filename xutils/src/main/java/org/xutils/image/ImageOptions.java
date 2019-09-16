@@ -70,12 +70,18 @@ public class ImageOptions {
         int screenWidth = DensityUtil.getScreenWidth();
         int screenHeight = DensityUtil.getScreenHeight();
 
+        if (this == DEFAULT) {
+            maxWidth = width = screenWidth * 3 / 2;
+            maxHeight = height = screenHeight * 3 / 2;
+            return;
+        }
+
         if (width < 0) {
-            maxWidth = screenWidth * 3 / 2; //Integer.MAX_VALUE;
+            maxWidth = screenWidth * 3 / 2;
             compress = false;
         }
         if (height < 0) {
-            maxHeight = screenHeight * 3 / 2; //Integer.MAX_VALUE;
+            maxHeight = screenHeight * 3 / 2;
             compress = false;
         }
 

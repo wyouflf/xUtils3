@@ -27,9 +27,9 @@ xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(251K), �
 ### 其他特性
 * 从3.5.0开始不再包含libwebpbackport.so
 
-#### 使用Gradle构建时添加一下依赖即可:
+#### 使用Gradle构建时添加以下依赖即可:
 ```javascript
-compile 'org.xutils:xutils:3.6.18'
+implementation 'org.xutils:xutils:3.6.18'
 ```
 
 #### 混淆配置参考示例项目sample的配置

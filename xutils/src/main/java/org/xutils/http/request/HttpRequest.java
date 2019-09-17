@@ -258,7 +258,8 @@ public class HttpRequest extends UriRequest {
             HttpException httpException = new HttpException(responseCode, this.getResponseMessage());
             try {
                 httpException.setResult(IOUtil.readStr(this.getInputStream(), params.getCharset()));
-            } catch (Throwable ignored) {
+            } catch (Throwable ex) {
+                LogUtil.w(ex.getMessage(), ex);
             }
             LogUtil.e(httpException.toString() + ", url: " + queryUrl);
             throw httpException;
@@ -358,13 +359,8 @@ public class HttpRequest extends UriRequest {
             } catch (Throwable ex) {
                 LogUtil.e(ex.getMessage(), ex);
             }
-            if (result < 1) {
-                try {
-                    result = this.getInputStream().available();
-                } catch (Throwable ignored) {
-                }
-            }
-        } else {
+        }
+        if (result < 1) {
             try {
                 result = this.getInputStream().available();
             } catch (Throwable ignored) {

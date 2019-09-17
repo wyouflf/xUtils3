@@ -318,7 +318,8 @@ public enum DbCookieStore implements CookieStore {
                     null,  // query component
                     null   // fragment component
             );
-        } catch (Throwable ignored) {
+        } catch (Throwable ex) {
+            LogUtil.w(ex.getMessage(), ex);
             effectiveURI = uri;
         }
 

@@ -289,7 +289,8 @@ public class ImageOptions {
             if (fieldValue > 0 && fieldValue < Integer.MAX_VALUE) {
                 value = fieldValue;
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable ex) {
+            LogUtil.w(ex.getMessage(), ex);
         }
         return value;
     }

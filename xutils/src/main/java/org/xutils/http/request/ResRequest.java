@@ -141,7 +141,8 @@ public class ResRequest extends UriRequest {
                 if (appFile.exists()) {
                     lastModifiedTime = appFile.lastModified();
                 }
-            } catch (Throwable ignored) {
+            } catch (Throwable ex) {
+                LogUtil.w(ex.getMessage(), ex);
                 lastModifiedTime = 0;
             } finally {
                 if (lastModifiedTime == 0) {

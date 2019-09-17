@@ -45,7 +45,8 @@ public class ParameterizedTypeUtil {
                     if (declaredClass.isAssignableFrom(cls)) {
                         try {
                             return getTrueType(getParameterizedType(t, declaredClass, paramIndex), tps, ats);
-                        } catch (Throwable ignored) {
+                        } catch (Throwable ex) {
+                            LogUtil.w(ex.getMessage(), ex);
                         }
                     }
                 }

@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import org.xutils.common.Callback;
 import org.xutils.common.util.IOUtil;
+import org.xutils.common.util.LogUtil;
 import org.xutils.http.ProgressHandler;
 
 import java.io.ByteArrayInputStream;
@@ -89,7 +90,8 @@ public class InputStreamBody implements ProgressBody {
                     inputStream instanceof ByteArrayInputStream) {
                 return inputStream.available();
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable ex) {
+            LogUtil.w(ex.getMessage(), ex);
         }
         return -1L;
     }

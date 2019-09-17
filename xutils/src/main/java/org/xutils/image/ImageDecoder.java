@@ -11,7 +11,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
-import android.os.Build;
 
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.DiskCacheFile;
@@ -48,9 +47,6 @@ public final class ImageDecoder {
 
     private final static Executor THUMB_CACHE_EXECUTOR = new PriorityExecutor(1, true);
     private final static LruDiskCache THUMB_CACHE = LruDiskCache.getDiskCache("xUtils_img_thumb");
-
-    // 4.2.1+ 对于webp是完全支持的(包含半透明的webp图)
-    private static final boolean supportWebP = Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN;
 
     static {
         int cpuCount = Runtime.getRuntime().availableProcessors();
@@ -95,6 +91,7 @@ public final class ImageDecoder {
         } else {
             Bitmap bitmap = null;
             { // decode with lock
+                boolean decodeStarted = false;
                 try {
                     synchronized (bitmapDecodeLock) {
                         while (bitmapDecodeWorker.get() >= BITMAP_DECODE_MAX_WORKER
@@ -112,6 +109,7 @@ public final class ImageDecoder {
                         throw new Callback.CancelledException("cancelled during decode image");
                     }
 
+                    decodeStarted = true;
                     bitmapDecodeWorker.incrementAndGet();
                     // get from thumb cache
                     if (options.isCompress()) {
@@ -131,7 +129,9 @@ public final class ImageDecoder {
                         }
                     }
                 } finally {
-                    bitmapDecodeWorker.decrementAndGet();
+                    if (decodeStarted) {
+                        bitmapDecodeWorker.decrementAndGet();
+                    }
                     synchronized (bitmapDecodeLock) {
                         bitmapDecodeLock.notifyAll();
                     }
@@ -590,7 +590,7 @@ public final class ImageDecoder {
             cacheFile = THUMB_CACHE.createDiskCacheFile(entity);
             if (cacheFile != null) {
                 out = new FileOutputStream(cacheFile);
-                thumbBitmap.compress(supportWebP ? Bitmap.CompressFormat.WEBP : Bitmap.CompressFormat.PNG, 80, out);
+                thumbBitmap.compress(Bitmap.CompressFormat.PNG, 80, out);
                 out.flush();
                 cacheFile = cacheFile.commit();
             }

@@ -44,16 +44,22 @@ public final class TableEntity<T> {
     /*package*/ TableEntity(DbManager db, Class<T> entityType) throws Throwable {
         this.db = db;
         this.entityType = entityType;
-        this.constructor = entityType.getConstructor();
-        this.constructor.setAccessible(true);
+
         Table table = entityType.getAnnotation(Table.class);
         if (table == null) {
             throw new DbException("missing @Table on " + entityType.getName());
         }
         this.name = table.name();
         this.onCreated = table.onCreated();
-        this.columnMap = TableUtils.findColumnMap(entityType);
 
+        try {
+            this.constructor = entityType.getConstructor();
+            this.constructor.setAccessible(true);
+        } catch (Throwable ex) {
+            throw new DbException("missing no-argument constructor for the table: " + this.name);
+        }
+
+        this.columnMap = TableUtils.findColumnMap(entityType);
         for (ColumnEntity column : columnMap.values()) {
             if (column.isId()) {
                 this.id = column;

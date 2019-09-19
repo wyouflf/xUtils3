@@ -28,6 +28,8 @@ public abstract class DbBase implements DbManager {
             if (table == null) {
                 try {
                     table = new TableEntity<T>(this, entityType);
+                } catch (DbException ex) {
+                    throw ex;
                 } catch (Throwable ex) {
                     throw new DbException(ex);
                 }

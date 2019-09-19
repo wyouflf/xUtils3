@@ -326,13 +326,11 @@ public final class DbManagerImpl extends DbBase {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T findById(Class<T> entityType, Object idValue) throws DbException {
         TableEntity<T> table = this.getTable(entityType);
         if (!table.tableIsExist()) return null;
 
-        Selector selector = Selector.from(table).where(table.getId().getName(), "=", idValue);
-
+        Selector<T> selector = Selector.from(table).where(table.getId().getName(), "=", idValue);
         String sql = selector.limit(1).toString();
         Cursor cursor = execQuery(sql);
         if (cursor != null) {
@@ -466,6 +464,7 @@ public final class DbManagerImpl extends DbBase {
 
     /**
      * xUtils对同一个库的链接是单实例的, 一般不需要关闭它.
+     *
      * @throws IOException
      */
     @Override

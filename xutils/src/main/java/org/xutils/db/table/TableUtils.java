@@ -30,7 +30,7 @@ import java.util.LinkedHashMap;
     }
 
     /* package */
-    static synchronized LinkedHashMap<String, ColumnEntity> findColumnMap(Class<?> entityType) {
+    static LinkedHashMap<String, ColumnEntity> findColumnMap(Class<?> entityType) {
         LinkedHashMap<String, ColumnEntity> columnMap = new LinkedHashMap<String, ColumnEntity>();
         addColumns2Map(entityType, columnMap);
         return columnMap;

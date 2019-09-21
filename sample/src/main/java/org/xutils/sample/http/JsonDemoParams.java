@@ -1,11 +1,8 @@
 package org.xutils.sample.http;
 
-import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.http.annotation.HttpRequest;
-import org.xutils.x;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -23,7 +23,7 @@ public class MyApplication extends Application {
         x.Ext.setDefaultHostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {
-                return true;
+                return true; // 这样是不安全的, 仅做示例.
             }
         });
     }

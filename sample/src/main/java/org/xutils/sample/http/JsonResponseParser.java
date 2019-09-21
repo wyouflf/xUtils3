@@ -1,9 +1,9 @@
 package org.xutils.sample.http;
 
+import org.xutils.common.util.LogUtil;
 import org.xutils.http.app.ResponseParser;
 import org.xutils.http.request.UriRequest;
 
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,14 +11,20 @@ import java.util.List;
 /**
  * Created by wyouflf on 15/11/5.
  * 添加在params对象的注解参数中.
- * 如果实现 InputStreamResponseParser, 可实现自定义流数据转换, 例如用于转换protobuff对象.
+ * 如果实现 ResponseParser<byte[]>, 可实现自定义流数据转换, 例如用于转换protobuf对象.
  */
-public class JsonResponseParser implements ResponseParser {
+public class JsonResponseParser implements ResponseParser<String> {
 
     @Override
-    public void checkResponse(UriRequest request) throws Throwable {
-        // custom check ?
-        // get headers ?
+    public void beforeRequest(UriRequest request) throws Throwable {
+        // custom check params?
+        LogUtil.d(request.getParams().toString());
+    }
+
+    @Override
+    public void afterRequest(UriRequest request) throws Throwable {
+        // custom check response Headers?
+        LogUtil.d("response code:" + request.getResponseCode());
     }
 
     /**
@@ -52,9 +58,4 @@ public class JsonResponseParser implements ResponseParser {
         }
 
     }
-
-    // 如果实现InputStreamResponseParser，可以在这里转换pb数据.
-    //@Override
-    //public Object parse(Type resultType, Class<?> resultClass, InputStream result) throws Throwable {
-    //}
 }

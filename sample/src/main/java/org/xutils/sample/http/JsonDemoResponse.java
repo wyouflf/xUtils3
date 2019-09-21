@@ -4,11 +4,11 @@ import org.xutils.http.annotation.HttpResponse;
 
 /**
  * Created by wyouflf on 15/11/5.
- * json 返回值示例, 如果它作为Callback的泛型,
- * 那么xUtils将自动调用JsonResponseParser将字符串转换为BaiduResponse.
+ * json 返回值示例, 如果JsonDemoResponse作为Callback的泛型,
+ * 那么xUtils将自动调用JsonResponseParser将字符串转换为JsonDemoResponse.
  *
- * @HttpResponse 注解 和 ResponseParser接口仅适合做json, xml等文本类型数据的解析,
- * 如果需要其他类型的解析可参考:
+ * @HttpResponse 注解结合 ResponseParser接口非常适合做json, xml, protobuf等类型数据的解析,
+ * 当然也可以通过PrepareCallback来实现自定义数据类型的转换, 参考:
  * {@link org.xutils.http.loader.LoaderFactory}
  * 和 {@link org.xutils.common.Callback.PrepareCallback}.
  * LoaderFactory提供PrepareCallback第一个泛型参数类型的自动转换,

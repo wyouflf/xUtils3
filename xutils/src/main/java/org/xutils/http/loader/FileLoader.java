@@ -42,6 +42,7 @@ public class FileLoader extends Loader<File> {
 
     private static final int CHECK_SIZE = 512;
 
+    private RequestParams params;
     private String tempSaveFilePath;
     private String saveFilePath;
     private boolean isAutoResume;

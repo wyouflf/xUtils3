@@ -17,11 +17,9 @@ import java.util.Date;
  */
 public abstract class Loader<T> {
 
-    protected RequestParams params;
     protected ProgressHandler progressHandler;
 
     public void setParams(final RequestParams params) {
-        this.params = params;
     }
 
     public void setProgressHandler(final ProgressHandler callbackHandler) {

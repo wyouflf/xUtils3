@@ -21,6 +21,7 @@ import java.util.List;
  */
 /*package*/ class ObjectLoader extends Loader<Object> {
 
+    private RequestParams params;
     private final Type objectType;
     private final Class<?> objectClass;
     private final ResponseParser parser;

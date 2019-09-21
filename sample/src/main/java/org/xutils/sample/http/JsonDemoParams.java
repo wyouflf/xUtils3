@@ -9,7 +9,7 @@ import java.util.List;
  * Created by wyouflf on 16/1/23.
  */
 @HttpRequest(
-        host = JsonParamsBuilder.SEEVER_A,
+        host = JsonParamsBuilder.SERVER_A,
         path = "query/test",
         builder = JsonParamsBuilder.class
 )

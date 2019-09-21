@@ -18,18 +18,18 @@ import javax.net.ssl.SSLSocketFactory;
  */
 public class JsonParamsBuilder implements ParamsBuilder {
 
-    public static final String SEEVER_A = "a";
-    public static final String SEEVER_B = "b";
+    public static final String SERVER_A = "a";
+    public static final String SERVER_B = "b";
 
     private static final HashMap<String, String> SERVER_MAP = new HashMap<String, String>();
 
     private static final HashMap<String, String> DEBUG_SERVER_MAP = new HashMap<String, String>();
 
     static {
-        SERVER_MAP.put(SEEVER_A, "https://www.baidu.com");
-        SERVER_MAP.put(SEEVER_B, "https://www.baidu.com");
-        DEBUG_SERVER_MAP.put(SEEVER_A, "https://www.baidu.com");
-        DEBUG_SERVER_MAP.put(SEEVER_B, "https://www.baidu.com");
+        SERVER_MAP.put(SERVER_A, "https://www.baidu.com");
+        SERVER_MAP.put(SERVER_B, "https://www.baidu.com");
+        DEBUG_SERVER_MAP.put(SERVER_A, "https://www.baidu.com");
+        DEBUG_SERVER_MAP.put(SERVER_B, "https://www.baidu.com");
     }
 
     @Override

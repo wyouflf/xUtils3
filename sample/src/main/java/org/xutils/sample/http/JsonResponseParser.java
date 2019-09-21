@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by wyouflf on 15/11/5.
  * 添加在params对象的注解参数中.
- * 如果实现 ResponseParser<byte[]>, 可实现自定义流数据转换, 例如用于转换protobuf对象.
+ * 如果泛型为 byte[] 或 InputStream, 可以方便的转换protobuf对象.
  */
 public class JsonResponseParser implements ResponseParser<String> {
 

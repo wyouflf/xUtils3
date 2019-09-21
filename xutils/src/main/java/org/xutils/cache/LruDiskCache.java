@@ -27,6 +27,9 @@ import java.util.concurrent.Executor;
  */
 public final class LruDiskCache {
 
+    /**
+     * key: cacheDirName
+     */
     private static final HashMap<String, LruDiskCache> DISK_CACHE_MAP = new HashMap<String, LruDiskCache>(5);
 
     private static final int LIMIT_COUNT = 5000; // 限制最多5000条数据
@@ -146,7 +149,7 @@ public final class LruDiskCache {
         if (entity != null && new File(entity.getPath()).exists()) {
             ProcessLock processLock = ProcessLock.tryLock(entity.getPath(), false, LOCK_WAIT);
             if (processLock != null && processLock.isValid()) {
-                result = new DiskCacheFile(entity, entity.getPath(), processLock);
+                result = new DiskCacheFile(entity.getPath(), entity, processLock);
                 if (!result.exists()) {
                     try {
                         cacheDb.delete(entity);
@@ -172,7 +175,7 @@ public final class LruDiskCache {
         String tempFilePath = entity.getPath() + TEMP_FILE_SUFFIX;
         ProcessLock processLock = ProcessLock.tryLock(tempFilePath, true);
         if (processLock != null && processLock.isValid()) {
-            result = new DiskCacheFile(entity, tempFilePath, processLock);
+            result = new DiskCacheFile(tempFilePath, entity, processLock);
             if (!result.getParentFile().exists()) {
                 result.mkdirs();
             }
@@ -198,7 +201,7 @@ public final class LruDiskCache {
         }
 
         DiskCacheFile result = null;
-        DiskCacheEntity cacheEntity = cacheFile.cacheEntity;
+        DiskCacheEntity cacheEntity = cacheFile.getCacheEntity();
         if (cacheFile.getName().endsWith(TEMP_FILE_SUFFIX)) { // is temp file
             ProcessLock processLock = null;
             DiskCacheFile destFile = null;
@@ -206,7 +209,7 @@ public final class LruDiskCache {
                 String destPath = cacheEntity.getPath();
                 processLock = ProcessLock.tryLock(destPath, true, LOCK_WAIT);
                 if (processLock != null && processLock.isValid()) { // lock
-                    destFile = new DiskCacheFile(cacheEntity, destPath, processLock);
+                    destFile = new DiskCacheFile(destPath, cacheEntity, processLock);
                     if (cacheFile.renameTo(destFile)) {
                         try {
                             result = destFile;

@@ -13,15 +13,10 @@ import java.io.IOException;
  */
 public final class DiskCacheFile extends File implements Closeable {
 
-    /*package*/ DiskCacheEntity cacheEntity;
-    /*package*/ ProcessLock lock;
+    private final DiskCacheEntity cacheEntity;
+    private final ProcessLock lock;
 
-    /**
-     * @param cacheEntity
-     * @param path
-     * @param lock        lock name: path
-     */
-    /*package*/ DiskCacheFile(DiskCacheEntity cacheEntity, String path, ProcessLock lock) {
+    /*package*/ DiskCacheFile(String path, DiskCacheEntity cacheEntity, ProcessLock lock) {
         super(path);
         this.cacheEntity = cacheEntity;
         this.lock = lock;

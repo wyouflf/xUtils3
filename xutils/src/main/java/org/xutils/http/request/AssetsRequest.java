@@ -22,8 +22,7 @@ public class AssetsRequest extends ResRequest {
     public InputStream getInputStream() throws IOException {
         if (inputStream == null) {
             Context context = params.getContext();
-            String assetsPath = queryUrl.substring("assets:".length());
-            assetsPath = assetsPath.replace("/", "");
+            String assetsPath = queryUrl.replace("assets://", "");
             inputStream = context.getResources().getAssets().open(assetsPath);
             contentLength = inputStream.available();
         }

@@ -355,7 +355,9 @@ public class HttpRequest extends UriRequest {
         if (connection != null) {
             try {
                 String value = connection.getHeaderField("content-length");
-                result = Long.parseLong(value);
+                if (value != null) {
+                    result = Long.parseLong(value);
+                }
             } catch (Throwable ex) {
                 LogUtil.e(ex.getMessage(), ex);
             }

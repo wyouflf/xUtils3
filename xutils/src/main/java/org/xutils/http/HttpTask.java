@@ -522,9 +522,6 @@ public class HttpTask<ResultType> extends AbsTask<ResultType> implements Progres
     private long loadingUpdateMaxTimeSpan = 300; // 300ms
 
     /**
-     * @param total
-     * @param current
-     * @param forceUpdateUI
      * @return continue
      */
     @Override

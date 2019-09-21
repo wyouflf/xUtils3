@@ -9,7 +9,7 @@ import java.util.concurrent.Executor;
  * Created by wyouflf on 15/6/5.
  * 异步任务基类
  *
- * @param <ResultType>
+ * @param <ResultType> 任务返回值类型
  */
 public abstract class AbsTask<ResultType> implements Callback.Cancelable {
 
@@ -71,8 +71,6 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
 
     /**
      * 取消任务时是否不等待任务彻底结束, 立即收到取消的通知.
-     *
-     * @return
      */
     protected boolean isCancelFast() {
         return false;

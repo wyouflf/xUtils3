@@ -52,7 +52,7 @@ public final class ProcessLock implements Closeable {
     /**
      * 获取进程锁
      *
-     * @param lockName
+     * @param lockName  锁的名称, 相同的名称被认为是同一个锁.
      * @param writeMode 是否写入模式(支持读并发).
      * @return null 或 进程锁, 如果锁已经被占用, 返回null.
      */
@@ -63,11 +63,10 @@ public final class ProcessLock implements Closeable {
     /**
      * 获取进程锁
      *
-     * @param lockName
+     * @param lockName          锁的名称, 相同的名称被认为是同一个锁.
      * @param writeMode         是否写入模式(支持读并发).
      * @param maxWaitTimeMillis 最大值 1000 * 60
      * @return null 或 进程锁, 如果锁已经被占用, 则在超时时间内继续尝试获取该锁.
-     * @throws InterruptedException
      */
     public static ProcessLock tryLock(final String lockName, final boolean writeMode, final long maxWaitTimeMillis) throws InterruptedException {
         ProcessLock lock = null;
@@ -92,8 +91,6 @@ public final class ProcessLock implements Closeable {
 
     /**
      * 锁是否有效
-     *
-     * @return
      */
     public boolean isValid() {
         return isValid(mFileLock);

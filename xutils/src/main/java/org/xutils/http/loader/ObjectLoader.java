@@ -1,7 +1,5 @@
 package org.xutils.http.loader;
 
-import android.annotation.SuppressLint;
-
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.common.util.ParameterizedTypeUtil;
 import org.xutils.http.RequestParams;
@@ -87,7 +85,6 @@ import java.util.List;
     }
 
     @Override
-    @SuppressLint("unchecked")
     @SuppressWarnings("unchecked")
     public Object load(final UriRequest request) throws Throwable {
         request.setResponseParser(parser);
@@ -96,7 +93,6 @@ import java.util.List;
     }
 
     @Override
-    @SuppressLint("unchecked")
     @SuppressWarnings("unchecked")
     public Object loadFromCache(final DiskCacheEntity cacheEntity) throws Throwable {
         Object innerLoaderResult = innerLoader.loadFromCache(cacheEntity);

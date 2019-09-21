@@ -41,7 +41,7 @@ public final class UriRequestFactory {
             Class<? extends UriRequest> cls = SCHEME_CLS_MAP.get(scheme);
             if (cls != null) {
                 Constructor<? extends UriRequest> constructor
-                        = cls.getConstructor(RequestParams.class, Class.class);
+                        = cls.getConstructor(RequestParams.class, Type.class);
                 return constructor.newInstance(params, loadType);
             } else {
                 if (scheme.startsWith("http")) {

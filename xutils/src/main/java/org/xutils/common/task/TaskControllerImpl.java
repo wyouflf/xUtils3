@@ -33,10 +33,6 @@ public final class TaskControllerImpl implements TaskController {
 
     /**
      * run task
-     *
-     * @param task
-     * @param <T>
-     * @return
      */
     @Override
     public <T> AbsTask<T> start(AbsTask<T> task) {
@@ -73,8 +69,8 @@ public final class TaskControllerImpl implements TaskController {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends AbsTask<?>> Callback.Cancelable startTasks(
             final Callback.GroupCallback<T> groupCallback, final T... tasks) {
 
@@ -224,8 +220,6 @@ public final class TaskControllerImpl implements TaskController {
 
     /**
      * run in UI thread
-     *
-     * @param runnable
      */
     @Override
     public void post(Runnable runnable) {
@@ -235,9 +229,6 @@ public final class TaskControllerImpl implements TaskController {
 
     /**
      * run in UI thread
-     *
-     * @param runnable
-     * @param delayMillis
      */
     @Override
     public void postDelayed(Runnable runnable, long delayMillis) {
@@ -247,8 +238,6 @@ public final class TaskControllerImpl implements TaskController {
 
     /**
      * run in background thread
-     *
-     * @param runnable
      */
     @Override
     public void run(Runnable runnable) {
@@ -261,8 +250,6 @@ public final class TaskControllerImpl implements TaskController {
 
     /**
      * 移除post或postDelayed提交的, 未执行的runnable
-     *
-     * @param runnable
      */
     @Override
     public void removeCallbacks(Runnable runnable) {

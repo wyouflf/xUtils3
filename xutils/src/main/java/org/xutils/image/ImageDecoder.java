@@ -1,5 +1,6 @@
 package org.xutils.image;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,7 +11,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
 
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.DiskCacheFile;
@@ -63,12 +63,6 @@ public final class ImageDecoder {
 
     /**
      * decode image file for ImageLoader
-     *
-     * @param file
-     * @param options
-     * @param cancelable
-     * @return
-     * @throws IOException
      */
     /*package*/
     static Drawable decodeFileWithLock(final File file,
@@ -161,12 +155,6 @@ public final class ImageDecoder {
 
     /**
      * 转化文件为Bitmap.
-     *
-     * @param file
-     * @param options
-     * @param cancelable
-     * @return
-     * @throws IOException
      */
     public static Bitmap decodeBitmap(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
         {// check params
@@ -280,12 +268,6 @@ public final class ImageDecoder {
 
     /**
      * 转换文件为Movie, 可用于创建GifDrawable.
-     *
-     * @param file
-     * @param options
-     * @param cancelable
-     * @return
-     * @throws IOException
      */
     public static Movie decodeGif(File file, ImageOptions options, Callback.Cancelable cancelable) throws IOException {
         {// check params
@@ -326,11 +308,11 @@ public final class ImageDecoder {
     /**
      * 计算压缩采样倍数
      *
-     * @param rawWidth
-     * @param rawHeight
-     * @param maxWidth
-     * @param maxHeight
-     * @return
+     * @param rawWidth  图片宽度
+     * @param rawHeight 图片高度
+     * @param maxWidth  最大宽度
+     * @param maxHeight 最大高度
+     * @return 压缩采样倍数
      */
     public static int calculateSampleSize(final int rawWidth, final int rawHeight,
                                           final int maxWidth, final int maxHeight) {
@@ -361,9 +343,7 @@ public final class ImageDecoder {
     /**
      * 裁剪方形图片
      *
-     * @param source
-     * @param recycleSource 裁剪成功后销毁原图
-     * @return
+     * @param recycleSource 是否裁剪成功后销毁原图
      */
     public static Bitmap cut2Square(Bitmap source, boolean recycleSource) {
         int width = source.getWidth();
@@ -389,9 +369,7 @@ public final class ImageDecoder {
     /**
      * 裁剪圆形图片
      *
-     * @param source
-     * @param recycleSource 裁剪成功后销毁原图
-     * @return
+     * @param recycleSource 是否裁剪成功后销毁原图
      */
     public static Bitmap cut2Circular(Bitmap source, boolean recycleSource) {
         int width = source.getWidth();
@@ -418,11 +396,7 @@ public final class ImageDecoder {
     /**
      * 裁剪圆角
      *
-     * @param source
-     * @param radius
-     * @param isSquare
-     * @param recycleSource 裁剪成功后销毁原图
-     * @return
+     * @param recycleSource 是否裁剪成功后销毁原图
      */
     public static Bitmap cut2RoundCorner(Bitmap source, int radius, boolean isSquare, boolean recycleSource) {
         if (radius <= 0) return source;
@@ -458,11 +432,7 @@ public final class ImageDecoder {
     /**
      * 裁剪并缩放至指定大小
      *
-     * @param source
-     * @param dstWidth
-     * @param dstHeight
-     * @param recycleSource 裁剪成功后销毁原图
-     * @return
+     * @param recycleSource 是否裁剪成功后销毁原图
      */
     public static Bitmap cut2ScaleSize(Bitmap source, int dstWidth, int dstHeight, boolean recycleSource) {
         final int width = source.getWidth();
@@ -510,10 +480,7 @@ public final class ImageDecoder {
     /**
      * 旋转图片
      *
-     * @param source
-     * @param angle
-     * @param recycleSource
-     * @return
+     * @param recycleSource 是否旋转成功后销毁原图
      */
     public static Bitmap rotate(Bitmap source, int angle, boolean recycleSource) {
         Bitmap result = null;
@@ -543,24 +510,25 @@ public final class ImageDecoder {
     /**
      * 获取图片旋转角度
      *
-     * @param filePath
-     * @return
+     * @param filePath 图片文件路径
+     * @return 需要旋转的角度
      */
+    @SuppressLint("ExifInterface")
     public static int getRotateAngle(String filePath) {
         int angle = 0;
         try {
-            ExifInterface exif = new ExifInterface(filePath);
+            android.media.ExifInterface exif = new android.media.ExifInterface(filePath);
             int orientation = exif.getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_UNDEFINED);
+                    android.media.ExifInterface.TAG_ORIENTATION,
+                    android.media.ExifInterface.ORIENTATION_UNDEFINED);
             switch (orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
+                case android.media.ExifInterface.ORIENTATION_ROTATE_90:
                     angle = 90;
                     break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
+                case android.media.ExifInterface.ORIENTATION_ROTATE_180:
                     angle = 180;
                     break;
-                case ExifInterface.ORIENTATION_ROTATE_270:
+                case android.media.ExifInterface.ORIENTATION_ROTATE_270:
                     angle = 270;
                     break;
                 default:
@@ -575,10 +543,6 @@ public final class ImageDecoder {
 
     /**
      * 根据文件的修改时间和图片的属性保存缩略图
-     *
-     * @param file
-     * @param options
-     * @param thumbBitmap
      */
     private static void saveThumbCache(File file, ImageOptions options, Bitmap thumbBitmap) {
         DiskCacheEntity entity = new DiskCacheEntity();
@@ -605,10 +569,6 @@ public final class ImageDecoder {
 
     /**
      * 根据文件的修改时间和图片的属性获取缩略图
-     *
-     * @param file
-     * @param options
-     * @return
      */
     private static Bitmap getThumbCache(File file, ImageOptions options) {
         DiskCacheFile cacheFile = null;

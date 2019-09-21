@@ -4,8 +4,8 @@ import org.xutils.cache.DiskCacheEntity;
 import org.xutils.http.request.UriRequest;
 
 /**
- * @author: wyouflf
- * @date: 2014/10/17
+ * Author: wyouflf
+ * Time: 2014/10/17
  */
 /*package*/ class IntegerLoader extends Loader<Integer> {
     @Override

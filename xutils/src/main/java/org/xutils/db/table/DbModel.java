@@ -112,8 +112,7 @@ public final class DbModel {
     }
 
     /**
-     * @param columnName
-     * @return
+     * 列数据是否空
      */
     public boolean isEmpty(String columnName) {
         return TextUtils.isEmpty(dataMap.get(columnName));

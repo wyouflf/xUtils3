@@ -180,8 +180,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 是否在请求过程中启用cookie, 默认true.
-     *
-     * @return
      */
     public boolean isUseCookie() {
         return useCookie;
@@ -189,8 +187,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 是否在请求过程中启用cookie, 默认true.
-     *
-     * @param useCookie
      */
     public void setUseCookie(boolean useCookie) {
         this.useCookie = useCookie;
@@ -236,8 +232,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 注意get请求失败后默认会重试2次, 可以通过setMaxRetryCount(0)来防止get请求自动重试.
-     *
-     * @param readTimeout
      */
     public void setReadTimeout(int readTimeout) {
         if (readTimeout > 0) {
@@ -263,8 +257,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
-     *
-     * @return
      */
     public long getCacheMaxAge() {
         return cacheMaxAge;
@@ -272,8 +264,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 默认缓存存活时间, 单位:毫秒.(如果服务没有返回有效的max-age或Expires)
-     *
-     * @param cacheMaxAge
      */
     public void setCacheMaxAge(long cacheMaxAge) {
         this.cacheMaxAge = cacheMaxAge;
@@ -281,8 +271,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 自定义线程池
-     *
-     * @return
      */
     public Executor getExecutor() {
         return executor;

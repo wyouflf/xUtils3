@@ -40,8 +40,6 @@ public class WhereBuilder {
 
     /**
      * create new instance
-     *
-     * @return
      */
     public static WhereBuilder b() {
         return new WhereBuilder();
@@ -50,10 +48,7 @@ public class WhereBuilder {
     /**
      * create new instance
      *
-     * @param columnName
-     * @param op         operator: "=","LIKE","IN","BETWEEN"...
-     * @param value
-     * @return
+     * @param op operator: "=","LIKE","IN","BETWEEN"...
      */
     public static WhereBuilder b(String columnName, String op, Object value) {
         WhereBuilder result = new WhereBuilder();
@@ -64,10 +59,7 @@ public class WhereBuilder {
     /**
      * add AND condition
      *
-     * @param columnName
-     * @param op         operator: "=","LIKE","IN","BETWEEN"...
-     * @param value
-     * @return
+     * @param op operator: "=","LIKE","IN","BETWEEN"...
      */
     public WhereBuilder and(String columnName, String op, Object value) {
         appendCondition(whereItems.size() == 0 ? null : "AND", columnName, op, value);
@@ -78,7 +70,6 @@ public class WhereBuilder {
      * add AND condition
      *
      * @param where expr("[AND] (" + where.toString() + ")")
-     * @return
      */
     public WhereBuilder and(WhereBuilder where) {
         String condition = whereItems.size() == 0 ? " " : "AND ";
@@ -88,10 +79,7 @@ public class WhereBuilder {
     /**
      * add OR condition
      *
-     * @param columnName
-     * @param op         operator: "=","LIKE","IN","BETWEEN"...
-     * @param value
-     * @return
+     * @param op operator: "=","LIKE","IN","BETWEEN"...
      */
     public WhereBuilder or(String columnName, String op, Object value) {
         appendCondition(whereItems.size() == 0 ? null : "OR", columnName, op, value);
@@ -102,7 +90,6 @@ public class WhereBuilder {
      * add OR condition
      *
      * @param where expr("[OR] (" + where.toString() + ")")
-     * @return
      */
     public WhereBuilder or(WhereBuilder where) {
         String condition = whereItems.size() == 0 ? " " : "OR ";

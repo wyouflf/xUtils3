@@ -126,10 +126,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
     /**
      * load from Network or DiskCache, invoke in any thread.
-     *
-     * @param url
-     * @param options
-     * @param callback
      */
     /*package*/
     static Cancelable doLoadDrawable(final String url,
@@ -146,10 +142,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
     /**
      * load from Network or DiskCache, invoke in any thread.
-     *
-     * @param url
-     * @param options
-     * @param callback
      */
     /*package*/
     static Cancelable doLoadFile(final String url,
@@ -166,11 +158,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
     /**
      * load from Network or DiskCache, invoke in ui thread.
-     *
-     * @param view
-     * @param url
-     * @param options
-     * @param callback
      */
     /*package*/
     static Cancelable doBind(final ImageView view,
@@ -295,11 +282,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
     /**
      * load from Network or DiskCache
-     *
-     * @param view
-     * @param url
-     * @param options
-     * @param callback
      */
     private Cancelable doLoad(ImageView view,
                               String url,

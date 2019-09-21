@@ -95,8 +95,11 @@ import java.util.List;
     }
 
     @Override
+    @SuppressLint("unchecked")
+    @SuppressWarnings("unchecked")
     public Object loadFromCache(final DiskCacheEntity cacheEntity) throws Throwable {
-        return innerLoader.loadFromCache(cacheEntity);
+        Object innerLoaderResult = innerLoader.loadFromCache(cacheEntity);
+        return parser.parse(objectType, objectClass, innerLoaderResult);
     }
 
     @Override

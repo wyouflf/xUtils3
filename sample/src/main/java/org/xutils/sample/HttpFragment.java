@@ -223,6 +223,7 @@ public class HttpFragment extends BaseFragment {
                 //   如果服务端返回304, 则表示数据没有更新, 不继续加载数据.
                 //
                 this.result = result;
+                LogUtil.d(result);
                 return false; // true: 信任缓存数据, 不在发起网络请求; false不信任缓存数据.
             }
 

@@ -24,6 +24,9 @@ public final class DiskCacheEntity {
     @Column(name = "textContent")
     private String textContent;
 
+    @Column(name = "bytesContent")
+    private byte[] bytesContent;
+
     // from "max-age" (since http 1.1)
     @Column(name = "expires")
     private long expires = Long.MAX_VALUE;
@@ -74,6 +77,14 @@ public final class DiskCacheEntity {
 
     public void setTextContent(String textContent) {
         this.textContent = textContent;
+    }
+
+    public byte[] getBytesContent() {
+        return bytesContent;
+    }
+
+    public void setBytesContent(byte[] bytesContent) {
+        this.bytesContent = bytesContent;
     }
 
     public long getExpires() {

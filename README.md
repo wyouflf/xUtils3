@@ -109,7 +109,7 @@ Callback.Cancelable cancelable
        *
        * 自定义callback的泛型支持方案2, 自定义一类数据的自动转化: 
        * 将注解@HttpResponse加到自定义返回值类型上, 实现自定义ResponseParser接口来统一转换.
-       * 如果返回值是json/xml/protobuf等数据格式, 那么利用第三方的json/xml/protobuf等工具将十分容易定义自己的ResponseParser/InputStreamResponseParser.
+       * 如果返回值是json/xml/protobuf等数据格式, 那么利用第三方的json/xml/protobuf等工具将十分容易定义自己的ResponseParser.
        * 如示例代码{@link org.xutils.sample.http.JsonDemoResponse}, 可直接使用JsonDemoResponse作为callback的泛型.
        *
        * 2. callback的组合:

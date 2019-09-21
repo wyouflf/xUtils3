@@ -4,6 +4,7 @@ import org.xutils.common.util.LogUtil;
 import org.xutils.http.ProgressHandler;
 import org.xutils.http.RequestParams;
 import org.xutils.http.app.RequestInterceptListener;
+import org.xutils.http.app.ResponseParser;
 import org.xutils.http.loader.Loader;
 import org.xutils.http.loader.LoaderFactory;
 import org.xutils.x;
@@ -26,6 +27,7 @@ public abstract class UriRequest implements Closeable {
     protected final Loader<?> loader;
 
     protected ProgressHandler progressHandler = null;
+    protected ResponseParser responseParser = null;
     protected RequestInterceptListener requestInterceptListener = null;
 
     public UriRequest(RequestParams params, Type loadType) throws Throwable {
@@ -42,6 +44,10 @@ public abstract class UriRequest implements Closeable {
     public void setProgressHandler(ProgressHandler progressHandler) {
         this.progressHandler = progressHandler;
         this.loader.setProgressHandler(progressHandler);
+    }
+
+    public void setResponseParser(ResponseParser responseParser) {
+        this.responseParser = responseParser;
     }
 
     public void setRequestInterceptListener(RequestInterceptListener requestInterceptListener) {

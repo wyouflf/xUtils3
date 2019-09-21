@@ -180,6 +180,9 @@ public class HttpRequest extends UriRequest {
         }
 
         // intercept response
+        if (responseParser != null) {
+            responseParser.beforeRequest(this);
+        }
         if (requestInterceptListener != null) {
             requestInterceptListener.beforeRequest(this);
         }
@@ -248,9 +251,13 @@ public class HttpRequest extends UriRequest {
 
         // check response code
         responseCode = connection.getResponseCode();
-        // intercept response
-        if (requestInterceptListener != null) {
-            requestInterceptListener.afterRequest(this);
+        {   // intercept response
+            if (responseParser != null) {
+                responseParser.afterRequest(this);
+            }
+            if (requestInterceptListener != null) {
+                requestInterceptListener.afterRequest(this);
+            }
         }
         if (responseCode == 204 || responseCode == 205) { // empty content
             throw new HttpException(responseCode, this.getResponseMessage());

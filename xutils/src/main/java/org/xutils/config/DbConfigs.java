@@ -11,7 +11,7 @@ import org.xutils.ex.DbException;
 public enum DbConfigs {
     HTTP(new DbManager.DaoConfig()
             .setDbName("xUtils_http_cache.db")
-            .setDbVersion(1)
+            .setDbVersion(2)
             .setDbOpenListener(new DbManager.DbOpenListener() {
                 @Override
                 public void onDbOpened(DbManager db) {

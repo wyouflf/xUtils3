@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.xutils.http.RequestParams;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
@@ -29,9 +30,12 @@ public final class LoaderFactory {
         converterHashMap.put(String.class, new StringLoader());
         converterHashMap.put(File.class, new FileLoader());
         converterHashMap.put(byte[].class, new ByteArrayLoader());
+        converterHashMap.put(InputStream.class, new InputStreamLoader());
+
         BooleanLoader booleanLoader = new BooleanLoader();
         converterHashMap.put(boolean.class, booleanLoader);
         converterHashMap.put(Boolean.class, booleanLoader);
+
         IntegerLoader integerLoader = new IntegerLoader();
         converterHashMap.put(int.class, integerLoader);
         converterHashMap.put(Integer.class, integerLoader);

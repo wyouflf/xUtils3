@@ -33,7 +33,8 @@ public abstract class UriRequest implements Closeable {
     public UriRequest(RequestParams params, Type loadType) throws Throwable {
         this.params = params;
         this.queryUrl = buildQueryUrl(params);
-        this.loader = LoaderFactory.getLoader(loadType, params);
+        this.loader = LoaderFactory.getLoader(loadType);
+        this.loader.setParams(params);
     }
 
     // build query

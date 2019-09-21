@@ -3,7 +3,6 @@ package org.xutils.http.loader;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.xutils.http.RequestParams;
 
 import java.io.File;
 import java.io.InputStream;
@@ -41,14 +40,13 @@ public final class LoaderFactory {
         converterHashMap.put(Integer.class, integerLoader);
     }
 
-    public static Loader<?> getLoader(Type type, RequestParams params) {
+    public static Loader<?> getLoader(Type type) {
         Loader<?> result = converterHashMap.get(type);
         if (result == null) {
             result = new ObjectLoader(type);
         } else {
             result = result.newInstance();
         }
-        result.setParams(params);
         return result;
     }
 

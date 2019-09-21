@@ -19,7 +19,6 @@ import java.util.List;
  */
 /*package*/ class ObjectLoader extends Loader<Object> {
 
-    private RequestParams params;
     private final Type objectType;
     private final Class<?> objectClass;
     private final ResponseParser parser;
@@ -61,7 +60,7 @@ import java.util.List;
                 Class<? extends ResponseParser> parserCls = response.parser();
                 this.parser = parserCls.newInstance();
                 this.innerLoader = LoaderFactory.getLoader(
-                        ParameterizedTypeUtil.getParameterizedType(parserCls, ResponseParser.class, 0), params);
+                        ParameterizedTypeUtil.getParameterizedType(parserCls, ResponseParser.class, 0));
             } catch (Throwable ex) {
                 throw new RuntimeException("create parser error", ex);
             }
@@ -81,7 +80,7 @@ import java.util.List;
 
     @Override
     public void setParams(final RequestParams params) {
-        this.params = params;
+        this.innerLoader.setParams(params);
     }
 
     @Override

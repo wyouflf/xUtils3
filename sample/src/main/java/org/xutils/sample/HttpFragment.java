@@ -77,14 +77,14 @@ public class HttpFragment extends BaseFragment {
                  * 2. callback的组合:
                  * 可以用基类或接口组合个种类的Callback, 见{@link org.xutils.common.Callback}.
                  * 例如:
-                 * a. 组合使用CacheCallback将使请求检测缓存或将结果存入缓存(仅GET请求生效).
+                 * a. 组合使用CacheCallback将使请求检测缓存或将结果存入缓存(仅GET和POST请求生效).
                  * b. 组合使用PrepareCallback的prepare方法将为callback提供一次后台执行耗时任务的机会, 然后将结果给onCache或onSuccess.
                  * c. 组合使用ProgressCallback将提供进度回调.
                  * 可参考{@link org.xutils.image.ImageLoader} 或 示例代码中的 {@link org.xutils.sample.download.DownloadCallback}
                  *
                  * 3. 请求过程拦截或记录日志: 参考 {@link org.xutils.http.app.RequestTracker}
                  *
-                 * 4. 请求Header获取: 参考 {@link org.xutils.http.app.RequestInterceptListener}
+                 * 4. 请求Header获取: 参考 {@link org.xutils.sample.http.JsonResponseParser} 或 {@link org.xutils.http.app.RequestInterceptListener}
                  *
                  * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
                  *

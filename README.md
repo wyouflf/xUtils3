@@ -76,6 +76,37 @@ private void onTest1Click(View view) {
 ```
 
 ### 访问网络(更多示例参考sample项目)
+#### 如果你只需要一个简单的网络请求:
+```java
+@Event(value = R.id.btn_test2)
+private void onTest2Click(View view) {
+    RequestParams params = new RequestParams("https://www.baidu.com/s");
+    // params.setSslSocketFactory(...); // 如果需要自定义SSL
+    params.addQueryStringParameter("wd", "xUtils");
+    x.http().get(params, new Callback.CommonCallback<String>() {
+        @Override
+        public void onSuccess(String result) {
+            Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onError(Throwable ex, boolean isOnCallback) {
+            Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onCancelled(CancelledException cex) {
+            Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onFinished() {
+
+        }
+    });
+}
+````
+#### json或protobuf类型请求的处理
 ```java
 /**
  * 自定义实体参数类请参考:
@@ -115,14 +146,14 @@ Callback.Cancelable cancelable
        * 2. callback的组合:
        * 可以用基类或接口组合个种类的Callback, 见{@link org.xutils.common.Callback}.
        * 例如:
-       * a. 组合使用CacheCallback将使请求检测缓存或将结果存入缓存(仅GET请求生效).
+       * a. 组合使用CacheCallback将使请求检测缓存或将结果存入缓存(仅GET和POST请求生效).
        * b. 组合使用PrepareCallback的prepare方法将为callback提供一次后台执行耗时任务的机会, 然后将结果给onCache或onSuccess.
        * c. 组合使用ProgressCallback将提供进度回调.
        * 可参考{@link org.xutils.image.ImageLoader} 或 示例代码中的 {@link org.xutils.sample.download.DownloadCallback}
        *
        * 3. 请求过程拦截或记录日志: 参考 {@link org.xutils.http.app.RequestTracker}
        *
-       * 4. 请求Header获取: 参考 {@link org.xutils.http.app.RequestInterceptListener}
+       * 4. 请求Header获取: 参考 {@link org.xutils.sample.http.JsonResponseParser} 或 {@link org.xutils.http.app.RequestInterceptListener}
        *
        * 5. 其他(线程池, 超时, 重定向, 重试, 代理等): 参考 {@link org.xutils.http.RequestParams}
        *
@@ -161,36 +192,6 @@ Callback.Cancelable cancelable
 
 // cancelable.cancel(); // 取消请求
 ```
-#### 如果你只需要一个简单的版本:
-```java
-@Event(value = R.id.btn_test2)
-private void onTest2Click(View view) {
-    RequestParams params = new RequestParams("https://www.baidu.com/s");
-    params.setSslSocketFactory(...); // 设置ssl
-    params.addQueryStringParameter("wd", "xUtils");
-    x.http().get(params, new Callback.CommonCallback<String>() {
-        @Override
-        public void onSuccess(String result) {
-            Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onError(Throwable ex, boolean isOnCallback) {
-            Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onCancelled(CancelledException cex) {
-            Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onFinished() {
-
-        }
-    });
-}
-````
 #### 带有缓存的请求示例:
 ```java
 JsonDemoParams params = new JsonDemoParams();

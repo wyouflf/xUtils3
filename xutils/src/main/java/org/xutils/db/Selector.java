@@ -142,7 +142,7 @@ public final class Selector<T> {
     }
 
     public T findFirst() throws DbException {
-        if (!table.tableIsExist()) return null;
+        if (!table.tableIsExists()) return null;
 
         this.limit(1);
         Cursor cursor = table.getDb().execQuery(this.toString());
@@ -161,7 +161,7 @@ public final class Selector<T> {
     }
 
     public List<T> findAll() throws DbException {
-        if (!table.tableIsExist()) return null;
+        if (!table.tableIsExists()) return null;
 
         List<T> result = null;
         Cursor cursor = table.getDb().execQuery(this.toString());
@@ -182,7 +182,7 @@ public final class Selector<T> {
     }
 
     public long count() throws DbException {
-        if (!table.tableIsExist()) return 0;
+        if (!table.tableIsExists()) return 0;
 
         DbModelSelector dmSelector = this.select("count(\"" + table.getId().getName() + "\") as count");
         DbModel firstModel = dmSelector.findFirst();

@@ -135,7 +135,7 @@ public final class DbModelSelector {
 
     public DbModel findFirst() throws DbException {
         TableEntity<?> table = selector.getTable();
-        if (!table.tableIsExist()) return null;
+        if (!table.tableIsExists()) return null;
 
         this.limit(1);
         Cursor cursor = table.getDb().execQuery(this.toString());
@@ -155,7 +155,7 @@ public final class DbModelSelector {
 
     public List<DbModel> findAll() throws DbException {
         TableEntity<?> table = selector.getTable();
-        if (!table.tableIsExist()) return null;
+        if (!table.tableIsExists()) return null;
 
         List<DbModel> result = null;
 

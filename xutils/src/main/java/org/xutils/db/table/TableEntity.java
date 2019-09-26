@@ -16,10 +16,13 @@
 package org.xutils.db.table;
 
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import org.xutils.DbManager;
 import org.xutils.common.util.IOUtil;
 import org.xutils.db.annotation.Table;
+import org.xutils.db.sqlite.SqlInfo;
+import org.xutils.db.sqlite.SqlInfoBuilder;
 import org.xutils.ex.DbException;
 
 import java.lang.reflect.Constructor;
@@ -31,10 +34,10 @@ public final class TableEntity<T> {
     private final DbManager db;
     private final String name;
     private final String onCreated;
+    private final Class<T> entityType;
+    private final Constructor<T> constructor;
     private ColumnEntity id;
-    private Class<T> entityType;
-    private Constructor<T> constructor;
-    private volatile boolean checkedDatabase;
+    private volatile boolean tableCheckedStatus;
 
     /**
      * key: columnName
@@ -72,8 +75,8 @@ public final class TableEntity<T> {
         return this.constructor.newInstance();
     }
 
-    public boolean tableIsExist() throws DbException {
-        if (this.isCheckedDatabase()) {
+    public boolean tableIsExists() throws DbException {
+        if (tableCheckedStatus) {
             return true;
         }
 
@@ -83,7 +86,7 @@ public final class TableEntity<T> {
                 if (cursor.moveToNext()) {
                     int count = cursor.getInt(0);
                     if (count > 0) {
-                        this.setCheckedDatabase(true);
+                        tableCheckedStatus = true;
                         return true;
                     }
                 }
@@ -95,6 +98,25 @@ public final class TableEntity<T> {
         }
 
         return false;
+    }
+
+    public void createTableIfNotExists() throws DbException {
+        if (!this.tableIsExists()) {
+            synchronized (entityType) {
+                if (!this.tableIsExists()) {
+                    SqlInfo sqlInfo = SqlInfoBuilder.buildCreateTableSqlInfo(this);
+                    db.execNonQuery(sqlInfo);
+                    if (!TextUtils.isEmpty(onCreated)) {
+                        db.execNonQuery(onCreated);
+                    }
+                    tableCheckedStatus = true;
+                    DbManager.TableCreateListener listener = db.getDaoConfig().getTableCreateListener();
+                    if (listener != null) {
+                        listener.onTableCreated(db, this);
+                    }
+                }
+            }
+        }
     }
 
     public DbManager getDb() {
@@ -121,12 +143,8 @@ public final class TableEntity<T> {
         return columnMap;
     }
 
-    /*package*/ boolean isCheckedDatabase() {
-        return checkedDatabase;
-    }
-
-    /*package*/ void setCheckedDatabase(boolean checkedDatabase) {
-        this.checkedDatabase = checkedDatabase;
+    /*package*/ void setTableCheckedStatus(boolean tableCheckedStatus) {
+        this.tableCheckedStatus = tableCheckedStatus;
     }
 
     @Override

@@ -124,13 +124,13 @@ public final class DbManagerImpl extends DbBase {
                 List<?> entities = (List<?>) entity;
                 if (entities.isEmpty()) return;
                 TableEntity<?> table = this.getTable(entities.get(0).getClass());
-                createTableIfNotExist(table);
+                table.createTableIfNotExists();
                 for (Object item : entities) {
                     saveOrUpdateWithoutTransaction(table, item);
                 }
             } else {
                 TableEntity<?> table = this.getTable(entity.getClass());
-                createTableIfNotExist(table);
+                table.createTableIfNotExists();
                 saveOrUpdateWithoutTransaction(table, entity);
             }
 
@@ -149,13 +149,13 @@ public final class DbManagerImpl extends DbBase {
                 List<?> entities = (List<?>) entity;
                 if (entities.isEmpty()) return;
                 TableEntity<?> table = this.getTable(entities.get(0).getClass());
-                createTableIfNotExist(table);
+                table.createTableIfNotExists();
                 for (Object item : entities) {
                     execNonQuery(SqlInfoBuilder.buildReplaceSqlInfo(table, item));
                 }
             } else {
                 TableEntity<?> table = this.getTable(entity.getClass());
-                createTableIfNotExist(table);
+                table.createTableIfNotExists();
                 execNonQuery(SqlInfoBuilder.buildReplaceSqlInfo(table, entity));
             }
 
@@ -174,13 +174,13 @@ public final class DbManagerImpl extends DbBase {
                 List<?> entities = (List<?>) entity;
                 if (entities.isEmpty()) return;
                 TableEntity<?> table = this.getTable(entities.get(0).getClass());
-                createTableIfNotExist(table);
+                table.createTableIfNotExists();
                 for (Object item : entities) {
                     execNonQuery(SqlInfoBuilder.buildInsertSqlInfo(table, item));
                 }
             } else {
                 TableEntity<?> table = this.getTable(entity.getClass());
-                createTableIfNotExist(table);
+                table.createTableIfNotExists();
                 execNonQuery(SqlInfoBuilder.buildInsertSqlInfo(table, entity));
             }
 
@@ -200,7 +200,7 @@ public final class DbManagerImpl extends DbBase {
                 List<?> entities = (List<?>) entity;
                 if (entities.isEmpty()) return false;
                 TableEntity<?> table = this.getTable(entities.get(0).getClass());
-                createTableIfNotExist(table);
+                table.createTableIfNotExists();
                 for (Object item : entities) {
                     if (!saveBindingIdWithoutTransaction(table, item)) {
                         throw new DbException("saveBindingId error, transaction will not commit!");
@@ -208,7 +208,7 @@ public final class DbManagerImpl extends DbBase {
                 }
             } else {
                 TableEntity<?> table = this.getTable(entity.getClass());
-                createTableIfNotExist(table);
+                table.createTableIfNotExists();
                 result = saveBindingIdWithoutTransaction(table, entity);
             }
 
@@ -222,7 +222,7 @@ public final class DbManagerImpl extends DbBase {
     @Override
     public void deleteById(Class<?> entityType, Object idValue) throws DbException {
         TableEntity<?> table = this.getTable(entityType);
-        if (!table.tableIsExist()) return;
+        if (!table.tableIsExists()) return;
         try {
             beginTransaction();
 
@@ -243,13 +243,13 @@ public final class DbManagerImpl extends DbBase {
                 List<?> entities = (List<?>) entity;
                 if (entities.isEmpty()) return;
                 TableEntity<?> table = this.getTable(entities.get(0).getClass());
-                if (!table.tableIsExist()) return;
+                if (!table.tableIsExists()) return;
                 for (Object item : entities) {
                     execNonQuery(SqlInfoBuilder.buildDeleteSqlInfo(table, item));
                 }
             } else {
                 TableEntity<?> table = this.getTable(entity.getClass());
-                if (!table.tableIsExist()) return;
+                if (!table.tableIsExists()) return;
                 execNonQuery(SqlInfoBuilder.buildDeleteSqlInfo(table, entity));
             }
 
@@ -267,7 +267,7 @@ public final class DbManagerImpl extends DbBase {
     @Override
     public int delete(Class<?> entityType, WhereBuilder whereBuilder) throws DbException {
         TableEntity<?> table = this.getTable(entityType);
-        if (!table.tableIsExist()) return 0;
+        if (!table.tableIsExists()) return 0;
         int result = 0;
         try {
             beginTransaction();
@@ -290,13 +290,13 @@ public final class DbManagerImpl extends DbBase {
                 List<?> entities = (List<?>) entity;
                 if (entities.isEmpty()) return;
                 TableEntity<?> table = this.getTable(entities.get(0).getClass());
-                if (!table.tableIsExist()) return;
+                if (!table.tableIsExists()) return;
                 for (Object item : entities) {
                     execNonQuery(SqlInfoBuilder.buildUpdateSqlInfo(table, item, updateColumnNames));
                 }
             } else {
                 TableEntity<?> table = this.getTable(entity.getClass());
-                if (!table.tableIsExist()) return;
+                if (!table.tableIsExists()) return;
                 execNonQuery(SqlInfoBuilder.buildUpdateSqlInfo(table, entity, updateColumnNames));
             }
 
@@ -309,7 +309,7 @@ public final class DbManagerImpl extends DbBase {
     @Override
     public int update(Class<?> entityType, WhereBuilder whereBuilder, KeyValue... nameValuePairs) throws DbException {
         TableEntity<?> table = this.getTable(entityType);
-        if (!table.tableIsExist()) return 0;
+        if (!table.tableIsExists()) return 0;
 
         int result = 0;
         try {
@@ -328,7 +328,7 @@ public final class DbManagerImpl extends DbBase {
     @Override
     public <T> T findById(Class<T> entityType, Object idValue) throws DbException {
         TableEntity<T> table = this.getTable(entityType);
-        if (!table.tableIsExist()) return null;
+        if (!table.tableIsExists()) return null;
 
         Selector<T> selector = Selector.from(table).where(table.getId().getName(), "=", idValue);
         String sql = selector.limit(1).toString();

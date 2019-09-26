@@ -1,13 +1,10 @@
 package org.xutils.db.table;
 
 import android.database.Cursor;
-import android.text.TextUtils;
 
 import org.xutils.DbManager;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
-import org.xutils.db.sqlite.SqlInfo;
-import org.xutils.db.sqlite.SqlInfoBuilder;
 import org.xutils.ex.DbException;
 
 import java.util.HashMap;
@@ -43,9 +40,9 @@ public abstract class DbBase implements DbManager {
     @Override
     public void dropTable(Class<?> entityType) throws DbException {
         TableEntity<?> table = this.getTable(entityType);
-        if (!table.tableIsExist()) return;
+        if (!table.tableIsExists()) return;
         execNonQuery("DROP TABLE \"" + table.getName() + "\"");
-        table.setCheckedDatabase(false);
+        table.setTableCheckedStatus(false);
         this.removeTable(entityType);
     }
 
@@ -65,7 +62,7 @@ public abstract class DbBase implements DbManager {
 
                 synchronized (tableMap) {
                     for (TableEntity<?> table : tableMap.values()) {
-                        table.setCheckedDatabase(false);
+                        table.setTableCheckedStatus(false);
                     }
                     tableMap.clear();
                 }
@@ -88,26 +85,6 @@ public abstract class DbBase implements DbManager {
                     append(" ").append(col.getColumnDbType()).
                     append(" ").append(col.getProperty());
             execNonQuery(builder.toString());
-        }
-    }
-
-    protected void createTableIfNotExist(TableEntity<?> table) throws DbException {
-        if (!table.tableIsExist()) {
-            synchronized (table.getClass()) {
-                if (!table.tableIsExist()) {
-                    SqlInfo sqlInfo = SqlInfoBuilder.buildCreateTableSqlInfo(table);
-                    execNonQuery(sqlInfo);
-                    String execAfterTableCreated = table.getOnCreated();
-                    if (!TextUtils.isEmpty(execAfterTableCreated)) {
-                        execNonQuery(execAfterTableCreated);
-                    }
-                    table.setCheckedDatabase(true);
-                    TableCreateListener listener = this.getDaoConfig().getTableCreateListener();
-                    if (listener != null) {
-                        listener.onTableCreated(this, table);
-                    }
-                }
-            }
         }
     }
 

@@ -7,6 +7,7 @@ import android.content.Context;
 import org.xutils.common.TaskController;
 import org.xutils.common.task.TaskControllerImpl;
 import org.xutils.db.DbManagerImpl;
+import org.xutils.ex.DbException;
 import org.xutils.http.HttpManagerImpl;
 import org.xutils.image.ImageManagerImpl;
 import org.xutils.view.ViewInjectorImpl;
@@ -73,7 +74,7 @@ public final class x {
         return Ext.viewInjector;
     }
 
-    public static DbManager getDb(DbManager.DaoConfig daoConfig) {
+    public static DbManager getDb(DbManager.DaoConfig daoConfig) throws DbException {
         return DbManagerImpl.getInstance(daoConfig);
     }
 

@@ -66,7 +66,7 @@ public final class DbManagerImpl extends DbBase {
         }
     }
 
-    public synchronized static DbManager getInstance(DaoConfig daoConfig) {
+    public synchronized static DbManager getInstance(DaoConfig daoConfig) throws DbException {
 
         if (daoConfig == null) {//使用默认配置
             daoConfig = new DaoConfig();
@@ -90,11 +90,7 @@ public final class DbManagerImpl extends DbBase {
                 if (upgradeListener != null) {
                     upgradeListener.onUpgrade(dao, oldVersion, newVersion);
                 } else {
-                    try {
-                        dao.dropDb();
-                    } catch (DbException e) {
-                        LogUtil.e(e.getMessage(), e);
-                    }
+                    dao.dropDb();
                 }
             }
             database.setVersion(newVersion);
@@ -463,7 +459,8 @@ public final class DbManagerImpl extends DbBase {
     }
 
     /**
-     * xUtils对同一个库的链接是单实例的, 一般不需要关闭它.
+     * 关闭数据库,
+     * 同一个库的链接是单实例的, 尽量不要调用这个方法, 会自动释放.
      */
     @Override
     public void close() throws IOException {

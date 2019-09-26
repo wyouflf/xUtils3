@@ -101,7 +101,7 @@ public interface DbManager extends Closeable {
 
     /**
      * 关闭数据库,
-     * xUtils对同一个库的链接是单实例的, 一般不需要关闭它.
+     * 同一个库的链接是单实例的, 尽量不要调用这个方法, 会自动释放.
      */
     void close() throws IOException;
 
@@ -123,7 +123,7 @@ public interface DbManager extends Closeable {
     }
 
     public interface DbUpgradeListener {
-        void onUpgrade(DbManager db, int oldVersion, int newVersion);
+        void onUpgrade(DbManager db, int oldVersion, int newVersion) throws DbException;
     }
 
     public interface TableCreateListener {

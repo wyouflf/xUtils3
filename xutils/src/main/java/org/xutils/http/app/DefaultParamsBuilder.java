@@ -22,10 +22,6 @@ public class DefaultParamsBuilder implements ParamsBuilder {
 
     /**
      * 根据@HttpRequest构建请求的url
-     *
-     * @param params
-     * @param httpRequest
-     * @return
      */
     @Override
     public String buildUri(RequestParams params, HttpRequest httpRequest) throws Throwable {
@@ -34,11 +30,7 @@ public class DefaultParamsBuilder implements ParamsBuilder {
 
     /**
      * 根据注解的cacheKeys构建缓存的自定义key,
-     * 如果返回null, 默认使用 url 和整个 query string 组成.
-     *
-     * @param params
-     * @param cacheKeys
-     * @return
+     * 如果返回为空, 默认使用 url 和整个 query string 组成.
      */
     @Override
     public String buildCacheKey(RequestParams params, String[] cacheKeys) {
@@ -60,8 +52,6 @@ public class DefaultParamsBuilder implements ParamsBuilder {
 
     /**
      * 自定义SSLSocketFactory
-     *
-     * @return
      */
     @Override
     public SSLSocketFactory getSSLSocketFactory() throws Throwable {
@@ -70,8 +60,6 @@ public class DefaultParamsBuilder implements ParamsBuilder {
 
     /**
      * 为请求添加通用参数等操作
-     *
-     * @param params
      */
     @Override
     public void buildParams(RequestParams params) throws Throwable {
@@ -79,9 +67,6 @@ public class DefaultParamsBuilder implements ParamsBuilder {
 
     /**
      * 自定义参数签名
-     *
-     * @param params
-     * @param signs
      */
     @Override
     public void buildSign(RequestParams params, String[] signs) throws Throwable {

@@ -17,8 +17,7 @@ public interface ResponseParser<ResponseDataType> extends RequestInterceptListen
      * @param resultType  返回值类型(可能带有泛型信息)
      * @param resultClass 返回值类型
      * @param result      网络返回数据(支持String, byte[], JSONObject, JSONArray, InputStream)
-     * @return
-     * @throws Throwable
+     * @return 请求结果, 类型为resultType
      */
     Object parse(Type resultType, Class<?> resultClass, ResponseDataType result) throws Throwable;
 }

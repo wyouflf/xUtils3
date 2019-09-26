@@ -110,8 +110,6 @@ public class HttpRequest extends UriRequest {
 
     /**
      * invoke via Loader
-     *
-     * @throws IOException
      */
     @Override
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -301,9 +299,6 @@ public class HttpRequest extends UriRequest {
 
     /**
      * 尝试从缓存获取结果, 并为请求头加入缓存控制参数.
-     *
-     * @return
-     * @throws Throwable
      */
     @Override
     public Object loadResultFromCache() throws Throwable {

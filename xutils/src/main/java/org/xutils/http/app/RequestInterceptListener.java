@@ -15,17 +15,11 @@ public interface RequestInterceptListener {
 
     /**
      * 检查请求参数等处理
-     *
-     * @param request
-     * @throws Throwable
      */
     void beforeRequest(UriRequest request) throws Throwable;
 
     /**
      * 检查请求相应头等处理
-     *
-     * @param request
-     * @throws Throwable
      */
     void afterRequest(UriRequest request) throws Throwable;
 }

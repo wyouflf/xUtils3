@@ -12,7 +12,7 @@ public interface RedirectHandler {
     /**
      * 根据请求信息返回自定义重定向的请求参数
      *
-     * @param request
+     * @param request 原始请求
      * @return 返回不为null时进行重定向
      */
     RequestParams getRedirectParams(UriRequest request) throws Throwable;

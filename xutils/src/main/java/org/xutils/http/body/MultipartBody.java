@@ -110,11 +110,6 @@ public class MultipartBody implements ProgressBody {
 
     /**
      * 写入multipart中的一项
-     *
-     * @param out
-     * @param name
-     * @param value
-     * @throws IOException
      */
     private void writeEntry(OutputStream out, String name, Object value) throws IOException {
         writeLine(out, TWO_DASHES_BYTES, BOUNDARY_PREFIX_BYTES, boundaryPostfixBytes);

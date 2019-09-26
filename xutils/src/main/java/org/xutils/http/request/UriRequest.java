@@ -65,8 +65,6 @@ public abstract class UriRequest implements Closeable {
 
     /**
      * invoke via Loader
-     *
-     * @throws IOException
      */
     public abstract void sendRequest() throws Throwable;
 
@@ -76,9 +74,6 @@ public abstract class UriRequest implements Closeable {
 
     /**
      * 由loader发起请求, 拿到结果.
-     *
-     * @return
-     * @throws Throwable
      */
     public Object loadResult() throws Throwable {
         return this.loader.load(this);
@@ -86,9 +81,6 @@ public abstract class UriRequest implements Closeable {
 
     /**
      * 尝试从缓存获取结果, 并为请求头加入缓存控制参数.
-     *
-     * @return
-     * @throws Throwable
      */
     public abstract Object loadResultFromCache() throws Throwable;
 

@@ -95,6 +95,9 @@ public final class Selector<T> {
         return new DbModelSelector(this, columnExpressions);
     }
 
+    /**
+     * 排序条件, 默认asc
+     */
     public Selector<T> orderBy(String columnName) {
         if (orderByList == null) {
             orderByList = new ArrayList<OrderBy>(5);
@@ -103,6 +106,9 @@ public final class Selector<T> {
         return this;
     }
 
+    /**
+     * 排序条件, 默认asc
+     */
     public Selector<T> orderBy(String columnName, boolean desc) {
         if (orderByList == null) {
             orderByList = new ArrayList<OrderBy>(5);
@@ -219,10 +225,16 @@ public final class Selector<T> {
         private String columnName;
         private boolean desc;
 
+        /**
+         * 排序条件, 默认asc
+         */
         public OrderBy(String columnName) {
             this.columnName = columnName;
         }
 
+        /**
+         * 排序条件, 默认asc
+         */
         public OrderBy(String columnName, boolean desc) {
             this.columnName = columnName;
             this.desc = desc;

@@ -109,11 +109,17 @@ public final class DbModelSelector {
         return this;
     }
 
+    /**
+     * 排序条件, 默认asc
+     */
     public DbModelSelector orderBy(String columnName) {
         selector.orderBy(columnName);
         return this;
     }
 
+    /**
+     * 排序条件, 默认asc
+     */
     public DbModelSelector orderBy(String columnName, boolean desc) {
         selector.orderBy(columnName, desc);
         return this;

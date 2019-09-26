@@ -36,14 +36,14 @@ import java.util.Map;
     private String charset = "UTF-8";
     private HttpMethod method;
     private String bodyContent;
-    private boolean multipart = false; // 是否强制使用multipart表单
+    private String bodyContentType;
+    private boolean multipart = false; // 是否使用multipart表单
     private boolean asJsonContent = false; // 用json形式的bodyParams上传
     private RequestBody requestBody; // 生成的表单
 
     private final List<Header> headers = new ArrayList<Header>();
     private final List<KeyValue> queryStringParams = new ArrayList<KeyValue>();
     private final List<KeyValue> bodyParams = new ArrayList<KeyValue>();
-    private final List<KeyValue> fileParams = new ArrayList<KeyValue>();
 
     public void setCharset(String charset) {
         if (!TextUtils.isEmpty(charset)) {
@@ -73,8 +73,6 @@ import java.util.Map;
 
     /**
      * 以json形式提交body参数
-     *
-     * @return
      */
     public boolean isAsJsonContent() {
         return asJsonContent;
@@ -82,8 +80,6 @@ import java.util.Map;
 
     /**
      * 以json形式提交body参数
-     *
-     * @param asJsonContent
      */
     public void setAsJsonContent(boolean asJsonContent) {
         this.asJsonContent = asJsonContent;
@@ -92,10 +88,10 @@ import java.util.Map;
     /**
      * 覆盖header
      *
-     * @param name
-     * @param value
+     * @param name 不可为空
      */
     public void setHeader(String name, String value) {
+        if (TextUtils.isEmpty(name)) return;
         Header header = new Header(name, value, true);
         Iterator<Header> it = headers.iterator();
         while (it.hasNext()) {
@@ -110,10 +106,10 @@ import java.util.Map;
     /**
      * 添加header
      *
-     * @param name
-     * @param value
+     * @param name 不可为空
      */
     public void addHeader(String name, String value) {
+        if (TextUtils.isEmpty(name)) return;
         this.headers.add(new Header(name, value, false));
     }
 
@@ -124,63 +120,37 @@ import java.util.Map;
      * @param value 可以是String, File, InputStream 或 byte[]
      */
     public void addParameter(String name, Object value) {
-        if (value == null) return;
-
         if (HttpMethod.permitsRequestBody(method)) {
-            if (!TextUtils.isEmpty(name)) {
-                if (value instanceof File
-                        || value instanceof InputStream
-                        || value instanceof byte[]) {
-                    this.fileParams.add(new KeyValue(name, value));
-                } else {
-                    if (value instanceof Iterable) {
-                        for (Object item : (Iterable) value) {
-                            this.bodyParams.add(new ArrayItem(name, item));
-                        }
-                    } else if (value instanceof JSONArray) {
-                        JSONArray array = (JSONArray) value;
-                        int len = array.length();
-                        for (int i = 0; i < len; i++) {
-                            this.bodyParams.add(new ArrayItem(name, array.opt(i)));
-                        }
-                    } else if (value.getClass().isArray()) {
-                        int len = Array.getLength(value);
-                        for (int i = 0; i < len; i++) {
-                            this.bodyParams.add(new ArrayItem(name, Array.get(value, i)));
-                        }
-                    } else {
-                        this.bodyParams.add(new KeyValue(name, value));
-                    }
-                }
-            } else {
-                this.bodyContent = value.toString();
-            }
+            addBodyParameter(name, value, null, null);
         } else {
-            if (!TextUtils.isEmpty(name)) {
-                if (value instanceof Iterable) {
-                    for (Object item : (Iterable) value) {
-                        this.queryStringParams.add(new ArrayItem(name, item));
-                    }
-                } else if (value.getClass().isArray()) {
-                    int len = Array.getLength(value);
-                    for (int i = 0; i < len; i++) {
-                        this.queryStringParams.add(new ArrayItem(name, Array.get(value, i)));
-                    }
-                } else {
-                    this.queryStringParams.add(new KeyValue(name, value));
-                }
-            }
+            addQueryStringParameter(name, value);
         }
     }
 
     /**
      * 添加参数至Query String
      *
-     * @param name
-     * @param value
+     * @param name  参数名, 不可为空
+     * @param value 字符串值, 也可以是Iterable<String>或String[]
      */
-    public void addQueryStringParameter(String name, String value) {
-        if (!TextUtils.isEmpty(name)) {
+    public void addQueryStringParameter(String name, Object value) {
+        if (TextUtils.isEmpty(name)) return;
+        if (value instanceof Iterable) {
+            for (Object item : (Iterable) value) {
+                this.queryStringParams.add(new ArrayItem(name, item));
+            }
+        } else if (value instanceof JSONArray) {
+            JSONArray array = (JSONArray) value;
+            int len = array.length();
+            for (int i = 0; i < len; i++) {
+                this.bodyParams.add(new ArrayItem(name, array.opt(i)));
+            }
+        } else if (value.getClass().isArray()) {
+            int len = Array.getLength(value);
+            for (int i = 0; i < len; i++) {
+                this.queryStringParams.add(new ArrayItem(name, Array.get(value, i)));
+            }
+        } else {
             this.queryStringParams.add(new KeyValue(name, value));
         }
     }
@@ -188,21 +158,10 @@ import java.util.Map;
     /**
      * 添加参数至Body
      *
-     * @param name
-     * @param value
+     * @param name  参数名
+     * @param value 可以是String, File, InputStream 或 byte[]
      */
     public void addBodyParameter(String name, String value) {
-        if (!TextUtils.isEmpty(name)) {
-            this.bodyParams.add(new KeyValue(name, value));
-        } else {
-            this.bodyContent = value;
-        }
-    }
-
-    /**
-     * 添加body参数
-     */
-    public void addBodyParameter(String name, File value) {
         addBodyParameter(name, value, null, null);
     }
 
@@ -211,7 +170,7 @@ import java.util.Map;
      *
      * @param name        参数名
      * @param value       可以是String, File, InputStream 或 byte[]
-     * @param contentType 可为null
+     * @param contentType 可为空
      */
     public void addBodyParameter(String name, Object value, String contentType) {
         addBodyParameter(name, value, contentType, null);
@@ -222,14 +181,33 @@ import java.util.Map;
      *
      * @param name        参数名
      * @param value       可以是String, File, InputStream 或 byte[]
-     * @param contentType 可为null
+     * @param contentType 可为空
      * @param fileName    服务端看到的文件名
      */
     public void addBodyParameter(String name, Object value, String contentType, String fileName) {
         if (TextUtils.isEmpty(contentType) && TextUtils.isEmpty(fileName)) {
-            this.fileParams.add(new KeyValue(name, value));
+            if (value instanceof Iterable) {
+                for (Object item : (Iterable) value) {
+                    this.bodyParams.add(new ArrayItem(name, item));
+                }
+            } else if (value instanceof JSONArray) {
+                JSONArray array = (JSONArray) value;
+                int len = array.length();
+                for (int i = 0; i < len; i++) {
+                    this.bodyParams.add(new ArrayItem(name, array.opt(i)));
+                }
+            } else if (value instanceof byte[]) {
+                this.bodyParams.add(new KeyValue(name, value));
+            } else if (value.getClass().isArray()) {
+                int len = Array.getLength(value);
+                for (int i = 0; i < len; i++) {
+                    this.bodyParams.add(new ArrayItem(name, Array.get(value, i)));
+                }
+            } else {
+                this.bodyParams.add(new KeyValue(name, value));
+            }
         } else {
-            this.fileParams.add(new KeyValue(name, new BodyItemWrapper(value, contentType, fileName)));
+            this.bodyParams.add(new KeyValue(name, new BodyItemWrapper(value, contentType, fileName)));
         }
     }
 
@@ -240,6 +218,19 @@ import java.util.Map;
     public String getBodyContent() {
         checkBodyParams();
         return bodyContent;
+    }
+
+    /**
+     * 设置POST等请求的 Content-Type
+     *
+     * @param bodyContentType multipart表单仅设置subType(例如:"form-data"(默认) or "related");
+     *                        kv结构自定义设置会被忽略, 默认使用:"application/x-www-form-urlencoded;charset=" + charset;
+     *                        字符串内容表单默认使用: "application/json;charset=" + charset;
+     *                        File表单默认尝试使用文件名匹配Content-Type, 匹配失败使用:"application/octet-stream";
+     *                        InputStream表单默认使用: "application/octet-stream";
+     */
+    public void setBodyContentType(String bodyContentType) {
+        this.bodyContentType = bodyContentType;
     }
 
     public List<Header> getHeaders() {
@@ -256,54 +247,14 @@ import java.util.Map;
         return new ArrayList<KeyValue>(bodyParams);
     }
 
-    public List<KeyValue> getFileParams() {
-        checkBodyParams();
-        return new ArrayList<KeyValue>(fileParams);
-    }
-
-    public List<KeyValue> getStringParams() {
-        List<KeyValue> result = new ArrayList<KeyValue>(
-                queryStringParams.size() + bodyParams.size());
-        result.addAll(queryStringParams);
-        result.addAll(bodyParams);
-        return result;
-    }
-
-    public String getStringParameter(String name) {
-        for (KeyValue kv : queryStringParams) {
-            if (name == null && kv.key == null) {
-                return kv.getValueStr();
-            } else if (name != null && name.equals(kv.key)) {
-                return kv.getValueStr();
-            }
-        }
-        for (KeyValue kv : bodyParams) {
-            if (name == null && kv.key == null) {
-                return kv.getValueStr();
-            } else if (name != null && name.equals(kv.key)) {
-                return kv.getValueStr();
-            }
-        }
-        return null;
-    }
-
     public List<KeyValue> getParams(String name) {
         List<KeyValue> result = new ArrayList<KeyValue>();
         for (KeyValue kv : queryStringParams) {
-            if (name == null && kv.key == null) {
-                result.add(kv);
-            } else if (name != null && name.equals(kv.key)) {
+            if (name != null && name.equals(kv.key)) {
                 result.add(kv);
             }
         }
         for (KeyValue kv : bodyParams) {
-            if (name == null && kv.key == null) {
-                result.add(kv);
-            } else if (name != null && name.equals(kv.key)) {
-                result.add(kv);
-            }
-        }
-        for (KeyValue kv : fileParams) {
             if (name == null && kv.key == null) {
                 result.add(kv);
             } else if (name != null && name.equals(kv.key)) {
@@ -316,13 +267,16 @@ import java.util.Map;
     public void clearParams() {
         queryStringParams.clear();
         bodyParams.clear();
-        fileParams.clear();
         bodyContent = null;
+        bodyContentType = null;
         requestBody = null;
     }
 
     public void removeParameter(String name) {
-        if (!TextUtils.isEmpty(name)) {
+        if (TextUtils.isEmpty(name)) {
+            bodyContent = null;
+            bodyContentType = null;
+        } else {
             Iterator<KeyValue> it = queryStringParams.iterator();
             while (it.hasNext()) {
                 KeyValue kv = it.next();
@@ -330,24 +284,16 @@ import java.util.Map;
                     it.remove();
                 }
             }
+        }
 
-            it = bodyParams.iterator();
-            while (it.hasNext()) {
-                KeyValue kv = it.next();
-                if (name.equals(kv.key)) {
-                    it.remove();
-                }
+        Iterator<KeyValue> it = bodyParams.iterator();
+        while (it.hasNext()) {
+            KeyValue kv = it.next();
+            if (name == null && kv.key == null) {
+                it.remove();
+            } else if (name != null && name.equals(kv.key)) {
+                it.remove();
             }
-
-            it = fileParams.iterator();
-            while (it.hasNext()) {
-                KeyValue kv = it.next();
-                if (name.equals(kv.key)) {
-                    it.remove();
-                }
-            }
-        } else {
-            bodyContent = null;
         }
     }
 
@@ -360,61 +306,50 @@ import java.util.Map;
         if (this.requestBody != null) {
             return this.requestBody;
         }
+
         RequestBody result = null;
         if (!TextUtils.isEmpty(bodyContent)) {
             result = new StringBody(bodyContent, charset);
-        } else if (multipart || fileParams.size() > 0) {
-            if (!multipart && fileParams.size() == 1) {
-                for (KeyValue kv : fileParams) {
-                    String contentType = null;
-                    Object value = kv.value;
-                    if (value instanceof BodyItemWrapper) {
-                        BodyItemWrapper wrapper = (BodyItemWrapper) value;
-                        value = wrapper.getValue();
-                        contentType = wrapper.getContentType();
-                    }
-                    if (value instanceof File) {
-                        result = new FileBody((File) value, contentType);
-                    } else if (value instanceof InputStream) {
-                        result = new InputStreamBody((InputStream) value, contentType);
-                    } else if (value instanceof byte[]) {
-                        result = new InputStreamBody(new ByteArrayInputStream((byte[]) value), contentType);
-                    } else if (value instanceof String) {
-                        // invoke addBodyParameter(key, stringValue, contentType)
-                        result = new StringBody((String) value, charset);
-                        result.setContentType(contentType);
-                    } else {
-                        LogUtil.w("Some params will be ignored for: " + this.toString());
-                    }
-                    break;
-                }
-            } else {
-                multipart = true;
-                result = new MultipartBody(fileParams, charset);
+            result.setContentType(bodyContentType);
+        } else if (multipart) {
+            result = new MultipartBody(bodyParams, charset);
+            result.setContentType(bodyContentType);
+        } else if (bodyParams.size() == 1) {
+            KeyValue kv = bodyParams.get(0);
+            String name = kv.key;
+            Object value = kv.value;
+            String contentType = null;
+            if (value instanceof BodyItemWrapper) {
+                BodyItemWrapper wrapper = (BodyItemWrapper) value;
+                value = wrapper.getValue();
+                contentType = wrapper.getContentType();
             }
-        } else if (bodyParams.size() > 0) {
+            if (TextUtils.isEmpty(contentType)) {
+                contentType = bodyContentType;
+            }
+            if (value instanceof String) {
+                if (TextUtils.isEmpty(name)) {
+                    result = new StringBody((String) value, charset);
+                    result.setContentType(contentType);
+                } else {
+                    result = new UrlEncodedBody(bodyParams, charset);
+                    result.setContentType(contentType);
+                }
+            } else if (value instanceof File) {
+                result = new FileBody((File) value, contentType);
+            } else if (value instanceof InputStream) {
+                result = new InputStreamBody((InputStream) value, contentType);
+            } else if (value instanceof byte[]) {
+                result = new InputStreamBody(new ByteArrayInputStream((byte[]) value), contentType);
+            } else {
+                LogUtil.w("Some params will be ignored for: " + this.toString());
+            }
+        } else {
             result = new UrlEncodedBody(bodyParams, charset);
+            result.setContentType(bodyContentType);
         }
 
         return result;
-    }
-
-    public String toJSONString() {
-        List<KeyValue> list = new ArrayList<KeyValue>(queryStringParams.size() + bodyParams.size());
-        list.addAll(queryStringParams);
-        list.addAll(bodyParams);
-        try {
-            JSONObject jsonObject = null;
-            if (!TextUtils.isEmpty(bodyContent)) {
-                jsonObject = new JSONObject(bodyContent);
-            } else {
-                jsonObject = new JSONObject();
-            }
-            params2Json(jsonObject, list);
-            return jsonObject.toString();
-        } catch (JSONException ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
     @Override
@@ -445,19 +380,13 @@ import java.util.Map;
     private synchronized void checkBodyParams() {
         if (bodyParams.isEmpty()) return;
 
-        if (!HttpMethod.permitsRequestBody(method)
-                || !TextUtils.isEmpty(bodyContent)
-                || requestBody != null) {
+        if (requestBody != null || !HttpMethod.permitsRequestBody(method)) {
             queryStringParams.addAll(bodyParams);
             bodyParams.clear();
+            return;
         }
 
-        if (!bodyParams.isEmpty() && (multipart || fileParams.size() > 0)) {
-            fileParams.addAll(bodyParams);
-            bodyParams.clear();
-        }
-
-        if (asJsonContent && !bodyParams.isEmpty()) {
+        if (asJsonContent) {
             try {
                 JSONObject jsonObject = null;
                 if (!TextUtils.isEmpty(bodyContent)) {
@@ -469,8 +398,11 @@ import java.util.Map;
                 bodyContent = jsonObject.toString();
                 bodyParams.clear();
             } catch (JSONException ex) {
-                throw new RuntimeException(ex);
+                throw new IllegalArgumentException(ex.getMessage(), ex);
             }
+        } else if (!TextUtils.isEmpty(bodyContent)) {
+            queryStringParams.addAll(bodyParams);
+            bodyParams.clear();
         }
     }
 

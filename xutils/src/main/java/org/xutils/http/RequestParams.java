@@ -92,9 +92,9 @@ public class RequestParams extends BaseParams {
 
     /**
      * @param uri       不可为空
-     * @param builder
-     * @param signs
-     * @param cacheKeys
+     * @param builder   用于自定义参数构建过程, 为空时使用{@link DefaultParamsBuilder}
+     * @param signs     自定义需要签名的字段, 会传给ParamsBuilder
+     * @param cacheKeys 自定义缓存关键key信息, 会传给ParamsBuilder
      */
     public RequestParams(String uri, ParamsBuilder builder, String[] signs, String[] cacheKeys) {
         if (uri != null && builder == null) {
@@ -278,8 +278,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 自定义线程池
-     *
-     * @param executor
      */
     public void setExecutor(Executor executor) {
         this.executor = executor;
@@ -294,8 +292,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 设置是否在下载是自动断点续传
-     *
-     * @param autoResume
      */
     public void setAutoResume(boolean autoResume) {
         this.autoResume = autoResume;
@@ -310,8 +306,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 设置是否根据头信息自动命名文件
-     *
-     * @param autoRename
      */
     public void setAutoRename(boolean autoRename) {
         this.autoRename = autoRename;
@@ -326,8 +320,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 设置下载文件时文件保存的路径和文件名
-     *
-     * @param saveFilePath
      */
     public void setSaveFilePath(String saveFilePath) {
         this.saveFilePath = saveFilePath;
@@ -365,8 +357,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 进度刷新最大间隔时间(默认300毫秒)
-     *
-     * @param loadingUpdateMaxTimeSpan
      */
     public void setLoadingUpdateMaxTimeSpan(int loadingUpdateMaxTimeSpan) {
         this.loadingUpdateMaxTimeSpan = loadingUpdateMaxTimeSpan;
@@ -386,8 +376,6 @@ public class RequestParams extends BaseParams {
 
     /**
      * 自定义重定向接口, 默认系统自动重定向.
-     *
-     * @param redirectHandler
      */
     public void setRedirectHandler(RedirectHandler redirectHandler) {
         this.redirectHandler = redirectHandler;
@@ -424,11 +412,6 @@ public class RequestParams extends BaseParams {
         return httpRequest;
     }
 
-    /**
-     * 在网络请求onStart前, 尽量不要在UI线程调用这个方法, 可能产生性能影响.
-     *
-     * @return
-     */
     @Override
     public String toString() {
         String url = this.getUri();

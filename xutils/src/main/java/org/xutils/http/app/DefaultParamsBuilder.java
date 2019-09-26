@@ -1,10 +1,12 @@
 package org.xutils.http.app;
 
+import org.xutils.common.util.KeyValue;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.http.annotation.HttpRequest;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -34,20 +36,20 @@ public class DefaultParamsBuilder implements ParamsBuilder {
      */
     @Override
     public String buildCacheKey(RequestParams params, String[] cacheKeys) {
-        String cacheKey = null;
+        StringBuilder result = new StringBuilder();
         if (cacheKeys != null && cacheKeys.length > 0) {
-
-            cacheKey = params.getUri() + "?";
+            result.append(params.getUri()).append("?");
 
             // 添加cacheKeys对应的参数
             for (String key : cacheKeys) {
-                String value = params.getStringParameter(key);
-                if (value != null) {
-                    cacheKey += key + "=" + value + "&";
+                List<KeyValue> kvList = params.getParams(key);
+                if (kvList != null && !kvList.isEmpty()) {
+                    String value = kvList.get(0).getValueStr();
+                    result.append(key).append("=").append(value).append("&");
                 }
             }
         }
-        return cacheKey;
+        return result.toString();
     }
 
     /**

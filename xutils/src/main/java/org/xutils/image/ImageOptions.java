@@ -317,10 +317,6 @@ public class ImageOptions {
 
         /**
          * 小于0时不采样压缩. 等于0时自动识别ImageView的宽高和(maxWidth, maxHeight).
-         *
-         * @param width
-         * @param height
-         * @return
          */
         public Builder setSize(int width, int height) {
             options.width = width;

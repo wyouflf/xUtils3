@@ -3,6 +3,7 @@ package org.xutils.http.body;
 import android.text.TextUtils;
 
 import org.xutils.common.util.KeyValue;
+import org.xutils.common.util.LogUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,6 +49,9 @@ public class UrlEncodedBody implements RequestBody {
 
     @Override
     public void setContentType(String contentType) {
+        if (!TextUtils.isEmpty(contentType)) {
+            LogUtil.w("ignored Content-Type: " + contentType);
+        }
     }
 
     @Override

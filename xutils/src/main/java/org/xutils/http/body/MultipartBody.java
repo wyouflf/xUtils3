@@ -77,6 +77,7 @@ public class MultipartBody implements ProgressBody {
      */
     @Override
     public void setContentType(String subType) {
+        if (TextUtils.isEmpty(subType)) return;
         int index = contentType.indexOf(";");
         this.contentType = "multipart/" + subType + contentType.substring(index);
     }

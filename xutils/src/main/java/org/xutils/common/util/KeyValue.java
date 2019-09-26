@@ -24,6 +24,9 @@ public class KeyValue {
         this.value = value;
     }
 
+    /**
+     * 获取value的字符串值, 为null时返回空字符串
+     */
     public String getValueStr() {
         return value == null ? null : value.toString();
     }

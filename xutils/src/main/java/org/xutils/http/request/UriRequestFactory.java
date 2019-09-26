@@ -38,6 +38,7 @@ public final class UriRequestFactory {
 
         // get UriRequest
         if (!TextUtils.isEmpty(scheme)) {
+            scheme = scheme.toLowerCase();
             Class<? extends UriRequest> cls = SCHEME_CLS_MAP.get(scheme);
             if (cls != null) {
                 Constructor<? extends UriRequest> constructor

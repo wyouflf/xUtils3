@@ -12,10 +12,6 @@ public final class BodyItemWrapper {
     private final String fileName;
     private final String contentType;
 
-    public BodyItemWrapper(Object value, String contentType) {
-        this(value, contentType, null);
-    }
-
     public BodyItemWrapper(Object value, String contentType, String fileName) {
         this.value = value;
         if (TextUtils.isEmpty(contentType)) {
@@ -36,5 +32,14 @@ public final class BodyItemWrapper {
 
     public String getContentType() {
         return contentType;
+    }
+
+    @Override
+    public String toString() {
+        return "BodyItemWrapper{" +
+                "value=" + value +
+                ", fileName='" + fileName + '\'' +
+                ", contentType='" + contentType + '\'' +
+                '}';
     }
 }

@@ -19,7 +19,7 @@ public interface ParamsBuilder {
 
     /**
      * 根据注解的cacheKeys构建缓存的自定义key,
-     * 如果返回null, 默认使用 url 和整个 query string 组成.
+     * 如果返回为空, 默认使用 url 和整个 query string 组成.
      */
     String buildCacheKey(RequestParams params, String[] cacheKeys);
 

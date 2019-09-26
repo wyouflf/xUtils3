@@ -79,12 +79,15 @@ public abstract class DbBase implements DbManager {
         TableEntity<?> table = this.getTable(entityType);
         ColumnEntity col = table.getColumnMap().get(column);
         if (col != null) {
+            if (!table.tableIsExists()) return;
             StringBuilder builder = new StringBuilder();
             builder.append("ALTER TABLE ").append("\"").append(table.getName()).append("\"").
                     append(" ADD COLUMN ").append("\"").append(col.getName()).append("\"").
                     append(" ").append(col.getColumnDbType()).
                     append(" ").append(col.getProperty());
             execNonQuery(builder.toString());
+        } else {
+            throw new DbException("the column(" + column + ") is not defined in table:" + table.getName());
         }
     }
 

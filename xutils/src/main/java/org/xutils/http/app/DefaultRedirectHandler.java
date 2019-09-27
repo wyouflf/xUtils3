@@ -4,16 +4,15 @@ import android.text.TextUtils;
 import android.webkit.URLUtil;
 
 import org.xutils.http.RequestParams;
+import org.xutils.http.request.HttpRequest;
 import org.xutils.http.request.UriRequest;
 
 public class DefaultRedirectHandler implements RedirectHandler {
     @Override
     public RequestParams getRedirectParams(UriRequest request) throws Throwable {
-        org.xutils.http.request.HttpRequest httpRequest = null;
-        RequestParams params = null;
-        if (request instanceof org.xutils.http.request.HttpRequest) {
-            httpRequest = (org.xutils.http.request.HttpRequest) request;
-            params = httpRequest.getParams();
+        if (request instanceof HttpRequest) {
+            HttpRequest httpRequest = (HttpRequest) request;
+            RequestParams params = httpRequest.getParams();
             String location = httpRequest.getResponseHeader("Location");
             if (!TextUtils.isEmpty(location)) {
                 if (!URLUtil.isHttpsUrl(location) && !URLUtil.isHttpUrl(location)) {

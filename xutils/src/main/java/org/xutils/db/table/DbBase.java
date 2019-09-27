@@ -79,7 +79,7 @@ public abstract class DbBase implements DbManager {
         TableEntity<?> table = this.getTable(entityType);
         ColumnEntity col = table.getColumnMap().get(column);
         if (col != null) {
-            if (!table.tableIsExists()) return;
+            if (!table.tableIsExists()) return; // 不需要添加, 表创建时会自动添加
             StringBuilder builder = new StringBuilder();
             builder.append("ALTER TABLE ").append("\"").append(table.getName()).append("\"").
                     append(" ADD COLUMN ").append("\"").append(col.getName()).append("\"").
@@ -87,7 +87,7 @@ public abstract class DbBase implements DbManager {
                     append(" ").append(col.getProperty());
             execNonQuery(builder.toString());
         } else {
-            throw new DbException("the column(" + column + ") is not defined in table:" + table.getName());
+            throw new DbException("the column(" + column + ") is not defined in table: " + table.getName());
         }
     }
 

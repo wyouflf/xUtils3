@@ -96,7 +96,7 @@ public final class Selector<T> {
     }
 
     /**
-     * 排序条件, 默认asc
+     * 排序条件, 默认ASC
      */
     public Selector<T> orderBy(String columnName) {
         if (orderByList == null) {
@@ -107,7 +107,7 @@ public final class Selector<T> {
     }
 
     /**
-     * 排序条件, 默认asc
+     * 排序条件, 默认ASC
      */
     public Selector<T> orderBy(String columnName, boolean desc) {
         if (orderByList == null) {
@@ -226,14 +226,14 @@ public final class Selector<T> {
         private boolean desc;
 
         /**
-         * 排序条件, 默认asc
+         * 排序条件, 默认ASC
          */
         public OrderBy(String columnName) {
             this.columnName = columnName;
         }
 
         /**
-         * 排序条件, 默认asc
+         * 排序条件, 默认ASC
          */
         public OrderBy(String columnName, boolean desc) {
             this.columnName = columnName;

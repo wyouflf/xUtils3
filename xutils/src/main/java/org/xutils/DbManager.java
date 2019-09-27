@@ -100,8 +100,8 @@ public interface DbManager extends Closeable {
     void dropDb() throws DbException;
 
     /**
-     * 关闭数据库,
-     * 同一个库的链接是单实例的, 尽量不要调用这个方法, 会自动释放.
+     * 关闭数据库.
+     * 同一个库是单实例的, 尽量不要调用这个方法, 会自动释放.
      */
     void close() throws IOException;
 

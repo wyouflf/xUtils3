@@ -459,8 +459,8 @@ public final class DbManagerImpl extends DbBase {
     }
 
     /**
-     * 关闭数据库,
-     * 同一个库的链接是单实例的, 尽量不要调用这个方法, 会自动释放.
+     * 关闭数据库.
+     * 同一个库的是单实例的, 尽量不要调用这个方法, 会自动释放.
      */
     @Override
     public void close() throws IOException {

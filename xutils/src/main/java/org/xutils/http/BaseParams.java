@@ -155,12 +155,12 @@ public abstract class BaseParams {
     }
 
     /**
-     * 添加参数至Body
+     * 添加body参数
      *
      * @param name  参数名
      * @param value 可以是String, File, InputStream 或 byte[]
      */
-    public void addBodyParameter(String name, String value) {
+    public void addBodyParameter(String name, Object value) {
         addBodyParameter(name, value, null, null);
     }
 
@@ -362,15 +362,13 @@ public abstract class BaseParams {
 
         if (!TextUtils.isEmpty(bodyContent)) {
             sb.append("<").append(bodyContent).append(">");
-        } else {
-            if (!bodyParams.isEmpty()) {
-                sb.append("<");
-                for (KeyValue kv : bodyParams) {
-                    sb.append(kv.key).append("=").append(kv.value).append("&");
-                }
-                sb.deleteCharAt(sb.length() - 1);
-                sb.append(">");
+        } else if (!bodyParams.isEmpty()) {
+            sb.append("<");
+            for (KeyValue kv : bodyParams) {
+                sb.append(kv.key).append("=").append(kv.value).append("&");
             }
+            sb.deleteCharAt(sb.length() - 1);
+            sb.append(">");
         }
         return sb.toString();
     }

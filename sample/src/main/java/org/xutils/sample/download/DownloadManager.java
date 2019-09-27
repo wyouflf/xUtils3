@@ -32,7 +32,7 @@ public final class DownloadManager {
     // 有效的值范围[1, RequestParams.MAX_FILE_LOAD_WORKER], 下载线程太多会影响图片加载.
     private final static int MAX_DOWNLOAD_THREAD = RequestParams.MAX_FILE_LOAD_WORKER - 3;
 
-    private final DbManager db;
+    private DbManager db;
     private final Executor executor = new PriorityExecutor(MAX_DOWNLOAD_THREAD, true);
     private final List<DownloadInfo> downloadInfoList = new ArrayList<DownloadInfo>();
     private final ConcurrentHashMap<DownloadInfo, DownloadCallback>
@@ -42,8 +42,8 @@ public final class DownloadManager {
         DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
                 .setDbName("download")
                 .setDbVersion(1);
-        db = x.getDb(daoConfig);
         try {
+            db = x.getDb(daoConfig);
             List<DownloadInfo> infoList = db.selector(DownloadInfo.class).findAll();
             if (infoList != null) {
                 for (DownloadInfo info : infoList) {

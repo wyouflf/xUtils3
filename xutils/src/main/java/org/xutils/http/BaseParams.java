@@ -350,6 +350,21 @@ public abstract class BaseParams {
         return result;
     }
 
+    public String toJSONString() throws JSONException {
+        JSONObject jsonObject = null;
+        if (!TextUtils.isEmpty(bodyContent)) {
+            jsonObject = new JSONObject(bodyContent);
+        } else {
+            jsonObject = new JSONObject();
+        }
+        List<KeyValue> list = new ArrayList<KeyValue>(
+                queryStringParams.size() + bodyParams.size());
+        list.addAll(queryStringParams);
+        list.addAll(bodyParams);
+        params2Json(jsonObject, list);
+        return jsonObject.toString();
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();

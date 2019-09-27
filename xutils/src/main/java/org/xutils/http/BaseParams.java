@@ -7,7 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.common.util.KeyValue;
 import org.xutils.common.util.LogUtil;
-import org.xutils.http.body.BodyItemWrapper;
 import org.xutils.http.body.FileBody;
 import org.xutils.http.body.InputStreamBody;
 import org.xutils.http.body.MultipartBody;
@@ -31,7 +30,7 @@ import java.util.Map;
  * 请求的基础参数
  * Created by wyouflf on 16/1/23.
  */
-/*package*/ abstract class BaseParams {
+public abstract class BaseParams {
 
     private String charset = "UTF-8";
     private HttpMethod method;
@@ -131,7 +130,7 @@ import java.util.Map;
      * 添加参数至Query String
      *
      * @param name  参数名, 不可为空
-     * @param value 字符串值, 也可以是Iterable<String>或String[]
+     * @param value 字符串值, 也可以是String集合或数组
      */
     public void addQueryStringParameter(String name, Object value) {
         if (TextUtils.isEmpty(name)) return;
@@ -207,7 +206,7 @@ import java.util.Map;
                 this.bodyParams.add(new KeyValue(name, value));
             }
         } else {
-            this.bodyParams.add(new KeyValue(name, new BodyItemWrapper(value, contentType, fileName)));
+            this.bodyParams.add(new BodyItemWrapper(name, value, contentType, fileName));
         }
     }
 
@@ -319,10 +318,9 @@ import java.util.Map;
             String name = kv.key;
             Object value = kv.value;
             String contentType = null;
-            if (value instanceof BodyItemWrapper) {
-                BodyItemWrapper wrapper = (BodyItemWrapper) value;
-                value = wrapper.getValue();
-                contentType = wrapper.getContentType();
+            if (kv instanceof BodyItemWrapper) {
+                BodyItemWrapper wrapper = (BodyItemWrapper) kv;
+                contentType = wrapper.contentType;
             }
             if (TextUtils.isEmpty(contentType)) {
                 contentType = bodyContentType;
@@ -454,6 +452,22 @@ import java.util.Map;
         public Header(String key, String value, boolean setHeader) {
             super(key, value);
             this.setHeader = setHeader;
+        }
+    }
+
+    public final class BodyItemWrapper extends KeyValue {
+
+        public final String fileName;
+        public final String contentType;
+
+        public BodyItemWrapper(String key, Object value, String contentType, String fileName) {
+            super(key, value);
+            if (TextUtils.isEmpty(contentType)) {
+                this.contentType = "application/octet-stream";
+            } else {
+                this.contentType = contentType;
+            }
+            this.fileName = fileName;
         }
     }
 }

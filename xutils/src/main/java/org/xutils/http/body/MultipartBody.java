@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import org.xutils.common.Callback;
 import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.KeyValue;
+import org.xutils.http.BaseParams.BodyItemWrapper;
 import org.xutils.http.ProgressHandler;
 
 import java.io.File;
@@ -94,12 +95,8 @@ public class MultipartBody implements ProgressBody {
             throw new Callback.CancelledException("upload stopped!");
         }
 
-        for (KeyValue kv : multipartParams) {
-            String name = kv.key;
-            Object value = kv.value;
-            if (!TextUtils.isEmpty(name) && value != null) {
-                writeEntry(out, name, value);
-            }
+        for (KeyValue entry : multipartParams) {
+            writeEntry(out, entry);
         }
         writeLine(out, TWO_DASHES_BYTES, BOUNDARY_PREFIX_BYTES, boundaryPostfixBytes, TWO_DASHES_BYTES);
         out.flush();
@@ -112,16 +109,19 @@ public class MultipartBody implements ProgressBody {
     /**
      * 写入multipart中的一项
      */
-    private void writeEntry(OutputStream out, String name, Object value) throws IOException {
+    private void writeEntry(OutputStream out, KeyValue entry) throws IOException {
+        String name = entry.key;
+        Object value = entry.value;
+        if (TextUtils.isEmpty(name) || value == null) return;
+
         writeLine(out, TWO_DASHES_BYTES, BOUNDARY_PREFIX_BYTES, boundaryPostfixBytes);
 
         String fileName = "";
         String contentType = null;
-        if (value instanceof BodyItemWrapper) {
-            BodyItemWrapper wrapper = (BodyItemWrapper) value;
-            value = wrapper.getValue();
-            fileName = wrapper.getFileName();
-            contentType = wrapper.getContentType();
+        if (entry instanceof BodyItemWrapper) {
+            BodyItemWrapper wrapper = (BodyItemWrapper) entry;
+            fileName = wrapper.fileName;
+            contentType = wrapper.contentType;
         }
 
         if (value instanceof File) {
@@ -149,7 +149,7 @@ public class MultipartBody implements ProgressBody {
                 if (value instanceof byte[]) {
                     content = (byte[]) value;
                 } else {
-                    content = String.valueOf(value).getBytes(charset);
+                    content = entry.getValueStr().getBytes(charset);
                 }
                 writeLine(out, content);
                 current += content.length;

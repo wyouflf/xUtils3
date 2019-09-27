@@ -50,7 +50,7 @@ public class JsonParamsBuilder implements ParamsBuilder {
     }
 
     @Override
-    public void buildParams(RequestParams params) {
+    public void buildParams(RequestParams params) throws Throwable {
         // 添加额外公共参数
         params.addParameter("common_a", "xxxx");
         params.addParameter("common_b", "xxxx");

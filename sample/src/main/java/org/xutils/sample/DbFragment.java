@@ -149,9 +149,15 @@ public class DbFragment extends BaseFragment {
             @Override
             public void run() {
 
-                DbManager db = x.getDb(daoConfig);
-                String result = "";
+                DbManager db = null;
+                try {
+                    db = x.getDb(daoConfig);
+                } catch (DbException e) {
+                    e.printStackTrace();
+                    return;
+                }
 
+                String result = "";
                 List<Parent> parentList = new ArrayList<Parent>();
                 for (int i = 0; i < 1000; i++) {
                     Parent parent = new Parent();

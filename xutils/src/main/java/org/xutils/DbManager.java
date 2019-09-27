@@ -119,7 +119,7 @@ public interface DbManager extends Closeable {
     Cursor execQuery(String sql) throws DbException;
 
     public interface DbOpenListener {
-        void onDbOpened(DbManager db);
+        void onDbOpened(DbManager db) throws DbException;
     }
 
     public interface DbUpgradeListener {

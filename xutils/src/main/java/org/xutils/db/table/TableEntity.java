@@ -20,6 +20,7 @@ import android.text.TextUtils;
 
 import org.xutils.DbManager;
 import org.xutils.common.util.IOUtil;
+import org.xutils.common.util.LogUtil;
 import org.xutils.db.annotation.Table;
 import org.xutils.db.sqlite.SqlInfo;
 import org.xutils.db.sqlite.SqlInfoBuilder;
@@ -112,7 +113,11 @@ public final class TableEntity<T> {
                     tableCheckedStatus = true;
                     DbManager.TableCreateListener listener = db.getDaoConfig().getTableCreateListener();
                     if (listener != null) {
-                        listener.onTableCreated(db, this);
+                        try {
+                            listener.onTableCreated(db, this);
+                        } catch (Throwable ex) {
+                            LogUtil.e(ex.getMessage(), ex);
+                        }
                     }
                 }
             }

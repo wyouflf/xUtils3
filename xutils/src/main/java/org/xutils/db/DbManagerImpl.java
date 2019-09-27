@@ -53,16 +53,25 @@ public final class DbManagerImpl extends DbBase {
     private DaoConfig daoConfig;
     private boolean allowTransaction;
 
-    private DbManagerImpl(DaoConfig config) {
+    private DbManagerImpl(DaoConfig config) throws DbException {
         if (config == null) {
             throw new IllegalArgumentException("daoConfig may not be null");
         }
+
         this.daoConfig = config;
         this.allowTransaction = config.isAllowTransaction();
-        this.database = openOrCreateDatabase(config);
-        DbOpenListener dbOpenListener = config.getDbOpenListener();
-        if (dbOpenListener != null) {
-            dbOpenListener.onDbOpened(this);
+        try {
+            this.database = openOrCreateDatabase(config);
+            DbOpenListener dbOpenListener = config.getDbOpenListener();
+            if (dbOpenListener != null) {
+                dbOpenListener.onDbOpened(this);
+            }
+        } catch (DbException ex) {
+            IOUtil.closeQuietly(this.database);
+            throw ex;
+        } catch (Throwable ex) {
+            IOUtil.closeQuietly(this.database);
+            throw new DbException(ex.getMessage(), ex);
         }
     }
 

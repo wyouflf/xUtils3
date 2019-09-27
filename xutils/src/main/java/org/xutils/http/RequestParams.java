@@ -6,11 +6,11 @@ import android.text.TextUtils;
 import org.xutils.common.task.Priority;
 import org.xutils.http.annotation.HttpRequest;
 import org.xutils.http.app.DefaultParamsBuilder;
+import org.xutils.http.app.DefaultRedirectHandler;
 import org.xutils.http.app.HttpRetryHandler;
 import org.xutils.http.app.ParamsBuilder;
 import org.xutils.http.app.RedirectHandler;
 import org.xutils.http.app.RequestTracker;
-import org.xutils.http.request.UriRequest;
 import org.xutils.x;
 
 import java.net.Proxy;
@@ -26,6 +26,7 @@ import javax.net.ssl.SSLSocketFactory;
 public class RequestParams extends BaseParams {
 
     public final static int MAX_FILE_LOAD_WORKER = 10;
+    private final static DefaultRedirectHandler DEFAULT_REDIRECT_HANDLER = new DefaultRedirectHandler();
 
     // 注解及其扩展参数
     private HttpRequest httpRequest;
@@ -57,24 +58,7 @@ public class RequestParams extends BaseParams {
     private int loadingUpdateMaxTimeSpan = 300; // 进度刷新最大间隔时间(ms)
     private HttpRetryHandler httpRetryHandler; // 自定义HttpRetryHandler
     private RequestTracker requestTracker; // 自定义日志记录接口.
-    private RedirectHandler redirectHandler = new RedirectHandler() { // 重定向接口.
-        @Override
-        public RequestParams getRedirectParams(UriRequest request) throws Throwable {
-            org.xutils.http.request.HttpRequest httpRequest = null;
-            RequestParams params = null;
-            if (request instanceof org.xutils.http.request.HttpRequest) {
-                httpRequest = (org.xutils.http.request.HttpRequest) request;
-                params = httpRequest.getParams();
-                String location = httpRequest.getResponseHeader("Location");
-                if (!TextUtils.isEmpty(location)) {
-                    params.setUri(location);
-                    return params;
-                }
-            }
-
-            return null;
-        }
-    };
+    private RedirectHandler redirectHandler = DEFAULT_REDIRECT_HANDLER;
 
     /**
      * 使用空构造创建时必须, 必须是带有@HttpRequest注解的子类.

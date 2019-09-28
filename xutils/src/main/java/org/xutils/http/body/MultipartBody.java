@@ -149,7 +149,7 @@ public class MultipartBody implements ProgressBody {
                 if (value instanceof byte[]) {
                     content = (byte[]) value;
                 } else {
-                    content = entry.getValueStr().getBytes(charset);
+                    content = entry.getValueStrOrEmpty().getBytes(charset);
                 }
                 writeLine(out, content);
                 current += content.length;

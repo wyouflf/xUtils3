@@ -27,7 +27,14 @@ public class KeyValue {
     /**
      * 获取value的字符串值, 为null时返回空字符串
      */
-    public String getValueStr() {
+    public String getValueStrOrEmpty() {
+        return value == null ? "" : value.toString();
+    }
+
+    /**
+     * 获取value的字符串值, 为null时返回null
+     */
+    public String getValueStrOrNull() {
         return value == null ? null : value.toString();
     }
 

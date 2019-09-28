@@ -76,7 +76,7 @@ public class HttpRequest extends UriRequest {
         if (queryParams != null) {
             for (KeyValue kv : queryParams) {
                 String name = kv.key;
-                String value = kv.getValueStr();
+                String value = kv.getValueStrOrNull();
                 if (!TextUtils.isEmpty(name) && value != null) {
                     queryBuilder.append(URLEncoder.encode(name, params.getCharset()).replaceAll("\\+", "%20"))
                             .append("=")
@@ -165,8 +165,8 @@ public class HttpRequest extends UriRequest {
             if (headers != null) {
                 for (RequestParams.Header header : headers) {
                     String name = header.key;
-                    String value = header.getValueStr();
-                    if (!TextUtils.isEmpty(name) && value != null) {
+                    String value = header.getValueStrOrNull();
+                    if (!TextUtils.isEmpty(name)) {
                         if (header.setHeader) {
                             connection.setRequestProperty(name, value);
                         } else {

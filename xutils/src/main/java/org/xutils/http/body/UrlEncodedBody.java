@@ -27,7 +27,7 @@ public class UrlEncodedBody implements RequestBody {
         if (params != null) {
             for (KeyValue kv : params) {
                 String name = kv.key;
-                String value = kv.getValueStr();
+                String value = kv.getValueStrOrNull();
                 if (!TextUtils.isEmpty(name) && value != null) {
                     if (contentSb.length() > 0) {
                         contentSb.append("&");

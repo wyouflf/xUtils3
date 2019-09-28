@@ -86,7 +86,7 @@ public abstract class BaseParams {
     /**
      * 覆盖header
      *
-     * @param name 不可为空
+     * @param name 为空时不添加该参数
      */
     public void setHeader(String name, String value) {
         if (TextUtils.isEmpty(name)) return;
@@ -104,7 +104,7 @@ public abstract class BaseParams {
     /**
      * 添加header
      *
-     * @param name 不可为空
+     * @param name 为空时不添加该参数
      */
     public void addHeader(String name, String value) {
         if (TextUtils.isEmpty(name)) return;
@@ -114,7 +114,7 @@ public abstract class BaseParams {
     /**
      * 添加请求参数(根据请求谓词, 将参数加入QueryString或Body.)
      *
-     * @param name  参数名
+     * @param name  参数名(单个File/InputStream/byte[]数据表单允许name为空)
      * @param value 可以是String, File, InputStream 或 byte[]
      */
     public void addParameter(String name, Object value) {
@@ -128,7 +128,7 @@ public abstract class BaseParams {
     /**
      * 添加参数至Query String
      *
-     * @param name  参数名, 不可为空
+     * @param name  参数名, 为空时不添加该参数
      * @param value 字符串值, 也可以是String集合或数组
      */
     public void addQueryStringParameter(String name, Object value) {
@@ -141,7 +141,7 @@ public abstract class BaseParams {
             JSONArray array = (JSONArray) value;
             int len = array.length();
             for (int i = 0; i < len; i++) {
-                this.bodyParams.add(new ArrayItem(name, array.opt(i)));
+                this.queryStringParams.add(new ArrayItem(name, array.opt(i)));
             }
         } else if (value.getClass().isArray()) {
             int len = Array.getLength(value);
@@ -156,7 +156,7 @@ public abstract class BaseParams {
     /**
      * 添加body参数
      *
-     * @param name  参数名
+     * @param name  参数名(单个File/InputStream/byte[]数据表单允许name为空)
      * @param value 可以是String, File, InputStream 或 byte[]
      */
     public void addBodyParameter(String name, Object value) {
@@ -166,7 +166,7 @@ public abstract class BaseParams {
     /**
      * 添加body参数
      *
-     * @param name        参数名
+     * @param name        参数名(单个File/InputStream/byte[]数据表单允许name为空)
      * @param value       可以是String, File, InputStream 或 byte[]
      * @param contentType 可为空
      */
@@ -177,12 +177,13 @@ public abstract class BaseParams {
     /**
      * 添加body参数
      *
-     * @param name        参数名
+     * @param name        参数名(单个File/InputStream/byte[]数据表单允许name为空)
      * @param value       可以是String, File, InputStream 或 byte[]
      * @param contentType 可为空
      * @param fileName    服务端看到的文件名
      */
     public void addBodyParameter(String name, Object value, String contentType, String fileName) {
+        if (TextUtils.isEmpty(name) && value == null) return;
         if (TextUtils.isEmpty(contentType) && TextUtils.isEmpty(fileName)) {
             if (value instanceof Iterable) {
                 for (Object item : (Iterable) value) {
@@ -332,7 +333,7 @@ public abstract class BaseParams {
                 result = new InputStreamBody(new ByteArrayInputStream((byte[]) value), contentType);
             } else {
                 if (TextUtils.isEmpty(name)) {
-                    result = new StringBody(kv.getValueStr(), charset);
+                    result = new StringBody(kv.getValueStrOrEmpty(), charset);
                     result.setContentType(contentType);
                 } else {
                     result = new UrlEncodedBody(bodyParams, charset);

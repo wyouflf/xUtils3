@@ -44,8 +44,10 @@ public class DefaultParamsBuilder implements ParamsBuilder {
             for (String key : cacheKeys) {
                 List<KeyValue> kvList = params.getParams(key);
                 if (kvList != null && !kvList.isEmpty()) {
-                    String value = kvList.get(0).getValueStr();
-                    result.append(key).append("=").append(value).append("&");
+                    String value = kvList.get(0).getValueStrOrNull();
+                    if (value != null) {
+                        result.append(key).append("=").append(value).append("&");
+                    }
                 }
             }
         }

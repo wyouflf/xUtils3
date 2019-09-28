@@ -32,9 +32,8 @@ public class JsonResponseParser implements ResponseParser<String> {
      *
      * @param resultType  返回值类型(可能带有泛型信息)
      * @param resultClass 返回值类型
-     * @param result      字符串数据
-     * @return
-     * @throws Throwable
+     * @param result      网络返回数据(支持String, byte[], JSONObject, JSONArray, InputStream)
+     * @return 请求结果, 类型为resultType
      */
     @Override
     public Object parse(Type resultType, Class<?> resultClass, String result) throws Throwable {

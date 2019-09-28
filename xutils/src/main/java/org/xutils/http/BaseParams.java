@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.common.util.KeyValue;
-import org.xutils.common.util.LogUtil;
 import org.xutils.http.body.FileBody;
 import org.xutils.http.body.InputStreamBody;
 import org.xutils.http.body.MultipartBody;
@@ -325,22 +324,20 @@ public abstract class BaseParams {
             if (TextUtils.isEmpty(contentType)) {
                 contentType = bodyContentType;
             }
-            if (value instanceof String) {
-                if (TextUtils.isEmpty(name)) {
-                    result = new StringBody((String) value, charset);
-                    result.setContentType(contentType);
-                } else {
-                    result = new UrlEncodedBody(bodyParams, charset);
-                    result.setContentType(contentType);
-                }
-            } else if (value instanceof File) {
+            if (value instanceof File) {
                 result = new FileBody((File) value, contentType);
             } else if (value instanceof InputStream) {
                 result = new InputStreamBody((InputStream) value, contentType);
             } else if (value instanceof byte[]) {
                 result = new InputStreamBody(new ByteArrayInputStream((byte[]) value), contentType);
             } else {
-                LogUtil.w("Some params will be ignored for: " + this.toString());
+                if (TextUtils.isEmpty(name)) {
+                    result = new StringBody(kv.getValueStr(), charset);
+                    result.setContentType(contentType);
+                } else {
+                    result = new UrlEncodedBody(bodyParams, charset);
+                    result.setContentType(contentType);
+                }
             }
         } else {
             result = new UrlEncodedBody(bodyParams, charset);

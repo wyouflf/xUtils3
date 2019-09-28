@@ -75,6 +75,27 @@ private void onTest1Click(View view) {
 }
 ```
 
+### 使用数据库(更多示例参考sample项目)
+```java
+Parent test = db.selector(Parent.class)
+                    .where("id", "in", new int[]{1, 3, 6})
+                    .or("age", "<", 29)
+                    .findFirst();
+long count = db.selector(Parent.class)
+                    .where("name", "LIKE", "w%")
+                    .and("age", ">", 32)
+                    .count();
+List<Parent> testList = db.selector(Parent.class)
+                    .where("id", "between", new String[]{"1", "5"})
+                    .findAll();
+List<DbModel> list = db.selector(Child.class)
+                    .where("age", "<", 18)
+                    .groupBy("parentId")
+                    .having(WhereBuilder.b("COUNT(parentId)", ">", 1))
+                    .select("parentId, COUNT(parentId) as childNum")
+                    .findAll();
+```
+
 ### 访问网络(更多示例参考sample项目)
 #### 如果你只需要一个简单的网络请求:
 ```java
@@ -258,13 +279,6 @@ Callback.Cancelable cancelable
 		}
 	}
 });
-```
-
-### 使用数据库(更多示例参考sample项目)
-```java
-Parent test = db.selector(Parent.class).where("id", "in", new int[]{1, 3, 6}).findFirst();
-long count = db.selector(Parent.class).where("name", "LIKE", "w%").and("age", ">", 32).count();
-List<Parent> testList = db.selector(Parent.class).where("id", "between", new String[]{"1", "5"}).findAll();
 ```
 
 ### 绑定图片(更多示例参考sample项目)

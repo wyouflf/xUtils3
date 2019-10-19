@@ -399,8 +399,9 @@ public class RequestParams extends BaseParams {
     @Override
     public String toString() {
         String url = this.getUri();
+        String baseParamsStr = super.toString();
         return TextUtils.isEmpty(url) ?
-                super.toString() :
-                url + (url.contains("?") ? "&" : "?") + super.toString();
+                baseParamsStr :
+                url + (url.contains("?") ? "&" : "?") + baseParamsStr;
     }
 }

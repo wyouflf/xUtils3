@@ -30,7 +30,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -474,8 +473,6 @@ public class HttpRequest extends UriRequest {
                 "EEE, dd MMM y HH:mm:ss 'GMT'", Locale.US);
         TimeZone gmtZone = TimeZone.getTimeZone("GMT");
         sdf.setTimeZone(gmtZone);
-        GregorianCalendar gc = new GregorianCalendar(gmtZone);
-        gc.setTimeInMillis(date.getTime());
         return sdf.format(date);
     }
 }

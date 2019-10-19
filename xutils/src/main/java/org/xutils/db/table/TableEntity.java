@@ -38,7 +38,7 @@ public final class TableEntity<T> {
     private final Class<T> entityType;
     private final Constructor<T> constructor;
     private ColumnEntity id;
-    private volatile boolean tableCheckedStatus;
+    private volatile Boolean tableCheckedStatus;
 
     /**
      * key: columnName
@@ -77,8 +77,12 @@ public final class TableEntity<T> {
     }
 
     public boolean tableIsExists() throws DbException {
-        if (tableCheckedStatus) {
-            return true;
+        return tableIsExists(false);
+    }
+
+    public boolean tableIsExists(boolean forceCheckFromDb) throws DbException {
+        if (tableCheckedStatus != null && (tableCheckedStatus || !forceCheckFromDb)) {
+            return tableCheckedStatus;
         }
 
         Cursor cursor = db.execQuery("SELECT COUNT(*) AS c FROM sqlite_master WHERE type='table' AND name='" + name + "'");
@@ -88,7 +92,7 @@ public final class TableEntity<T> {
                     int count = cursor.getInt(0);
                     if (count > 0) {
                         tableCheckedStatus = true;
-                        return true;
+                        return tableCheckedStatus;
                     }
                 }
             } catch (Throwable e) {
@@ -98,26 +102,28 @@ public final class TableEntity<T> {
             }
         }
 
-        return false;
+        tableCheckedStatus = false;
+        return tableCheckedStatus;
     }
 
     public void createTableIfNotExists() throws DbException {
-        if (!this.tableIsExists()) {
-            synchronized (entityType) {
-                if (!this.tableIsExists()) {
-                    SqlInfo sqlInfo = SqlInfoBuilder.buildCreateTableSqlInfo(this);
-                    db.execNonQuery(sqlInfo);
-                    if (!TextUtils.isEmpty(onCreated)) {
-                        db.execNonQuery(onCreated);
-                    }
-                    tableCheckedStatus = true;
-                    DbManager.TableCreateListener listener = db.getDaoConfig().getTableCreateListener();
-                    if (listener != null) {
-                        try {
-                            listener.onTableCreated(db, this);
-                        } catch (Throwable ex) {
-                            LogUtil.e(ex.getMessage(), ex);
-                        }
+        if (tableCheckedStatus != null && tableCheckedStatus) return;
+        synchronized (entityType) {
+            if (!this.tableIsExists(true)) {
+                SqlInfo sqlInfo = SqlInfoBuilder.buildCreateTableSqlInfo(this);
+                db.execNonQuery(sqlInfo);
+                tableCheckedStatus = true;
+
+                if (!TextUtils.isEmpty(onCreated)) {
+                    db.execNonQuery(onCreated);
+                }
+
+                DbManager.TableCreateListener listener = db.getDaoConfig().getTableCreateListener();
+                if (listener != null) {
+                    try {
+                        listener.onTableCreated(db, this);
+                    } catch (Throwable ex) {
+                        LogUtil.e(ex.getMessage(), ex);
                     }
                 }
             }

@@ -21,12 +21,10 @@ import org.xutils.common.util.IOUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.x;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
@@ -280,15 +278,11 @@ public final class ImageDecoder {
             }*/
         }
 
-        InputStream in = null;
         try {
             if (cancelable != null && cancelable.isCancelled()) {
                 throw new Callback.CancelledException("cancelled during decode image");
             }
-            int buffSize = 1024 * 16;
-            in = new BufferedInputStream(new FileInputStream(file), buffSize);
-            in.mark(buffSize);
-            Movie movie = Movie.decodeStream(in);
+            Movie movie = Movie.decodeFile(file.getAbsolutePath());
             if (movie == null) {
                 throw new IOException("decode image error");
             }
@@ -300,8 +294,6 @@ public final class ImageDecoder {
         } catch (Throwable ex) {
             LogUtil.e(ex.getMessage(), ex);
             return null;
-        } finally {
-            IOUtil.closeQuietly(in);
         }
     }
 

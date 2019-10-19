@@ -1,7 +1,6 @@
 package org.xutils.db.converter;
 
 import org.xutils.common.util.LogUtil;
-import org.xutils.db.sqlite.ColumnDbType;
 
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,11 +35,6 @@ public final class ColumnConverterFactory {
         }
 
         return result;
-    }
-
-    public static ColumnDbType getDbColumnType(Class columnType) {
-        ColumnConverter converter = getColumnConverter(columnType);
-        return converter.getColumnDbType();
     }
 
     public static void registerColumnConverter(Class columnType, ColumnConverter columnConverter) {

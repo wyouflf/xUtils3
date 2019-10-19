@@ -17,7 +17,6 @@ package org.xutils.db.sqlite;
 
 import android.text.TextUtils;
 
-import org.xutils.db.converter.ColumnConverterFactory;
 import org.xutils.db.table.ColumnUtils;
 
 import java.lang.reflect.Array;
@@ -167,11 +166,8 @@ public class WhereBuilder {
                     StringBuilder inSb = new StringBuilder("(");
                     for (Object item : items) {
                         Object itemColValue = ColumnUtils.convert2DbValueIfNeeded(item);
-                        if (ColumnDbType.TEXT.equals(ColumnConverterFactory.getDbColumnType(itemColValue.getClass()))) {
-                            String valueStr = itemColValue.toString();
-                            if (valueStr.indexOf('\'') != -1) { // convert single quotations
-                                valueStr = valueStr.replace("'", "''");
-                            }
+                        if (ColumnUtils.isTextColumnDbType(itemColValue)) {
+                            String valueStr = ColumnUtils.convert2SafeExpr(itemColValue);
                             inSb.append("'").append(valueStr).append("'");
                         } else {
                             inSb.append(itemColValue);
@@ -201,24 +197,18 @@ public class WhereBuilder {
                 if (items != null) {
                     Iterator<?> iterator = items.iterator();
                     if (!iterator.hasNext())
-                        throw new IllegalArgumentException("value must have tow items.");
+                        throw new IllegalArgumentException("value must contains tow items.");
                     Object start = iterator.next();
                     if (!iterator.hasNext())
-                        throw new IllegalArgumentException("value must have tow items.");
+                        throw new IllegalArgumentException("value must contains tow items.");
                     Object end = iterator.next();
 
                     Object startColValue = ColumnUtils.convert2DbValueIfNeeded(start);
                     Object endColValue = ColumnUtils.convert2DbValueIfNeeded(end);
 
-                    if (ColumnDbType.TEXT.equals(ColumnConverterFactory.getDbColumnType(startColValue.getClass()))) {
-                        String startStr = startColValue.toString();
-                        if (startStr.indexOf('\'') != -1) { // convert single quotations
-                            startStr = startStr.replace("'", "''");
-                        }
-                        String endStr = endColValue.toString();
-                        if (endStr.indexOf('\'') != -1) { // convert single quotations
-                            endStr = endStr.replace("'", "''");
-                        }
+                    if (ColumnUtils.isTextColumnDbType(startColValue)) {
+                        String startStr = ColumnUtils.convert2SafeExpr(startColValue);
+                        String endStr = ColumnUtils.convert2SafeExpr(endColValue);
                         builder.append("'").append(startStr).append("'");
                         builder.append(" AND ");
                         builder.append("'").append(endStr).append("'");
@@ -232,11 +222,8 @@ public class WhereBuilder {
                 }
             } else {
                 value = ColumnUtils.convert2DbValueIfNeeded(value);
-                if (ColumnDbType.TEXT.equals(ColumnConverterFactory.getDbColumnType(value.getClass()))) {
-                    String valueStr = value.toString();
-                    if (valueStr.indexOf('\'') != -1) { // convert single quotations
-                        valueStr = valueStr.replace("'", "''");
-                    }
+                if (ColumnUtils.isTextColumnDbType(value)) {
+                    String valueStr = ColumnUtils.convert2SafeExpr(value);
                     builder.append("'").append(valueStr).append("'");
                 } else {
                     builder.append(value);

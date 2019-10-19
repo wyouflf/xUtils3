@@ -18,6 +18,7 @@ package org.xutils.db.table;
 import org.xutils.common.util.LogUtil;
 import org.xutils.db.converter.ColumnConverter;
 import org.xutils.db.converter.ColumnConverterFactory;
+import org.xutils.db.sqlite.ColumnDbType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -54,6 +55,20 @@ public final class ColumnUtils {
 
     public static boolean isBoolean(Class<?> fieldType) {
         return BOOLEAN_TYPES.contains(fieldType);
+    }
+
+    public static boolean isTextColumnDbType(Object value) {
+        if (value == null) return false;
+        ColumnConverter converter = ColumnConverterFactory.getColumnConverter(value.getClass());
+        return converter != null && ColumnDbType.TEXT.equals(converter.getColumnDbType());
+    }
+
+    public static String convert2SafeExpr(Object value) {
+        String result = String.valueOf(value);
+        if (result.indexOf('\'') != -1) {
+            result = result.replace("'", "''");
+        }
+        return result;
     }
 
     @SuppressWarnings("unchecked")

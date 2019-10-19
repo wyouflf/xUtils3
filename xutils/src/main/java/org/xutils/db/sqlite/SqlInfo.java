@@ -61,35 +61,36 @@ public final class SqlInfo {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public SQLiteStatement buildStatement(SQLiteDatabase database) {
         SQLiteStatement result = database.compileStatement(sql);
         if (bindArgs != null) {
             for (int i = 1; i < bindArgs.size() + 1; i++) {
                 KeyValue kv = bindArgs.get(i - 1);
-                Object value = ColumnUtils.convert2DbValueIfNeeded(kv.value);
-                if (value == null) {
+                if (kv.value == null) {
                     result.bindNull(i);
-                } else {
-                    ColumnConverter converter = ColumnConverterFactory.getColumnConverter(value.getClass());
-                    ColumnDbType type = converter.getColumnDbType();
-                    switch (type) {
-                        case INTEGER:
-                            result.bindLong(i, ((Number) value).longValue());
-                            break;
-                        case REAL:
-                            result.bindDouble(i, ((Number) value).doubleValue());
-                            break;
-                        case TEXT:
-                            result.bindString(i, value.toString());
-                            break;
-                        case BLOB:
-                            result.bindBlob(i, (byte[]) value);
-                            break;
-                        default:
-                            result.bindNull(i);
-                            break;
-                    } // end switch
+                    continue;
                 }
+                ColumnConverter converter = ColumnConverterFactory.getColumnConverter(kv.value.getClass());
+                Object value = converter.fieldValue2DbValue(kv.value);
+                ColumnDbType type = converter.getColumnDbType();
+                switch (type) {
+                    case INTEGER:
+                        result.bindLong(i, ((Number) value).longValue());
+                        break;
+                    case REAL:
+                        result.bindDouble(i, ((Number) value).doubleValue());
+                        break;
+                    case TEXT:
+                        result.bindString(i, value.toString());
+                        break;
+                    case BLOB:
+                        result.bindBlob(i, (byte[]) value);
+                        break;
+                    default:
+                        result.bindNull(i);
+                        break;
+                } // end switch
             }
         }
         return result;

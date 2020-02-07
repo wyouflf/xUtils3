@@ -143,7 +143,7 @@ public abstract class BaseParams {
             for (int i = 0; i < len; i++) {
                 this.queryStringParams.add(new ArrayItem(name, array.opt(i)));
             }
-        } else if (value.getClass().isArray()) {
+        } else if (value != null && value.getClass().isArray()) {
             int len = Array.getLength(value);
             for (int i = 0; i < len; i++) {
                 this.queryStringParams.add(new ArrayItem(name, Array.get(value, i)));
@@ -197,7 +197,7 @@ public abstract class BaseParams {
                 }
             } else if (value instanceof byte[]) {
                 this.bodyParams.add(new KeyValue(name, value));
-            } else if (value.getClass().isArray()) {
+            } else if (value != null && value.getClass().isArray()) {
                 int len = Array.getLength(value);
                 for (int i = 0; i < len; i++) {
                     this.bodyParams.add(new ArrayItem(name, Array.get(value, i)));

@@ -90,7 +90,7 @@ public class DefaultParamsBuilder implements ParamsBuilder {
                     TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
                         @Override
                         public X509Certificate[] getAcceptedIssuers() {
-                            return null;
+                            return new X509Certificate[0];
                         }
 
                         @Override

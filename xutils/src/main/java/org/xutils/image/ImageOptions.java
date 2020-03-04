@@ -2,6 +2,7 @@ package org.xutils.image;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -9,8 +10,6 @@ import android.widget.ImageView;
 import org.xutils.common.util.DensityUtil;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
-
-import java.lang.reflect.Field;
 
 /**
  * Created by wyouflf on 15/8/21.
@@ -119,8 +118,10 @@ public class ImageOptions {
                     }
                 }
 
-                if (tempWidth <= 0) tempWidth = getImageViewFieldValue(view, "mMaxWidth");
-                if (tempHeight <= 0) tempHeight = getImageViewFieldValue(view, "mMaxHeight");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    if (tempWidth <= 0) tempWidth = view.getMaxWidth();
+                    if (tempHeight <= 0) tempHeight = view.getMaxHeight();
+                }
             }
 
             if (tempWidth <= 0) tempWidth = screenWidth;
@@ -278,21 +279,6 @@ public class ImageOptions {
         sb.append(crop ? 1 : 0).append(square ? 1 : 0).append(circular ? 1 : 0);
         sb.append(autoRotate ? 1 : 0).append(compress ? 1 : 0);
         return sb.toString();
-    }
-
-    private static int getImageViewFieldValue(ImageView view, String fieldName) {
-        int value = 0;
-        try {
-            Field field = ImageView.class.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            int fieldValue = (Integer) field.get(view);
-            if (fieldValue > 0 && fieldValue < Integer.MAX_VALUE) {
-                value = fieldValue;
-            }
-        } catch (Throwable ex) {
-            LogUtil.w(ex.getMessage(), ex);
-        }
-        return value;
     }
 
     public interface ParamsBuilder {

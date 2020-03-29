@@ -212,8 +212,9 @@ public final class DbModelSelector {
         }
         List<Selector.OrderBy> orderByList = selector.getOrderByList();
         if (orderByList != null && orderByList.size() > 0) {
-            for (int i = 0; i < orderByList.size(); i++) {
-                result.append(" ORDER BY ").append(orderByList.get(i).toString()).append(',');
+            result.append(" ORDER BY ");
+            for (Selector.OrderBy orderBy : orderByList) {
+                result.append(orderBy.toString()).append(',');
             }
             result.deleteCharAt(result.length() - 1);
         }

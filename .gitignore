@@ -18,7 +18,7 @@ out/
 gradle/
 build/
 gradlew*
-gradle.properties
+# gradle.properties
 
 # Local configuration file (sdk path, etc)
 local.properties

@@ -37,7 +37,7 @@ public final class ImageManagerImpl implements ImageManager {
         x.task().autoPost(new Runnable() {
             @Override
             public void run() {
-                ImageLoader.doBind(view, url, null, null);
+                ImageLoader.doBind(view, url, null, 0, null);
             }
         });
     }
@@ -47,7 +47,7 @@ public final class ImageManagerImpl implements ImageManager {
         x.task().autoPost(new Runnable() {
             @Override
             public void run() {
-                ImageLoader.doBind(view, url, options, null);
+                ImageLoader.doBind(view, url, options, 0, null);
             }
         });
     }
@@ -57,7 +57,7 @@ public final class ImageManagerImpl implements ImageManager {
         x.task().autoPost(new Runnable() {
             @Override
             public void run() {
-                ImageLoader.doBind(view, url, null, callback);
+                ImageLoader.doBind(view, url, null, 0, callback);
             }
         });
     }
@@ -67,7 +67,7 @@ public final class ImageManagerImpl implements ImageManager {
         x.task().autoPost(new Runnable() {
             @Override
             public void run() {
-                ImageLoader.doBind(view, url, options, callback);
+                ImageLoader.doBind(view, url, options, 0, callback);
             }
         });
     }

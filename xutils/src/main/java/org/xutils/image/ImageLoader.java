@@ -47,6 +47,7 @@ import java.util.concurrent.atomic.AtomicLong;
     private MemCacheKey key;
     private ImageOptions options;
     private WeakReference<ImageView> viewRef;
+    private int fileLockedExceptionRetryCount = 0;
 
     private final static AtomicLong SEQ_SEEK = new AtomicLong(0);
     private final long seq = SEQ_SEEK.incrementAndGet();
@@ -137,7 +138,7 @@ import java.util.concurrent.atomic.AtomicLong;
         }
 
         FakeImageView fakeImageView = new FakeImageView();
-        return doBind(fakeImageView, url, options, callback);
+        return doBind(fakeImageView, url, options, 0, callback);
     }
 
     /**
@@ -163,6 +164,7 @@ import java.util.concurrent.atomic.AtomicLong;
     static Cancelable doBind(final ImageView view,
                              final String url,
                              final ImageOptions options,
+                             final int fileLockedExceptionRetryCount,
                              final Callback.CommonCallback<Drawable> callback) {
 
         // check params
@@ -254,16 +256,18 @@ import java.util.concurrent.atomic.AtomicLong;
                     // not trust the cache
                     // load from Network or DiskCache
                     ImageLoader loader = new ImageLoader();
+                    loader.fileLockedExceptionRetryCount = fileLockedExceptionRetryCount;
                     loader.skipOnWaitingCallback = true;
-                    return loader.doLoad(view, url, localOptions, callback);
+                    return loader.doLoadRequest(view, url, localOptions, callback);
                 }
             } catch (Throwable ex) {
                 LogUtil.e(ex.getMessage(), ex);
                 // try load from Network or DiskCache
                 trustMemCache = false;
                 ImageLoader loader = new ImageLoader();
+                loader.fileLockedExceptionRetryCount = fileLockedExceptionRetryCount;
                 loader.skipOnWaitingCallback = true;
-                return loader.doLoad(view, url, localOptions, callback);
+                return loader.doLoadRequest(view, url, localOptions, callback);
             } finally {
                 if (trustMemCache && callback != null) {
                     try {
@@ -275,7 +279,9 @@ import java.util.concurrent.atomic.AtomicLong;
             }
         } else {  /* memDrawable == null */
             // load from Network or DiskCache
-            return new ImageLoader().doLoad(view, url, localOptions, callback);
+            ImageLoader loader = new ImageLoader();
+            loader.fileLockedExceptionRetryCount = fileLockedExceptionRetryCount;
+            return loader.doLoadRequest(view, url, localOptions, callback);
         }
         return null;
     }
@@ -283,10 +289,10 @@ import java.util.concurrent.atomic.AtomicLong;
     /**
      * load from Network or DiskCache
      */
-    private Cancelable doLoad(ImageView view,
-                              String url,
-                              ImageOptions options,
-                              Callback.CommonCallback<Drawable> callback) {
+    private Cancelable doLoadRequest(ImageView view,
+                                     String url,
+                                     ImageOptions options,
+                                     Callback.CommonCallback<Drawable> callback) {
 
         this.viewRef = new WeakReference<ImageView>(view);
         this.options = options;
@@ -429,27 +435,27 @@ import java.util.concurrent.atomic.AtomicLong;
         stopped = true;
         if (!validView4Callback(false)) return;
 
-        if (ex instanceof FileLockedException) {
+        fileLockedExceptionRetryCount++;
+        if (ex instanceof FileLockedException && fileLockedExceptionRetryCount < 5) {
             LogUtil.d("ImageFileLocked: " + key.url);
             x.task().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     ImageView imageView = viewRef.get();
                     if (imageView != null) {
-                        doBind(imageView, key.url, options, callback);
+                        doBind(imageView, key.url, options, fileLockedExceptionRetryCount, callback);
                     } else {
                         ImageLoader.this.onFinished();
                     }
                 }
-            }, 10);
+            }, 10 + (fileLockedExceptionRetryCount - 1) * 100);
             skipOnFinishedCallback = true;
-            return;
-        }
-
-        LogUtil.e(key.url, ex);
-        setErrorDrawable4Callback();
-        if (callback != null) {
-            callback.onError(ex, isOnCallback);
+        } else {
+            LogUtil.e(key.url, ex);
+            setErrorDrawable4Callback();
+            if (callback != null) {
+                callback.onError(ex, isOnCallback);
+            }
         }
     }
 

@@ -71,6 +71,8 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
 
     /**
      * 取消任务时是否不等待任务彻底结束, 立即收到取消的通知.
+     *
+     * @return 是否立即响应取消回调
      */
     protected boolean isCancelFast() {
         return false;

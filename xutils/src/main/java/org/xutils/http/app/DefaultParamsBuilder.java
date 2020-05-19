@@ -65,7 +65,7 @@ public class DefaultParamsBuilder implements ParamsBuilder {
     }
 
     /**
-     * 为请求添加通用参数等操作
+     * 为请求添加通用参数或修改参数等操作
      */
     @Override
     public void buildParams(RequestParams params) throws Throwable {

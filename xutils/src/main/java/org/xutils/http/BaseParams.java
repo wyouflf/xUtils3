@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.common.util.KeyValue;
+import org.xutils.common.util.LogUtil;
 import org.xutils.http.body.FileBody;
 import org.xutils.http.body.InputStreamBody;
 import org.xutils.http.body.MultipartBody;
@@ -37,6 +38,7 @@ public abstract class BaseParams {
     private String bodyContentType;
     private boolean multipart = false; // 是否使用multipart表单
     private boolean asJsonContent = false; // 用json形式的bodyParams上传
+    private boolean asJsonArrayContent = false; // 用json array形式的bodyParams上传
     private RequestBody requestBody; // 生成的表单
 
     private final List<Header> headers = new ArrayList<Header>();
@@ -81,6 +83,21 @@ public abstract class BaseParams {
      */
     public void setAsJsonContent(boolean asJsonContent) {
         this.asJsonContent = asJsonContent;
+    }
+
+
+    /**
+     * 以 json array 形式提交body参数
+     */
+    public boolean isAsJsonArrayContent() {
+        return asJsonArrayContent;
+    }
+
+    /**
+     * 以 json array 形式提交body参数
+     */
+    public void setAsJsonArrayContent(boolean asJsonArrayContent) {
+        this.asJsonArrayContent = asJsonArrayContent;
     }
 
     /**
@@ -349,18 +366,7 @@ public abstract class BaseParams {
     }
 
     public String toJSONString() throws JSONException {
-        JSONObject jsonObject = null;
-        if (!TextUtils.isEmpty(bodyContent)) {
-            jsonObject = new JSONObject(bodyContent);
-        } else {
-            jsonObject = new JSONObject();
-        }
-        List<KeyValue> list = new ArrayList<KeyValue>(
-                queryStringParams.size() + bodyParams.size());
-        list.addAll(queryStringParams);
-        list.addAll(bodyParams);
-        params2Json(jsonObject, list);
-        return jsonObject.toString();
+        return toJSONString(true);
     }
 
     @Override
@@ -395,16 +401,9 @@ public abstract class BaseParams {
             return;
         }
 
-        if (asJsonContent) {
+        if (asJsonContent || asJsonArrayContent) {
             try {
-                JSONObject jsonObject = null;
-                if (!TextUtils.isEmpty(bodyContent)) {
-                    jsonObject = new JSONObject(bodyContent);
-                } else {
-                    jsonObject = new JSONObject();
-                }
-                params2Json(jsonObject, bodyParams);
-                bodyContent = jsonObject.toString();
+                bodyContent = toJSONString(false);
                 bodyParams.clear();
             } catch (JSONException ex) {
                 throw new IllegalArgumentException(ex.getMessage(), ex);
@@ -450,13 +449,54 @@ public abstract class BaseParams {
         }
     }
 
-    public final static class ArrayItem extends KeyValue {
+    private String toJSONString(boolean withQueryString) throws JSONException {
+        JSONArray jsonArray = null;
+        JSONObject jsonObject = null;
+        if (!TextUtils.isEmpty(bodyContent)) {
+            if (bodyContent.trim().startsWith("[")) {
+                jsonArray = new JSONArray(bodyContent);
+                if (jsonArray.length() > 0) {
+                    Object first = jsonArray.get(0);
+                    if (first instanceof JSONObject) {
+                        jsonObject = (JSONObject) first;
+                    } else {
+                        LogUtil.w("only contains bodyContent");
+                        return jsonArray.toString();
+                    }
+                } else {
+                    jsonObject = new JSONObject();
+                    jsonArray.put(jsonObject);
+                }
+            } else {
+                jsonObject = new JSONObject(bodyContent);
+            }
+        } else {
+            jsonObject = new JSONObject();
+            if (asJsonArrayContent) {
+                jsonArray = new JSONArray();
+                jsonArray.put(jsonObject);
+            }
+        }
+
+        if (withQueryString) {
+            List<KeyValue> list = new ArrayList<KeyValue>(queryStringParams.size() + bodyParams.size());
+            list.addAll(queryStringParams);
+            list.addAll(bodyParams);
+            params2Json(jsonObject, list);
+        } else {
+            params2Json(jsonObject, bodyParams);
+        }
+
+        return jsonArray != null ? jsonArray.toString() : jsonObject.toString();
+    }
+
+    public static final class ArrayItem extends KeyValue {
         public ArrayItem(String key, Object value) {
             super(key, value);
         }
     }
 
-    public final static class Header extends KeyValue {
+    public static final class Header extends KeyValue {
 
         public final boolean setHeader;
 
@@ -466,7 +506,7 @@ public abstract class BaseParams {
         }
     }
 
-    public final class BodyItemWrapper extends KeyValue {
+    public static final class BodyItemWrapper extends KeyValue {
 
         public final String fileName;
         public final String contentType;

@@ -436,7 +436,7 @@ import java.util.concurrent.atomic.AtomicLong;
         if (!validView4Callback(false)) return;
 
         fileLockedExceptionRetryCount++;
-        if (ex instanceof FileLockedException && fileLockedExceptionRetryCount < 5) {
+        if (ex instanceof FileLockedException && fileLockedExceptionRetryCount < 1000/*max*/) {
             LogUtil.d("ImageFileLocked: " + key.url);
             x.task().postDelayed(new Runnable() {
                 @Override
@@ -448,7 +448,7 @@ import java.util.concurrent.atomic.AtomicLong;
                         ImageLoader.this.onFinished();
                     }
                 }
-            }, 10 + (fileLockedExceptionRetryCount - 1) * 100);
+            }, 10);
             skipOnFinishedCallback = true;
         } else {
             LogUtil.e(key.url, ex);

@@ -1,5 +1,7 @@
 package org.xutils.common.task;
 
+import android.os.Looper;
+
 import org.xutils.common.Callback;
 
 import java.util.concurrent.Executor;
@@ -54,6 +56,10 @@ public abstract class AbsTask<ResultType> implements Callback.Cancelable {
     }
 
     public Executor getExecutor() {
+        return null;
+    }
+
+    public Looper customLooper() {
         return null;
     }
 

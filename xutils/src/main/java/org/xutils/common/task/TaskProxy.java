@@ -22,6 +22,7 @@ import java.util.concurrent.Executor;
 
     private final AbsTask<ResultType> task;
     private final Executor executor;
+    private final Handler handler;
     private volatile boolean callOnCanceled = false;
     private volatile boolean callOnFinished = false;
 
@@ -30,6 +31,16 @@ import java.util.concurrent.Executor;
         this.task = task;
         this.task.setTaskProxy(this);
         this.setTaskProxy(null);
+
+        // set handler
+        Looper looper = task.customLooper();
+        if (looper != null) {
+            handler = new InternalHandler(looper);
+        } else {
+            handler = sHandler;
+        }
+
+        // set executor
         Executor taskExecutor = task.getExecutor();
         if (taskExecutor == null) {
             taskExecutor = sDefaultExecutor;
@@ -85,42 +96,42 @@ import java.util.concurrent.Executor;
     @Override
     protected void onWaiting() {
         this.setState(State.WAITING);
-        sHandler.obtainMessage(MSG_WHAT_ON_WAITING, this).sendToTarget();
+        handler.obtainMessage(MSG_WHAT_ON_WAITING, this).sendToTarget();
     }
 
     @Override
     protected void onStarted() {
         this.setState(State.STARTED);
-        sHandler.obtainMessage(MSG_WHAT_ON_START, this).sendToTarget();
+        handler.obtainMessage(MSG_WHAT_ON_START, this).sendToTarget();
     }
 
     @Override
     protected void onSuccess(ResultType result) {
         this.setState(State.SUCCESS);
-        sHandler.obtainMessage(MSG_WHAT_ON_SUCCESS, this).sendToTarget();
+        handler.obtainMessage(MSG_WHAT_ON_SUCCESS, this).sendToTarget();
     }
 
     @Override
     protected void onError(Throwable ex, boolean isCallbackError) {
         this.setState(State.ERROR);
-        sHandler.obtainMessage(MSG_WHAT_ON_ERROR, new ArgsObj(this, ex)).sendToTarget();
+        handler.obtainMessage(MSG_WHAT_ON_ERROR, new ArgsObj(this, ex)).sendToTarget();
     }
 
     @Override
     protected void onUpdate(int flag, Object... args) {
         // obtainMessage(int what, int arg1, int arg2, Object obj), arg2 not be used.
-        sHandler.obtainMessage(MSG_WHAT_ON_UPDATE, flag, flag, new ArgsObj(this, args)).sendToTarget();
+        handler.obtainMessage(MSG_WHAT_ON_UPDATE, flag, flag, new ArgsObj(this, args)).sendToTarget();
     }
 
     @Override
     protected void onCancelled(Callback.CancelledException cex) {
         this.setState(State.CANCELLED);
-        sHandler.obtainMessage(MSG_WHAT_ON_CANCEL, new ArgsObj(this, cex)).sendToTarget();
+        handler.obtainMessage(MSG_WHAT_ON_CANCEL, new ArgsObj(this, cex)).sendToTarget();
     }
 
     @Override
     protected void onFinished() {
-        sHandler.obtainMessage(MSG_WHAT_ON_FINISHED, this).sendToTarget();
+        handler.obtainMessage(MSG_WHAT_ON_FINISHED, this).sendToTarget();
     }
 
     @Override
@@ -163,6 +174,10 @@ import java.util.concurrent.Executor;
 
         private InternalHandler() {
             super(Looper.getMainLooper());
+        }
+
+        private InternalHandler(Looper looper) {
+            super(looper);
         }
 
         @Override

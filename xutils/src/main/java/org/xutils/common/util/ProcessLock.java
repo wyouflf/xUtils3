@@ -72,16 +72,18 @@ public final class ProcessLock implements Closeable {
         ProcessLock lock = null;
         long expiryTime = System.currentTimeMillis() + maxWaitTimeMillis;
         String hash = customHash(lockName);
-        while (System.currentTimeMillis() < expiryTime) {
-            lock = tryLockInternal(lockName, hash, writeMode);
-            if (lock != null) {
-                break;
-            } else {
-                try {
-                    Thread.sleep(1); // milliseconds
-                } catch (InterruptedException iex) {
-                    throw iex;
-                } catch (Throwable ignored) {
+        synchronized (LOCK_MAP) {
+            while (System.currentTimeMillis() < expiryTime) {
+                lock = tryLockInternal(lockName, hash, writeMode);
+                if (lock != null) {
+                    break;
+                } else {
+                    try {
+                        LOCK_MAP.wait(10);
+                    } catch (InterruptedException iex) {
+                        throw iex;
+                    } catch (Throwable ignored) {
+                    }
                 }
             }
         }
@@ -136,6 +138,8 @@ public final class ProcessLock implements Closeable {
             }
 
             IOUtil.closeQuietly(stream);
+
+            LOCK_MAP.notifyAll();
         }
     }
 
@@ -210,6 +214,8 @@ public final class ProcessLock implements Closeable {
                 IOUtil.closeQuietly(stream);
                 IOUtil.closeQuietly(channel);
             }
+
+            LOCK_MAP.notifyAll();
         }
 
         return null;

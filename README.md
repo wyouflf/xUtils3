@@ -21,12 +21,12 @@ xUtils 包含了orm, http(s), image, view注解, 但依然很轻量级(251K), �
 * 支持圆角, 圆形, 方形等裁剪, 支持自动旋转...
 
 #### 4. `view注解`: view注解模块仅仅400多行代码却灵活的支持了各种View注入和事件绑定.
-* 事件注解支持且不受混淆影响...(参考sample的混淆配置)
+* 事件注解支持且不受混淆影响...([参考混淆配置](xutils/consumer-rules.pro))
 * 支持绑定拥有多个方法的listener
 
 #### 使用Gradle构建时添加以下依赖即可:
 ```javascript
-implementation 'org.xutils:xutils:3.8.11'
+implementation 'org.xutils:xutils:3.8.12'
 ```
 
 #### 混淆配置参考示例项目sample的配置

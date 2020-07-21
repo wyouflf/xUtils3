@@ -1,1 +1,1 @@
-include ':xutils', ':sample'
+include ':xutils', ':demo'

@@ -79,6 +79,7 @@ public final class ImageDecoder {
             }
             if (movie != null) {
                 result = new GifDrawable(movie, (int) file.length());
+                ((GifDrawable) result).setRate(options.getGifRate());
             }
         } else {
             Bitmap bitmap = null;

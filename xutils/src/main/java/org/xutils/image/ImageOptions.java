@@ -35,6 +35,7 @@ public class ImageOptions {
 
     // gif option
     private boolean ignoreGif = true;
+    private int gifRate = 100;
     // end region ########################################## decode options #################
 
     // region ############# display options
@@ -166,6 +167,10 @@ public class ImageOptions {
 
     public boolean isIgnoreGif() {
         return ignoreGif;
+    }
+
+    public int getGifRate() {
+        return gifRate;
     }
 
     public boolean isAutoRotate() {
@@ -342,6 +347,11 @@ public class ImageOptions {
 
         public Builder setIgnoreGif(boolean ignoreGif) {
             options.ignoreGif = ignoreGif;
+            return this;
+        }
+
+        public Builder setGifRate(int rate) {
+            options.gifRate = rate;
             return this;
         }
 

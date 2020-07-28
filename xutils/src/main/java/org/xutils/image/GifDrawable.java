@@ -13,7 +13,7 @@ import org.xutils.common.util.LogUtil;
 public class GifDrawable extends Drawable implements Runnable, Animatable {
 
     private int byteCount;
-    private int rate = 300;
+    private int rate = 100;
     private volatile boolean running;
 
     private final Movie movie;

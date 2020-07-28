@@ -33,9 +33,9 @@ import java.util.regex.Pattern;
 public class ImageFragment extends BaseFragment {
 
     private String[] imgSites = {
-            "http://m.haopic.me/touxiang",
-            "http://m.haopic.me/touxiang/page/2",
-            "http://m.haopic.me"
+            "http://www.gaoxiaogif.cn",
+            "https://www.ivsky.com/tupian/ziranfengguang/",
+            "https://www.ivsky.com/tupian/chengshilvyou/"
     };
 
     ImageOptions imageOptions;
@@ -56,6 +56,7 @@ public class ImageFragment extends BaseFragment {
                 .setImageScaleType(ImageView.ScaleType.CENTER_CROP)
                 .setLoadingDrawableId(R.mipmap.ic_launcher)
                 .setFailureDrawableId(R.mipmap.ic_launcher)
+                .setIgnoreGif(false)
                 .build();
 
         imageListAdapter = new ImageListAdapter();
@@ -217,30 +218,20 @@ public class ImageFragment extends BaseFragment {
      */
     public static List<String> getImgSrcList(String htmlStr) {
         List<String> pics = new ArrayList<String>();
+        resolveImgUrl(htmlStr, pics, "<img.*?src=['|\"]http://(.*?)['|\"]");
+        resolveImgUrl(htmlStr, pics, "<img.*?src=['|\"]//(.*?)['|\"]");
+        return pics;
+    }
 
-        String regEx_img = "<img.*?src=\"http://(.*?).jpg\""; // 图片链接地址
-        Pattern p_image = Pattern.compile(regEx_img, Pattern.CASE_INSENSITIVE);
+    private static void resolveImgUrl(String htmlStr, List<String> pics, String regEx) {
+        Pattern p_image = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
         Matcher m_image = p_image.matcher(htmlStr);
         while (m_image.find()) {
             String src = m_image.group(1);
-            if (src.length() < 100) {
-                pics.add("http://" + src + ".jpg");
-                //pics.add("http://f.hiphotos.baidu.com/zhidao/pic/item/2fdda3cc7cd98d104cc21595203fb80e7bec907b.jpg");
+            if (src.length() < 200) {
+                pics.add("http://" + src);
             }
         }
-
-        regEx_img = "<img.*?src=\"//(.*?).jpg\""; // 图片链接地址
-        p_image = Pattern.compile(regEx_img, Pattern.CASE_INSENSITIVE);
-        m_image = p_image.matcher(htmlStr);
-        while (m_image.find()) {
-            String src = m_image.group(1);
-            if (src.length() < 100) {
-                pics.add("http://" + src + ".jpg");
-                //pics.add("http://f.hiphotos.baidu.com/zhidao/pic/item/2fdda3cc7cd98d104cc21595203fb80e7bec907b.jpg");
-            }
-        }
-
-        return pics;
     }
 
 }

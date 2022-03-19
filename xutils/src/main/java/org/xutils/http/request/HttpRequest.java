@@ -3,7 +3,6 @@ package org.xutils.http.request;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.text.TextUtils;
-
 import org.xutils.cache.DiskCacheEntity;
 import org.xutils.cache.LruDiskCache;
 import org.xutils.common.util.IOUtil;
@@ -16,30 +15,16 @@ import org.xutils.http.body.ProgressBody;
 import org.xutils.http.body.RequestBody;
 import org.xutils.http.cookie.DbCookieStore;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
-import java.net.Proxy;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
+import java.util.*;
 
 /**
  * Created by wyouflf on 15/7/23.
@@ -66,13 +51,15 @@ public class HttpRequest extends UriRequest {
     protected String buildQueryUrl(RequestParams params) throws IOException {
         String uri = params.getUri();
         StringBuilder queryBuilder = new StringBuilder(uri);
-        if (!uri.contains("?")) {
-            queryBuilder.append("?");
-        } else if (!uri.endsWith("?")) {
-            queryBuilder.append("&");
-        }
         List<KeyValue> queryParams = params.getQueryStringParams();
-        if (queryParams != null) {
+
+        if (queryParams != null && !queryParams.isEmpty()) {
+            if (!uri.contains("?")) {
+                queryBuilder.append("?");
+            } else if (!uri.endsWith("?")) {
+                queryBuilder.append("&");
+            }
+
             for (KeyValue kv : queryParams) {
                 String name = kv.key;
                 String value = kv.getValueStrOrNull();
@@ -83,15 +70,16 @@ public class HttpRequest extends UriRequest {
                             .append("&");
                 }
             }
+
+            if (queryBuilder.charAt(queryBuilder.length() - 1) == '&') {
+                queryBuilder.deleteCharAt(queryBuilder.length() - 1);
+            }
+
+            if (queryBuilder.charAt(queryBuilder.length() - 1) == '?') {
+                queryBuilder.deleteCharAt(queryBuilder.length() - 1);
+            }
         }
 
-        if (queryBuilder.charAt(queryBuilder.length() - 1) == '&') {
-            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
-        }
-
-        if (queryBuilder.charAt(queryBuilder.length() - 1) == '?') {
-            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
-        }
         return queryBuilder.toString();
     }
 
